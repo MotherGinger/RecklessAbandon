@@ -1,0 +1,13 @@
+## Interface: 90002
+## Author: Arrila-Thrall (US)
+## Version: 1.0.0-alpha.1
+## Title: |cFF80528CReckless Abandon|r |cFFFF6B6B[Alpha]|r
+## Notes: A tool for quickly (and recklessly) abandoning quests
+## SavedVariables: RecklessAbandonDB, RecklessAbandonPrivateDB
+## SavedVariablesPerCharacter: RecklessAbandonCharacterDB
+
+Libraries\load.xml
+Locales\load.xml
+init.lua
+Settings\load.xml
+Core\load.xml

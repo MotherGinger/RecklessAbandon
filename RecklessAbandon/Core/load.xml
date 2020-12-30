@@ -1,0 +1,24 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Button name="RECKLESS_ABANDON_BUTTON" virtual="true" registerForClicks="AnyUp" frameStrata="HIGH" frameLevel="6">
+		<Size>
+			<AbsDimension x="30" y="30"/>
+		</Size>
+		<NormalFont style="GameFontNormal"/>
+		<NormalTexture file="Interface\Buttons\CancelButton-Up"/>
+		<PushedTexture file="Interface\Buttons\CancelButton-Down"/>
+		<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
+		
+		<Scripts>
+			<OnEnter>ButtonEnter(self)</OnEnter>
+			<OnLeave>ButtonLeave(self)</OnLeave>
+			<OnClick>ButtonClick(self)</OnClick>
+			<OnUpdate>ButtonUpdate(self)</OnUpdate>
+		</Scripts>
+	</Button>
+	
+	<Script file='Core.lua'/>
+	<Script file='Config.lua'/>
+	<Script file='General.lua'/>
+	<Script file='Profiles.lua'/>
+	<Script file='About.lua'/>
+</Ui>
