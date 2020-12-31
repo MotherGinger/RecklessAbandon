@@ -53,7 +53,9 @@ E.screenwidth, E.screenheight = GetPhysicalScreenSize()
 E.resolution = format("%dx%d", E.screenwidth, E.screenheight)
 
 local questGroupsByName = {}
-local buttonPool = CreateFramePool("Button", QuestMapFrame.QuestsFrame, "RECKLESS_ABANDON_BUTTON")
+-- TODO: We might want to define multiple xml buttons for each type
+local questButtonPool = CreateFramePool("Button", QuestMapFrame.QuestsFrame, "RECKLESS_ABANDON_BUTTON")
+local zoneButtonPool = CreateFramePool("Button", QuestMapFrame.QuestsFrame, "RECKLESS_ABANDON_BUTTON")
 
 StaticPopupDialogs["RECKLESS_ABANDON_GROUP_CONFIRMATION"] = {
 	text = L["Are you sure you want to abandon all quests in %s? This cannot be undone."],
@@ -105,13 +107,11 @@ local function CreateQuestLink(questId, title)
 	return format("|cff808080|Hquest:%d|h[%s]|h|r", questId, title)
 end
 
--- TODO: We might want to define multiple xml buttons for each type
-
 local function RenderButton(parent, offset, questId, title, tooltip)
 	title = title or parent:GetText()
 	tooltip = tooltip or format(L["Abandon '%s'"], title)
 
-	local button = buttonPool:Acquire()
+	local button = questButtonPool:Acquire()
 	button:SetPoint("CENTER", parent, "CENTER", offset, 0)
 	button.title = title
 	button.tooltip = tooltip
@@ -125,7 +125,7 @@ local function RenderGroupButton(parent, offset, title, tooltip, slug)
 	slug = slug or Slug(title)
 
 	if questGroupsByName[slug] then
-		local button = buttonPool:Acquire()
+		local button = zoneButtonPool:Acquire()
 		button:SetPoint("CENTER", parent, "CENTER", offset, 0)
 		button.title = title
 		button.tooltip = tooltip
@@ -135,7 +135,8 @@ local function RenderGroupButton(parent, offset, title, tooltip, slug)
 end
 
 local function ButtonsShow()
-	buttonPool:ReleaseAll()
+	questButtonPool:ReleaseAll()
+	zoneButtonPool:ReleaseAll()
 
 	if (E.db.general.campaignQuests.showAbandonButton) then
 		-- TODO: This shows even when there are no quests, but there is a header
@@ -172,7 +173,8 @@ local function ButtonsShow()
 end
 
 local function ButtonsHide()
-	buttonPool:ReleaseAll()
+	questButtonPool:ReleaseAll()
+	zoneButtonPool:ReleaseAll()
 end
 
 function ButtonEnter(self)
@@ -229,19 +231,83 @@ function E:Debug(...)
 	end
 end
 
+-- TODO: Eject to utilities
 function E:Dump(o)
-	if type(o) == "table" then
-		local s = "{ "
+	local cache, stack, output = {}, {}, {}
+	local depth = 1
+	local output_str = "{\n"
+
+	while true do
+		local size = 0
 		for k, v in pairs(o) do
-			if type(k) ~= "number" then
-				k = '"' .. k .. '"'
-			end
-			s = s .. "[" .. k .. "] = " .. self:Dump(v) .. ","
+			size = size + 1
 		end
-		return s .. "} "
-	else
-		return tostring(o)
+
+		local cur_index = 1
+		for k, v in pairs(o) do
+			if (cache[o] == nil) or (cur_index >= cache[o]) then
+				if (string.find(output_str, "}", output_str:len())) then
+					output_str = output_str .. ",\n"
+				elseif not (string.find(output_str, "\n", output_str:len())) then
+					output_str = output_str .. "\n"
+				end
+
+				-- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
+				table.insert(output, output_str)
+				output_str = ""
+
+				local key
+				if (type(k) == "number" or type(k) == "boolean") then
+					key = "[" .. tostring(k) .. "]"
+				else
+					key = "['" .. tostring(k) .. "']"
+				end
+
+				if (type(v) == "number" or type(v) == "boolean") then
+					output_str = output_str .. string.rep("    ", depth) .. key .. " = " .. tostring(v)
+				elseif (type(v) == "table") then
+					output_str = output_str .. string.rep("    ", depth) .. key .. " = {\n"
+					table.insert(stack, o)
+					table.insert(stack, v)
+					cache[o] = cur_index + 1
+					break
+				else
+					output_str = output_str .. string.rep("    ", depth) .. key .. " = '" .. tostring(v) .. "'"
+				end
+
+				if (cur_index == size) then
+					output_str = output_str .. "\n" .. string.rep("    ", depth - 1) .. "}"
+				else
+					output_str = output_str .. ","
+				end
+			else
+				-- close the table
+				if (cur_index == size) then
+					output_str = output_str .. "\n" .. string.rep("    ", depth - 1) .. "}"
+				end
+			end
+
+			cur_index = cur_index + 1
+		end
+
+		if (size == 0) then
+			output_str = output_str .. "\n" .. string.rep("    ", depth - 1) .. "}"
+		end
+
+		if (#stack > 0) then
+			o = stack[#stack]
+			stack[#stack] = nil
+			depth = cache[o] == nil and depth + 1 or depth - 1
+		else
+			break
+		end
 	end
+
+	-- This is necessary for working with HUGE tables otherwise we run out of memory using concat on huge strings
+	table.insert(output, output_str)
+	output_str = table.concat(output)
+
+	return output_str
 end
 
 function E:GenerateQuestTable()
@@ -345,11 +411,19 @@ function E:Initialize()
 	QuestScrollFrame:HookScript(
 		"OnVerticalScroll",
 		function()
-			for button in buttonPool:EnumerateInactive() do
+			for button in questButtonPool:EnumerateInactive() do
 				ButtonUpdate(button)
 			end
 
-			for button in buttonPool:EnumerateActive() do
+			for button in questButtonPool:EnumerateActive() do
+				ButtonUpdate(button)
+			end
+
+			for button in zoneButtonPool:EnumerateInactive() do
+				ButtonUpdate(button)
+			end
+
+			for button in zoneButtonPool:EnumerateActive() do
 				ButtonUpdate(button)
 			end
 		end
