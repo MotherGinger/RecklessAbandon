@@ -112,10 +112,10 @@ local function RenderButton(parent, offset, questId, title, tooltip)
 	tooltip = tooltip or format(L["Abandon '%s'"], title)
 
 	local button = questButtonPool:Acquire()
-	button:SetPoint("CENTER", parent, "CENTER", offset, 0)
 	button.title = title
 	button.tooltip = tooltip
 	button.questId = questId
+	button:SetPoint("CENTER", parent, "CENTER", offset, 0)
 	button:Show()
 end
 
@@ -126,10 +126,14 @@ local function RenderGroupButton(parent, offset, title, tooltip, slug)
 
 	if questGroupsByName[slug] then
 		local button = zoneButtonPool:Acquire()
-		button:SetPoint("CENTER", parent, "CENTER", offset, 0)
+		local texture = button:GetNormalTexture()
 		button.title = title
 		button.tooltip = tooltip
 		button.slug = slug
+		button:SetPoint("CENTER", parent, "CENTER", offset, 0)
+		button:SetEnabled(not questGroupsByName[slug].hidden)
+		texture:SetDesaturated(questGroupsByName[slug].hidden)
+		button:SetNormalTexture(texture)
 		button:Show()
 	end
 end
@@ -340,6 +344,8 @@ function E:GenerateQuestTable()
 			all.quests[info.questID] = info.title
 		end
 	end
+	
+	self:Debug(self:Dump(questGroupsByName))
 end
 
 function E:AbandonAllQuests()
