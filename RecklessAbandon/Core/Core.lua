@@ -111,6 +111,7 @@ local function RenderButton(parent, offset, questId, title, tooltip)
 	title = title or parent:GetText()
 	tooltip = tooltip or format(L["Abandon '%s'"], title)
 
+	-- TODO: Disable if C_QuestLog.CanAbandonQuest(questID) is false
 	local button = questButtonPool:Acquire()
 	button.title = title
 	button.tooltip = tooltip
@@ -143,9 +144,8 @@ local function ButtonsShow()
 	zoneButtonPool:ReleaseAll()
 
 	if (E.db.general.campaignQuests.showAbandonButton) then
-		-- TODO: This shows even when there are no quests, but there is a header
 		for header in QuestScrollFrame.campaignHeaderFramePool:EnumerateActive() do
-			RenderGroupButton(header.Text, 25)
+			RenderGroupButton(header.LoreButton, -25, header.Text:GetText())
 		end
 	end
 
@@ -163,7 +163,6 @@ local function ButtonsShow()
 	end
 
 	if (E.db.general.individualQuests.showAbandonButton) then
-		-- TODO: C_QuestLog.CanAbandonQuest(questID)
 		for quest in QuestScrollFrame.titleFramePool:EnumerateActive() do
 			local questId = quest.questID
 			local text = quest.Text:GetText()
@@ -171,9 +170,6 @@ local function ButtonsShow()
 			RenderButton(quest.TaskIcon, QuestScrollFrame:GetWidth() - 50, questId, text, tooltip, text)
 		end
 	end
-
-	-- TODO: Find a good place for this button, setup logic
-	-- RenderButton(QuestMapFrame, -40, "your quest log", "All quests", "all")
 end
 
 local function ButtonsHide()
@@ -248,8 +244,10 @@ function E:GenerateQuestTable()
 	-- }
 
 	local all = {quests = {}}
-	questGroupsByName = {all = all}
 	local currentGroup
+
+	questGroupsByName = {all = all}
+
 	for i = 1, C_QuestLog.GetNumQuestLogEntries() do
 		local info = C_QuestLog.GetInfo(i)
 		if info.isHeader then
@@ -265,7 +263,7 @@ function E:GenerateQuestTable()
 			all.quests[info.questID] = info.title
 		end
 	end
-	
+
 	self:Debug(self:Dump(questGroupsByName))
 end
 
