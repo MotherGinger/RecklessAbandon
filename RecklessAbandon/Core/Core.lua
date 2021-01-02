@@ -96,7 +96,7 @@ StaticPopupDialogs["RECKLESS_ABANDON_ALL_CONFIRMATION"] = {
 	preferredIndex = 3
 }
 
-local function Slug(value)
+local function getKey(value)
 	if value == nil then
 		return
 	end
@@ -107,7 +107,7 @@ local function CreateQuestLink(questId, title)
 	return format("|cff808080|Hquest:%d|h[%s]|h|r", questId, title)
 end
 
-local function RenderButton(parent, offset, questId, title, tooltip)
+local function RenderAbandonButton(parent, offset, questId, title, tooltip)
 	title = title or parent:GetText()
 	tooltip = tooltip or format(L["Abandon '%s'"], title)
 
@@ -120,18 +120,18 @@ local function RenderButton(parent, offset, questId, title, tooltip)
 	button:Show()
 end
 
-local function RenderGroupButton(parent, offset, title, tooltip, slug)
+local function RenderGroupAbandonButton(parent, offset, title, tooltip, key)
 	title = title or parent:GetText()
 	tooltip = tooltip or format(L["Abandon all '%s' quests"], title)
-	slug = slug or Slug(title)
+	key = key or getKey(title)
 
-	if questGroupsByName[slug] then
+	if questGroupsByName[key] then
 		local button = zoneButtonPool:Acquire()
 		local texture = button:GetNormalTexture()
-		local hasQuests = not E:isEmpty(questGroupsByName[slug].quests)
+		local hasQuests = not E:isEmpty(questGroupsByName[key].quests)
 		button.title = title
 		button.tooltip = tooltip
-		button.slug = slug
+		button.key = key
 		button:SetPoint("CENTER", parent, "CENTER", offset, 0)
 		button:SetEnabled(hasQuests)
 		texture:SetDesaturated(not hasQuests)
@@ -140,26 +140,26 @@ local function RenderGroupButton(parent, offset, title, tooltip, slug)
 	end
 end
 
-local function ButtonsShow()
+local function ShowAbandonButtons()
 	questButtonPool:ReleaseAll()
 	zoneButtonPool:ReleaseAll()
 
 	if (E.db.general.campaignQuests.showAbandonButton) then
 		for header in QuestScrollFrame.campaignHeaderFramePool:EnumerateActive() do
-			RenderGroupButton(header.LoreButton, -25, header.Text:GetText())
+			RenderGroupAbandonButton(header.LoreButton, -25, header.Text:GetText())
 		end
 	end
 
 	if (E.db.general.covenantCallings.showAbandonButton) then
 		for calling in QuestScrollFrame.covenantCallingsHeaderFramePool:EnumerateActive() do
 			local questId = calling.questID
-			RenderButton(calling, QuestScrollFrame:GetWidth() - 50, questId, L["covenant callings"], L["Abandon all covenant calling quests"])
+			RenderAbandonButton(calling, QuestScrollFrame:GetWidth() - 50, questId, L["covenant callings"], L["Abandon all covenant calling quests"])
 		end
 	end
 
 	if (E.db.general.zoneQuests.showAbandonButton) then
 		for header in QuestScrollFrame.headerFramePool:EnumerateActive() do
-			RenderGroupButton(header, QuestScrollFrame:GetWidth() - 25)
+			RenderGroupAbandonButton(header, QuestScrollFrame:GetWidth() - 25)
 		end
 	end
 
@@ -168,27 +168,27 @@ local function ButtonsShow()
 			local questId = quest.questID
 			local text = quest.Text:GetText()
 			local tooltip = format(L["Abandon '%s'"], text)
-			RenderButton(quest.TaskIcon, QuestScrollFrame:GetWidth() - 50, questId, text, tooltip, text)
+			RenderAbandonButton(quest.TaskIcon, QuestScrollFrame:GetWidth() - 50, questId, text, tooltip, text)
 		end
 	end
 end
 
-local function ButtonsHide()
+local function HideAbandonButtons()
 	questButtonPool:ReleaseAll()
 	zoneButtonPool:ReleaseAll()
 end
 
-function ButtonEnter(self)
+function onButtonEnter(self)
 	GameTooltip:SetOwner(self)
 	GameTooltip:SetText(self.tooltip)
 	GameTooltip:Show()
 end
 
-function ButtonLeave(self)
+function onButtonLeave(self)
 	GameTooltip:Hide()
 end
 
-function ButtonClick(self)
+function onButtonClick(self)
 	if self.questId then
 		if E.db.general.confirmIndividual then
 			local dialog = StaticPopup_Show("RECKLESS_ABANDON_CONFIRMATION", self.title)
@@ -205,15 +205,15 @@ function ButtonClick(self)
 		if E.db.general.confirmGroup then
 			local dialog = StaticPopup_Show("RECKLESS_ABANDON_GROUP_CONFIRMATION", self.title)
 			if dialog then
-				dialog.data = self.slug
+				dialog.data = self.key
 			end
 		else
-			E:AbandonQuests(self.slug)
+			E:AbandonQuests(self.key)
 		end
 	end
 end
 
-function ButtonUpdate(self)
+function onButtonUpdate(self)
 	local buffer = 10
 	if self:GetBottom() > QuestScrollFrame:GetBottom() - buffer and self:GetTop() < QuestScrollFrame:GetTop() + buffer then
 		self:Show()
@@ -244,10 +244,7 @@ function E:GenerateQuestTable()
 	-- 	},
 	-- }
 
-	local all = {quests = {}}
 	local currentGroup
-
-	questGroupsByName = {all = all}
 
 	for i = 1, C_QuestLog.GetNumQuestLogEntries() do
 		local info = C_QuestLog.GetInfo(i)
@@ -257,11 +254,10 @@ function E:GenerateQuestTable()
 				hidden = true,
 				quests = {}
 			}
-			questGroupsByName[Slug(info.title)] = currentGroup
+			questGroupsByName[getKey(info.title)] = currentGroup
 		else
 			currentGroup.hidden = currentGroup.hidden and info.isHidden
 			currentGroup.quests[info.questID] = info.title
-			all.quests[info.questID] = info.title
 		end
 	end
 
@@ -275,12 +271,12 @@ function E:AbandonAllQuests()
 	end
 end
 
-function E:AbandonQuests(slug)
-	local group = questGroupsByName[slug] or {}
+function E:AbandonQuests(key)
+	local group = questGroupsByName[key] or {}
 	for questId, title in pairs(group.quests or {}) do
 		self:AbandonQuest(title, questId)
 	end
-	questGroupsByName[slug] = nil
+	questGroupsByName[key] = nil
 end
 
 function E:AbandonQuest(title, questId)
@@ -330,27 +326,27 @@ function E:Initialize()
 	E.db = E.data.profile
 	E.global = E.data.global
 
-	QuestMapFrame:HookScript("OnShow", ButtonsShow)
-	QuestMapFrame:HookScript("OnEvent", ButtonsShow)
-	QuestMapFrame:HookScript("OnHide", ButtonsHide)
+	QuestMapFrame:HookScript("OnShow", ShowAbandonButtons)
+	QuestMapFrame:HookScript("OnEvent", ShowAbandonButtons)
+	QuestMapFrame:HookScript("OnHide", HideAbandonButtons)
 
 	QuestScrollFrame:HookScript(
 		"OnVerticalScroll",
 		function()
 			for button in questButtonPool:EnumerateInactive() do
-				ButtonUpdate(button)
+				onButtonUpdate(button)
 			end
 
 			for button in questButtonPool:EnumerateActive() do
-				ButtonUpdate(button)
+				onButtonUpdate(button)
 			end
 
 			for button in zoneButtonPool:EnumerateInactive() do
-				ButtonUpdate(button)
+				onButtonUpdate(button)
 			end
 
 			for button in zoneButtonPool:EnumerateActive() do
-				ButtonUpdate(button)
+				onButtonUpdate(button)
 			end
 		end
 	)

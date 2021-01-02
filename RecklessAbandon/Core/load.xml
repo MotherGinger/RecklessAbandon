@@ -9,10 +9,10 @@
 		<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
 		
 		<Scripts>
-			<OnEnter>ButtonEnter(self)</OnEnter>
-			<OnLeave>ButtonLeave(self)</OnLeave>
-			<OnClick>ButtonClick(self)</OnClick>
-			<OnUpdate>ButtonUpdate(self)</OnUpdate>
+			<OnEnter>onButtonEnter(self)</OnEnter>
+			<OnLeave>onButtonLeave(self)</OnLeave>
+			<OnClick>onButtonClick(self)</OnClick>
+			<OnUpdate>onButtonUpdate(self)</OnUpdate>
 		</Scripts>
 	</Button>
 	
