@@ -77,3 +77,10 @@ function E:Dump(o)
 
     return output_str
 end
+
+function E:isEmpty(t)
+    for _, _ in pairs(t) do
+        return false
+    end
+    return true
+end

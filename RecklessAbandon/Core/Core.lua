@@ -128,12 +128,13 @@ local function RenderGroupButton(parent, offset, title, tooltip, slug)
 	if questGroupsByName[slug] then
 		local button = zoneButtonPool:Acquire()
 		local texture = button:GetNormalTexture()
+		local hasQuests = not E:isEmpty(questGroupsByName[slug].quests)
 		button.title = title
 		button.tooltip = tooltip
 		button.slug = slug
 		button:SetPoint("CENTER", parent, "CENTER", offset, 0)
-		button:SetEnabled(not questGroupsByName[slug].hidden)
-		texture:SetDesaturated(questGroupsByName[slug].hidden)
+		button:SetEnabled(hasQuests)
+		texture:SetDesaturated(not hasQuests)
 		button:SetNormalTexture(texture)
 		button:Show()
 	end
