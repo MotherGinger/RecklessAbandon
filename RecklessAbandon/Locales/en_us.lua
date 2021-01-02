@@ -52,3 +52,6 @@ L["Reset Profile"] = true
 L["|cFFFF6B6BCaution: This will reset all of your settings.|r\n\nThis can often times fix issues. Use at your own risk."] = true
 
 L["About"] = true
+L["Testers"] = true
+L["Written by |T626001:0|t |cFF3FC7EB%s|r"] = true
+L["Please report any bugs on our issue board:"] = true

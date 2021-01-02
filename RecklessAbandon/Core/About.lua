@@ -5,12 +5,8 @@ E.Options.args.about = {
     name = L["About"],
     order = 2,
     childGroups = "tab",
-    get = function(info)
-        return E.db[info[#info]]
-    end,
-    set = function(info, value)
-        E.db[info[#info]] = value
-    end,
+    get = E.noop,
+    set = E.noop,
     args = {
         title = {
             order = 0,
