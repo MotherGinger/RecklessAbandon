@@ -97,10 +97,9 @@ StaticPopupDialogs["RECKLESS_ABANDON_ALL_CONFIRMATION"] = {
 }
 
 local function getKey(value)
-	if value == nil then
-		return
+	if value ~= nil then
+		return value:lower():gsub("[^a-z]", "")
 	end
-	return value:lower():gsub("[^a-z]", "")
 end
 
 local function CreateQuestLink(questId, title)
