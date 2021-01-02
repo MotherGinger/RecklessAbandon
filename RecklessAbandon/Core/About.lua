@@ -12,11 +12,50 @@ E.Options.args.about = {
         E.db[info[#info]] = value
     end,
     args = {
-        author = {
+        title = {
             order = 0,
             type = "description",
             fontSize = "large",
-            name = format(L["Written by |T626001:0|t |cFF3FC7EB%s|r"], E.author),
+            name = E.title
+        },
+        author = {
+            order = 1,
+            type = "description",
+            fontSize = "medium",
+            name = format(L["Written by |T626001:0|t |cFF3FC7EB%s|r"], E.author)
+        },
+        space1 = {
+            order = 2,
+            type = "description",
+            name = "\n"
+        },
+        testers = {
+            order = 3,
+            type = "group",
+            inline = true,
+            name = format(L["Testers"]),
+            args = {
+                cob = {
+                    order = 0,
+                    type = "description",
+                    name = "Cob"
+                }
+            }
+        },
+        space2 = {
+            order = 4,
+            type = "description",
+            name = "\n"
+        },
+        bugs = {
+            order = 5,
+            type = "input",
+            name = format(L["Please report any bugs on our issue board:"]),
+            width = "double",
+            get = function()
+                return "https://github.com/MotherGinger/RecklessAbandon/issues"
+            end,
+            set = E.noop
         }
     }
 }
