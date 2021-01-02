@@ -35,8 +35,13 @@ E.Options.args.about = {
             inline = true,
             name = format(L["Testers"]),
             args = {
-                cob = {
+                arrila = {
                     order = 0,
+                    type = "description",
+                    name = format("|T626001:0|t |cFF3FC7EB%s|r", E.author)
+                },
+                cob = {
+                    order = 1,
                     type = "description",
                     name = "Cob"
                 }
