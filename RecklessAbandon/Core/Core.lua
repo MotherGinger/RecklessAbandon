@@ -307,23 +307,21 @@ function E:CopyTable(currentTable, defaultTable)
 	return currentTable
 end
 
-function E:ResetProfile()
-	E.db = E:CopyTable({}, E.DF.profile)
-	self:Debug("Profile Reset!")
-end
-
 function E:Initialize()
 	twipe(E.db)
 	twipe(E.global)
 	twipe(E.private)
 
 	E.myguid = UnitGUID("player")
-	E.data = E.Libs.AceDB:New("RecklessAbandonDB", E.DF)
+	E.data = E.Libs.AceDB:New("RecklessAbandonDB", E.DF, true)
 	E.charSettings = E.Libs.AceDB:New("RecklessAbandonPrivateDB", E.privateVars)
 
 	E.private = E.charSettings.profile
 	E.db = E.data.profile
 	E.global = E.data.global
+
+	E.Options.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(E.data)
+	E.Options.args.profiles.order = 1
 
 	QuestMapFrame:HookScript("OnShow", ShowAbandonButtons)
 	QuestMapFrame:HookScript("OnEvent", ShowAbandonButtons)

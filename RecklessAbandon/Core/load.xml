@@ -19,6 +19,5 @@
 	<Script file='Core.lua'/>
 	<Script file='Config.lua'/>
 	<Script file='General.lua'/>
-	<Script file='Profiles.lua'/>
 	<Script file='About.lua'/>
 </Ui>

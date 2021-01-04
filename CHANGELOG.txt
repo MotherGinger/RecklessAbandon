@@ -4,7 +4,8 @@ This project adheres to Semantic Versioning.
 
 - Unreleased
   - Added
-    - Missing locale strings
+    - Missing localization strings
+    - Expanded profile options
 
 - v1.0.0 - 2021-02-01
   - Added
