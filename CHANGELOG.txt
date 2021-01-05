@@ -6,6 +6,7 @@ This project adheres to Semantic Versioning.
   - Added
     - Missing localization strings
     - Expanded profile options
+    - Fix lua errors when scrolling through the questlog
 
 - v1.0.0 - 2021-02-01
   - Added
