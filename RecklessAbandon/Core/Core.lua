@@ -330,15 +330,7 @@ function E:Initialize()
 	QuestScrollFrame:HookScript(
 		"OnVerticalScroll",
 		function()
-			for button in questButtonPool:EnumerateInactive() do
-				onButtonUpdate(button)
-			end
-
 			for button in questButtonPool:EnumerateActive() do
-				onButtonUpdate(button)
-			end
-
-			for button in zoneButtonPool:EnumerateInactive() do
 				onButtonUpdate(button)
 			end
 
