@@ -74,8 +74,8 @@ E.Options.args.general = {
                     args = {
                         showAbandonButton = {
                             order = 0,
-                            name = L["Show Abandon Button"],
-                            desc = L["Show an abandon button for zone quests."],
+                            name = L["Show Group Abandon Button"],
+                            desc = L["Show a group abandon button for zone quests."],
                             type = "toggle",
                             get = function(info)
                                 return E.db.general.zoneQuests.showAbandonButton
@@ -94,8 +94,8 @@ E.Options.args.general = {
                     args = {
                         showAbandonButton = {
                             order = 0,
-                            name = L["Show Abandon Button"],
-                            desc = L["Show an abandon button for campaign quests."],
+                            name = L["Show Group Abandon Button"],
+                            desc = L["Show a group abandon button for campaign quests."],
                             type = "toggle",
                             get = function(info)
                                 return E.db.general.campaignQuests.showAbandonButton
@@ -114,8 +114,8 @@ E.Options.args.general = {
                     args = {
                         showAbandonButton = {
                             order = 0,
-                            name = L["Show Abandon Button"],
-                            desc = L["Show an abandon button for covenant callings."],
+                            name = L["Show Group Abandon Button"],
+                            desc = L["Show a group abandon button for covenant callings."] .. "\n\n" .. L["|cFF00D1FFNote:|r Blizzard currently does not allow covenant callings to be abandoned. This button will be disabled if shown."],
                             type = "toggle",
                             get = function(info)
                                 return E.db.general.covenantCallings.showAbandonButton
@@ -128,8 +128,50 @@ E.Options.args.general = {
                 }
             }
         },
-        commands = {
+        exclusions = {
             order = 1,
+            type = "group",
+            name = L["Exclusions"],
+            args = {
+                exclusionsHeader = {
+                    order = 0,
+                    type = "header",
+                    name = L["Quest Exclusion List"]
+                },
+                exclusionDescription = {
+                    order = 1,
+                    type = "description",
+                    width = "full",
+                    name = L["The quest exclusion list allows you to exclude quests from group abandons. To use it, simply right click a quest abandon button in the quest log.\n\n|cFFFFF569Each character has their own exclusion list.|r\n\n"]
+                },
+                excludedQuests = {
+                    order = 2,
+                    type = "description",
+                    width = "double",
+                    name = function()
+                        if (E:IsEmpty(E.private.exclusions.excludedQuests)) then
+                            return L["There are currently no quests being excluded."]
+                        end
+
+                        local exclusions = ""
+                        for _, title in pairs(E.private.exclusions.excludedQuests) do
+                            exclusions = exclusions .. "\n" .. title
+                        end
+                        return exclusions
+                    end
+                },
+                clearExclusions = {
+                    order = 3,
+                    type = "execute",
+                    name = L["Clear Exclusion List"],
+                    func = function()
+                        E:ClearQuestExclusions()
+                    end
+                }
+            }
+        },
+        commands = {
+            order = 2,
             type = "group",
             name = L["Commands"],
             args = {
@@ -155,7 +197,7 @@ E.Options.args.general = {
             }
         },
         debug = {
-            order = 2,
+            order = 3,
             type = "group",
             name = L["Debugging"],
             args = {

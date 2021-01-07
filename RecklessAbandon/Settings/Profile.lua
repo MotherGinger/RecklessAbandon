@@ -13,7 +13,7 @@ P.general = {
         showAbandonButton = true
     },
     covenantCallings = {
-        showAbandonButton = true
+        showAbandonButton = false
     }
 }
 

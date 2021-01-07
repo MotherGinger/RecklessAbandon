@@ -51,7 +51,7 @@ E.Options.args.about = {
         bugs = {
             order = 5,
             type = "input",
-            name = format(L["Please report any bugs on our issue board:"]),
+            name = L["Please report any bugs or request features on our issue board:"],
             width = "double",
             get = function()
                 return "https://github.com/MotherGinger/RecklessAbandon/issues"

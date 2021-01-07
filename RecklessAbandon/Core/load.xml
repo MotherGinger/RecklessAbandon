@@ -1,5 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Button name="RECKLESS_ABANDON_BUTTON" virtual="true" registerForClicks="AnyUp" frameStrata="HIGH" frameLevel="6">
+	<Button name="RECKLESS_ABANDON_BUTTON" virtual="true" registerForClicks="LeftButtonUp,RightButtonUp" frameStrata="HIGH" frameLevel="6">
 		<Size>
 			<AbsDimension x="30" y="30"/>
 		</Size>
@@ -11,7 +11,24 @@
 		<Scripts>
 			<OnEnter>onButtonEnter(self)</OnEnter>
 			<OnLeave>onButtonLeave(self)</OnLeave>
-			<OnClick>onButtonClick(self)</OnClick>
+			<OnClick>onAbandonButtonClick(self, button)</OnClick>
+			<OnUpdate>onButtonUpdate(self)</OnUpdate>
+		</Scripts>
+	</Button>
+
+	<Button name="RECKLESS_GROUP_ABANDON_BUTTON" virtual="true" registerForClicks="LeftButtonUp,RightButtonUp" frameStrata="HIGH" frameLevel="6">
+		<Size>
+			<AbsDimension x="30" y="30"/>
+		</Size>
+		<NormalFont style="GameFontNormal"/>
+		<NormalTexture file="Interface\Buttons\CancelButton-Up"/>
+		<PushedTexture file="Interface\Buttons\CancelButton-Down"/>
+		<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
+		
+		<Scripts>
+			<OnEnter>onButtonEnter(self)</OnEnter>
+			<OnLeave>onButtonLeave(self)</OnLeave>
+			<OnClick>onGroupAbandonButtonClick(self, button)</OnClick>
 			<OnUpdate>onButtonUpdate(self)</OnUpdate>
 		</Scripts>
 	</Button>

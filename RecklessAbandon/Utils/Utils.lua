@@ -78,7 +78,25 @@ function E:Dump(o)
     return output_str
 end
 
-function E:isEmpty(t)
+function E:CopyTable(currentTable, defaultTable)
+    if type(currentTable) ~= "table" then
+        currentTable = {}
+    end
+
+    if type(defaultTable) == "table" then
+        for option, value in pairs(defaultTable) do
+            if type(value) == "table" then
+                value = self:CopyTable(currentTable[option], value)
+            end
+
+            currentTable[option] = value
+        end
+    end
+
+    return currentTable
+end
+
+function E:IsEmpty(t)
     for _, _ in pairs(t) do
         return false
     end
