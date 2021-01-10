@@ -62,7 +62,7 @@ L["Print debugging statements when this is enabled"] = true
 L["Exclusions"] = true
 L["Quest Exclusion List"] = true
 L["Clear Exclusion List"] = true
-L["The quest exclusion list allows you to exclude quests from group abandons. To use it, simply right click a quest abandon button in the quest log.\n\n|cFFFFF569Each character has their own exclusion list.|r\n\n"] = true
+L["The quest exclusion list allows you to exclude quests from group abandons. To use it, simply right click a quest abandon button in the quest log.\n\n|cFF00D1FFEach character has their own exclusion list.|r\n\n"] = true
 L["There are currently no quests being excluded."] = true
 
 L["Profiles"] = true
@@ -80,3 +80,6 @@ L["|cFFFFFF00You can't abandon %s|r"] = true
 L["Skipping %s since it is excluded from group abandons"] = true
 L["Excluding quest %s from group abandons"] = true
 L["Including quest %s in group abandons"] = true
+
+L["QuestID"] = true
+L["Title"] = true

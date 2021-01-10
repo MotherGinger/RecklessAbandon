@@ -1,5 +1,7 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 
+local format = format
+
 E.Options.args.general = {
     type = "group",
     name = L["General"],
@@ -142,26 +144,30 @@ E.Options.args.general = {
                     order = 1,
                     type = "description",
                     width = "full",
-                    name = L["The quest exclusion list allows you to exclude quests from group abandons. To use it, simply right click a quest abandon button in the quest log.\n\n|cFFFFF569Each character has their own exclusion list.|r\n\n"]
+                    name = L["The quest exclusion list allows you to exclude quests from group abandons. To use it, simply right click a quest abandon button in the quest log.\n\n|cFF00D1FFEach character has their own exclusion list.|r\n\n"]
                 },
                 excludedQuests = {
                     order = 2,
                     type = "description",
-                    width = "double",
                     name = function()
                         if (E:IsEmpty(E.private.exclusions.excludedQuests)) then
                             return L["There are currently no quests being excluded."]
                         end
 
-                        local exclusions = ""
-                        for _, title in pairs(E.private.exclusions.excludedQuests) do
-                            exclusions = exclusions .. "\n" .. title
+                        local exclusions = format("|cFFF2E699%s|r | %s\n--------------------", L["QuestID"], L["Title"])
+                        for questId, title in pairs(E.private.exclusions.excludedQuests) do
+                            exclusions = exclusions .. format("\n|cFFF2E699%s|r    | %s", questId, title)
                         end
                         return exclusions
                     end
                 },
-                clearExclusions = {
+                space1 = {
                     order = 3,
+                    type = "description",
+                    name = "\n"
+                },
+                clearExclusions = {
+                    order = 4,
                     type = "execute",
                     name = L["Clear Exclusion List"],
                     func = function()
