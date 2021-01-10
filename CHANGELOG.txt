@@ -16,6 +16,7 @@ This project adheres to Semantic Versioning.
   - Fixed
     - Rare lua errors when button bounds are nil in the questlog
       - Added nil checks to avoid bad arithmetic
+    - Lua errors when completing a covenant calling
 
 - v1.1.0 - 2021-05-01
   - Added

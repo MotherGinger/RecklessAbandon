@@ -161,9 +161,12 @@ local function ShowAbandonButtons()
 
 	if (E.db.general.covenantCallings.showAbandonButton) then
 		for calling in QuestScrollFrame.covenantCallingsHeaderFramePool:EnumerateActive() do
-			local title = C_QuestLog.GetInfo(calling.questLogIndex).title
-			local key = getKey(title)
-			RenderGroupAbandonButton(calling, QuestScrollFrame:GetWidth() - 50, L["covenant callings"], L["Left Click: Abandon all covenant calling quests"], key)
+			local info = C_QuestLog.GetInfo(calling.questLogIndex)
+			if info then
+				local title = info.title
+				local key = getKey(title)
+				RenderGroupAbandonButton(calling, QuestScrollFrame:GetWidth() - 50, L["covenant callings"], L["Left Click: Abandon all covenant calling quests"], key)
+			end
 		end
 	end
 
