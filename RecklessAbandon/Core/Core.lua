@@ -119,7 +119,7 @@ local function RenderAbandonButton(parent, offset, questId, excluded, title, too
 
 	if canAbandon and excluded then
 		texture:SetVertexColor(0.5, 0.5, 1, 0.7)
-	elseif canAbandon and not excluded then
+	else
 		texture:SetVertexColor(1, 1, 1, 1)
 	end
 
