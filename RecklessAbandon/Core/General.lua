@@ -151,7 +151,7 @@ E.Options.args.general = {
                     type = "description",
                     name = function()
                         if (E:IsEmpty(E.private.exclusions.excludedQuests)) then
-                            return L["There are currently no quests being excluded."]
+                            return L["|cFF808080There are currently no quests being excluded.|r"]
                         end
 
                         local exclusions = format("|cFFF2E699%s|r | %s\n--------------------", L["QuestID"], L["Title"])

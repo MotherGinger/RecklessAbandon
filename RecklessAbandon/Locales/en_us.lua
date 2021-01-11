@@ -63,7 +63,7 @@ L["Exclusions"] = true
 L["Quest Exclusion List"] = true
 L["Clear Exclusion List"] = true
 L["The quest exclusion list allows you to exclude quests from group abandons. To use it, simply right click a quest abandon button in the quest log.\n\n|cFF00D1FFEach character has their own exclusion list.|r\n\n"] = true
-L["There are currently no quests being excluded."] = true
+L["|cFF808080There are currently no quests being excluded.|r"] = true
 
 L["Profiles"] = true
 L["Reset Profile"] = true
