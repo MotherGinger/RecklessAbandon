@@ -3,16 +3,17 @@ All notable changes to this project will be documented in this file.
 This project adheres to Semantic Versioning.
 
 - Unreleased
+
+- v1.2.0 - 2021-11-01
   - Added
-    - Ability to exclude quests from group abandons. Right click a quests abandon button to exclude it.
+    - Ability to exclude quests from group abandons. Right click a quest abandon button to exclude it.
     - More missing localization strings
   - Changed
     - Group abandon buttons are now disabled if none of the child quests can be abandoned
     - Individual quest abandon buttons are now disabled if the quest cannot be abandoned
     - Covenant callings cannot actually be abandoned.
       - The covenant calling group abandon button is now hidden by default
-    - Updated language in the configuration panel
-    - Updated README with FAQs
+    - Language in the configuration panel
   - Fixed
     - Rare lua errors when button bounds are nil in the questlog
       - Added nil checks to avoid bad arithmetic
@@ -36,5 +37,6 @@ This project adheres to Semantic Versioning.
     - Documentation
 
 [unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.1.0...develop
+[1.2.0]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.1.0..v1.2.0
 [1.1.0]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.0.0..v1.1.0
 [1.0.0]: https://github.com/MotherGinger/RecklessAbandon/releases/tag/v1.0.0

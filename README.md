@@ -7,7 +7,6 @@ A WoW addon that lets you quickly (and _recklessly_) abandon quests.
 - Abandon individual quests with a single click
 - Abandon all zone quests with a single click (prompts for confirmation by default)
 - Abandon all campaign quests with a single click (prompts for confirmation by default)
-- Abandon all covenant callings with a single click (prompts for confirmation by default)
 - Command line option to abandon your entire quest log (disabled by default)
 - Exclude individual quests from group abandons
 - Configuration panel to toggle confirmations and hide/show abandon buttons
