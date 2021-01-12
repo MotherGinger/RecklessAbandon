@@ -321,7 +321,6 @@ end
 
 function E:AbandonQuests(key)
 	local group = questGroupsByName[key] or {}
-	self:Print(self:Dump(group))
 	for questId, title in pairs(group.quests or {}) do
 		if (not self.private.exclusions.excludedQuests[questId]) then
 			self:AbandonQuest(title, questId)
