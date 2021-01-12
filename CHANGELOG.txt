@@ -4,6 +4,10 @@ This project adheres to Semantic Versioning.
 
 - Unreleased
 
+-v1.2.1 - 2020-11-01
+  - Fixed
+    - Removed print statement that should have been a debug statement
+
 - v1.2.0 - 2021-11-01
   - Added
     - Ability to exclude quests from group abandons. Right click a quest abandon button to exclude it.
@@ -37,6 +41,7 @@ This project adheres to Semantic Versioning.
     - Documentation
 
 [unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.1.0...develop
+[1.2.1]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.2.0..v1.2.1
 [1.2.0]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.1.0..v1.2.0
 [1.1.0]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.0.0..v1.1.0
 [1.0.0]: https://github.com/MotherGinger/RecklessAbandon/releases/tag/v1.0.0
