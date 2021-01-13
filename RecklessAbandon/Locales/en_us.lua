@@ -17,7 +17,7 @@ L["No"] = true
 
 L["Are you sure you want to abandon all quests in %s? This cannot be undone."] = true
 L["Are you sure you want to abandon %s?. This cannot be undone."] = true
-L["Are you sure you want to abandon all of the quests in your questlog?. This cannot be undone."] = true
+L["Are you sure you want to abandon all of the quests in your questlog? This cannot be undone."] = true
 
 L["Left Click: Abandon quest"] = true
 L["Right Click: Exclude quest from group abandons"] = true
@@ -83,3 +83,9 @@ L["Including quest %s in group abandons"] = true
 
 L["QuestID"] = true
 L["Title"] = true
+
+L["Abandoning all quests from the command line is currently |cFFFF6B6Bdisabled|r. You can enable it in the configuration settings |cff888888/reckless config|r"] = true
+L["Abandoning quests from the command line is currently |cFFFF6B6Bdisabled|r. You can enable it in the configuration settings |cff888888/reckless config|r"] = true
+L["Unable to abandon quest, '%s' is not recognized. Either the quest is not in your quest log, or you may have entered the wrong id."] = true
+
+L["You are running |cFFB5FFEBv%s|r. Type |cff888888/reckless config|r to configure settings."] = true

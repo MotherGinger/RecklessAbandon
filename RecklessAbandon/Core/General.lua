@@ -200,6 +200,20 @@ E.Options.args.general = {
                         E.db.commands[info[#info]] = value
                     end
                 },
+                abandonByQuestId = {
+                    order = 2,
+                    name = L["Enable |cff888888/reckless abandon <questID>|r"],
+                    desc = L["This command abandons a quest that matches the provided questID."],
+                    descStyle = "inline",
+                    width = "full",
+                    type = "toggle",
+                    get = function(info)
+                        return E.db.commands[info[#info]]
+                    end,
+                    set = function(info, value)
+                        E.db.commands[info[#info]] = value
+                    end
+                }
             }
         },
         debug = {

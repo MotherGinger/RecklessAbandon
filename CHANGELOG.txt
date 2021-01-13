@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 This project adheres to Semantic Versioning.
 
 - Unreleased
+  - Added
+    - New command line for abandoning quests by quest id
+      - /reckless abandon <questId>
+      - You can enable it in the configuration panel
+    - Additional localized strings
+  - Changed
+    - Quest links are now more blizzard like and show up in yellow color
+    - Updated the syntax of the abandon all quests command line
+      - Use /reckless abandon all
+  - Fixed
+    - Punctuation in the abandon all quests popup confirmation
 
 -v1.2.1 - 2020-11-01
   - Fixed

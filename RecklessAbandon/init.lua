@@ -139,23 +139,20 @@ LoadUI:SetScript(
 )
 
 function E:ChatCommand(input)
-	if input ~= nil and input:trim() == "config" then
+	-- /reckless cmd args
+	local _, _, cmd, args = string.find(input, "%s?(%w+)%s?(.*)")
+
+	if cmd == "config" and args == "" then
 		E:ToggleOptionsUI()
-	elseif input ~= nil and input:trim() == "abandon all" then
-		if self.db.commands.abandonAll then
-			if self.db.general.confirmGroup then
-				StaticPopup_Show("RECKLESS_ABANDON_ALL_CONFIRMATION")
-			else
-				E:AbandonAllQuests()
-			end
-		else
-			self:Print('Abandoning all quests from the command line is currently |cFFFF6B6Bdisabled|r. This is typically disabled by default to prevent "oops" moments that are unrecoverable. You can enable it in the configuration settings |cff888888/reckless config|r')
-		end
+	elseif cmd == "abandon" and args == "all" then
+		E:CliAbandonAllQuests()
+	elseif cmd == "abandon" and tonumber(args) then
+		E:CliAbandonQuestById(args)
 	end
 end
 
 function E:PLAYER_ENTERING_WORLD(event, ...)
-	self:Print(format("You are running |cFFB5FFEBv%s|r. Type |cff888888/reckless config|r to configure settings.", E.version))
+	E:PrintWelcomMessage()
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
 
