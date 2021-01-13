@@ -141,7 +141,7 @@ LoadUI:SetScript(
 function E:ChatCommand(input)
 	if input ~= nil and input:trim() == "config" then
 		E:ToggleOptionsUI()
-	elseif input ~= nil and input:trim() == "abandonall" then
+	elseif input ~= nil and input:trim() == "abandon all" then
 		if self.db.commands.abandonAll then
 			if self.db.general.confirmGroup then
 				StaticPopup_Show("RECKLESS_ABANDON_ALL_CONFIRMATION")

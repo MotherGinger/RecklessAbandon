@@ -188,7 +188,7 @@ E.Options.args.general = {
                 },
                 abandonAll = {
                     order = 1,
-                    name = L["Enable |cff888888/reckless abandonall|r"],
+                    name = L["Enable |cff888888/reckless abandon all|r"],
                     desc = L["|cFFFFF569Warning:|r This command abandons all quests in your quest log, use it wisely."],
                     descStyle = "inline",
                     width = "full",
@@ -199,7 +199,7 @@ E.Options.args.general = {
                     set = function(info, value)
                         E.db.commands[info[#info]] = value
                     end
-                }
+                },
             }
         },
         debug = {
