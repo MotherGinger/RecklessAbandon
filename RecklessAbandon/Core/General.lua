@@ -150,7 +150,7 @@ E.Options.args.general = {
                     order = 2,
                     type = "description",
                     width = "full",
-                    name = L["|cFF00D1FFEach character has their own exclusion list.|r"] .. "\n\n"
+                    name = L["|cFF00D1FFNote:|r Each character has their own exclusion list."] .. "\n\n"
                 },
                 excludedQuests = {
                     order = 3,
@@ -175,8 +175,21 @@ E.Options.args.general = {
                     type = "description",
                     name = "\n"
                 },
-                pruneOrphans = {
+                autoPrune = {
                     order = 5,
+                    type = "toggle",
+                    name = L["Automatic Pruning"],
+                    desc = L["Automatically prune quests from the exclusion list when they are abandoned.\n\n|cFF00D1FFNote:|r This does not retroactively prune quests that have already been abandoned, but are still in the exclusion list.\n\nUse the 'Prune Exclusion List' button below to do this manually."],
+                    width = "full",
+                    get = function(info)
+                        return E.private.exclusions.autoPrune
+                    end,
+                    set = function(info, value)
+                        E.private.exclusions.autoPrune = value
+                    end
+                },
+                pruneOrphans = {
+                    order = 6,
                     type = "execute",
                     name = L["Prune Exclusion List"],
                     desc = L["Quests that appear in |cFFFF6B6Bred|r are no longer detected in your quest log.\n\nYou can prune them by clicking this button, or leave them and they will be excluded again the next time they are picked up."],
@@ -185,7 +198,7 @@ E.Options.args.general = {
                     end
                 },
                 clearExclusions = {
-                    order = 6,
+                    order = 7,
                     type = "execute",
                     name = L["Clear Exclusion List"],
                     desc = L["Clear the exclusion list by including quests that are still in your quest log and pruning those that aren't."],

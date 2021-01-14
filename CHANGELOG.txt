@@ -14,7 +14,8 @@ This project adheres to Semantic Versioning.
       - /reckless include <questId>
       - You can enable it in the configuration panel
     - New configuration options for exclusions lists
-      - Prune orphaned quests by clicking the "Prune Exclusion List" button
+      - Enable automatic pruning to remove a quest from the exclusion list when abandoned
+      - Prune orphaned quests manually by clicking the "Prune Exclusion List" button
     - Additional localized strings
   - Changed
     - Quest links are now more blizzard like and show up in yellow color

@@ -356,6 +356,10 @@ function E:AbandonQuest(questId)
 		C_QuestLog.SetAbandonQuest()
 		C_QuestLog.AbandonQuest()
 		self:Print(format(L["|cFFFFFF00Abandoned quest %s|r"], GetQuestLink(questId)))
+
+		if E.private.exclusions.autoPrune and self:IsExcluded(questId) then
+			self:PruneQuestExclusion(questId)
+		end
 	else
 		self:Print(format(L["|cFFFFFF00You can't abandon %s|r"], GetQuestLink(questId)))
 	end
@@ -385,16 +389,17 @@ function E:CanQuestGroupAbandon(quests)
 	return false
 end
 
-function E:PruneQuestExclusion(questId, title)
+function E:PruneQuestExclusion(questId)
+	local title = E.private.exclusions.excludedQuests[questId]
 	E.private.exclusions.excludedQuests[questId] = nil
-	self:Print(format(L["Pruning '%s'..."], title))
+	self:Print(format(L["Pruning '%s' from the exclusion list"], title))
 end
 
 function E:ClearQuestExclusions()
-	for questId, title in pairs(E.private.exclusions.excludedQuests) do
+	for questId, _ in pairs(E.private.exclusions.excludedQuests) do
 		local orphaned = C_QuestLog.GetLogIndexForQuestID(questId) == nil
 		if orphaned then
-			self:PruneQuestExclusion(questId, title)
+			self:PruneQuestExclusion(questId)
 		else
 			self:IncludeQuest(questId)
 		end
@@ -403,15 +408,15 @@ end
 
 function E:PruneQuestExclusions()
 	local count = 0
-	for questId, title in pairs(E.private.exclusions.excludedQuests) do
+	for questId, _ in pairs(E.private.exclusions.excludedQuests) do
 		local orphaned = C_QuestLog.GetLogIndexForQuestID(questId) == nil
 		if orphaned then
 			count = count + 1
-			self:PruneQuestExclusion(questId, title)
+			self:PruneQuestExclusion(questId)
 		end
 	end
 
-	self:Print(format(L["Pruned %s |4orphan:orphans; from the exclusion list!"], count))
+	self:Print(format(L["Pruned %s |4orphan:orphans;!"], count))
 end
 
 function E:CliAbandonAllQuests()
