@@ -443,6 +443,23 @@ function E:CliExcludeQuestById(questId)
 	end
 end
 
+function E:CliIncludeQuestById(questId)
+	if self.db.commands.includeByQuestId then
+		local index = C_QuestLog.GetLogIndexForQuestID(questId)
+		if index ~= nil then
+			if self:IsExcluded(questId) then
+				self:IncludeQuest(questId)
+			else
+				self:Print(format(L["%s is already included in group abandons!"], GetQuestLink(questId)))
+			end
+		else
+			self:Print(format(L["Unable to include quest, '%s' is not recognized. Either the quest is not in your quest log, or you may have entered the wrong id."], questId))
+		end
+	else
+		self:Print(L["Including quests from the command line is currently |cFFFF6B6Bdisabled|r. You can enable it in the configuration settings |cff888888/reckless config|r"])
+	end
+end
+
 function E:PrintWelcomMessage()
 	self:Print(format(L["You are running |cFFB5FFEBv%s|r. Type |cff888888/reckless config|r to configure settings."], E.version))
 end

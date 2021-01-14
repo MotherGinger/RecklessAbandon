@@ -150,6 +150,8 @@ function E:ChatCommand(input)
 		E:CliAbandonQuestById(args)
 	elseif cmd == "exclude" and tonumber(args) then
 		E:CliExcludeQuestById(args)
+	elseif cmd == "include" and tonumber(args) then
+		E:CliIncludeQuestById(args)
 	end
 end
 

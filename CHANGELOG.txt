@@ -10,6 +10,9 @@ This project adheres to Semantic Versioning.
     - New command line for excluding quests from group abandons by quest id
       - /reckless exclude <questId>
       - You can enable it in the configuration panel
+    - New command line for including quests in group abandons by quest id
+      - /reckless include <questId>
+      - You can enable it in the configuration panel
     - Additional localized strings
   - Changed
     - Quest links are now more blizzard like and show up in yellow color

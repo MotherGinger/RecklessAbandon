@@ -20,7 +20,8 @@ P.general = {
 P.commands = {
     abandonAll = false,
     abandonByQuestId = false,
-    excludeByQuestId = false
+    excludeByQuestId = false,
+    includeByQuestId = false
 }
 
 P.debugging = {
