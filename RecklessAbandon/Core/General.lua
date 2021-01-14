@@ -213,6 +213,20 @@ E.Options.args.general = {
                     set = function(info, value)
                         E.db.commands[info[#info]] = value
                     end
+                },
+                excludeByQuestId = {
+                    order = 3,
+                    name = L["Enable |cff888888/reckless exclude <questID>|r"],
+                    desc = L["This command excludes a quest that matches the provided questID from group abandons."],
+                    descStyle = "inline",
+                    width = "full",
+                    type = "toggle",
+                    get = function(info)
+                        return E.db.commands[info[#info]]
+                    end,
+                    set = function(info, value)
+                        E.db.commands[info[#info]] = value
+                    end
                 }
             }
         },

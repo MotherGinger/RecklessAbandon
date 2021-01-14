@@ -53,6 +53,10 @@ L["Prompt for confirmation when abandoning multiple quests.\n\n|cFFFF6B6BCaution
 L["Slash Commands"] = true
 L["Enable |cff888888/reckless abandonall|r"] = true
 L["|cFFFFF569Warning:|r This command abandons all quests in your quest log, use it wisely."] = true
+L["Enable |cff888888/reckless abandon <questID>|r"] = true
+L["This command abandons a quest that matches the provided questID."] = true
+L["Enable |cff888888/reckless exclude <questID>|r"] = true
+L["This command excludes a quest that matches the provided questID from group abandons."] = true
 
 L["|cffffcc00%s Debug:|r"] = true
 L["Debug Settings"] = true
@@ -85,7 +89,12 @@ L["QuestID"] = true
 L["Title"] = true
 
 L["Abandoning all quests from the command line is currently |cFFFF6B6Bdisabled|r. You can enable it in the configuration settings |cff888888/reckless config|r"] = true
+
 L["Abandoning quests from the command line is currently |cFFFF6B6Bdisabled|r. You can enable it in the configuration settings |cff888888/reckless config|r"] = true
 L["Unable to abandon quest, '%s' is not recognized. Either the quest is not in your quest log, or you may have entered the wrong id."] = true
+
+L["Excluding quests from the command line is currently |cFFFF6B6Bdisabled|r. You can enable it in the configuration settings |cff888888/reckless config|r"] = true
+L["Unable to exclude quest, '%s' is not recognized. Either the quest is not in your quest log, or you may have entered the wrong id."] = true
+L["%s is already excluded from group abandons!"] = true
 
 L["You are running |cFFB5FFEBv%s|r. Type |cff888888/reckless config|r to configure settings."] = true

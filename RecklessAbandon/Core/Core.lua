@@ -268,7 +268,7 @@ function onButtonUpdate(self)
 	local bottom = self:GetBottom()
 	local top = self:GetTop()
 
-	if (bottom ~= nil and top ~= nil) then
+	if bottom ~= nil and top ~= nil then
 		if bottom > QuestScrollFrame:GetBottom() - buffer and top < QuestScrollFrame:GetTop() + buffer then
 			self:Show()
 		else
@@ -317,6 +317,7 @@ function E:GenerateQuestTable()
 	end
 
 	self:Debug(self:Dump(questGroupsByName))
+	self:Debug(self:Dump(self.private.exclusions.excludedQuests))
 end
 
 function E:AbandonAllQuests()
@@ -362,16 +363,16 @@ end
 
 function E:ExcludeQuest(questId)
 	self:Print(format(L["Excluding quest %s from group abandons"], GetQuestLink(questId)))
-	self.private.exclusions.excludedQuests[questId] = QuestTitleFromID[questId]
+	self.private.exclusions.excludedQuests[tonumber(questId)] = QuestTitleFromID[questId]
 end
 
 function E:IncludeQuest(questId)
 	self:Print(format(L["Including quest %s in group abandons"], GetQuestLink(questId)))
-	self.private.exclusions.excludedQuests[questId] = nil
+	self.private.exclusions.excludedQuests[tonumber(questId)] = nil
 end
 
 function E:IsExcluded(questId)
-	return self.private.exclusions.excludedQuests[questId] ~= nil
+	return self.private.exclusions.excludedQuests[tonumber(questId)] ~= nil
 end
 
 function E:CanQuestGroupAbandon(quests)
@@ -422,6 +423,23 @@ function E:CliAbandonQuestById(questId)
 		end
 	else
 		self:Print(L["Abandoning quests from the command line is currently |cFFFF6B6Bdisabled|r. You can enable it in the configuration settings |cff888888/reckless config|r"])
+	end
+end
+
+function E:CliExcludeQuestById(questId)
+	if self.db.commands.excludeByQuestId then
+		local index = C_QuestLog.GetLogIndexForQuestID(questId)
+		if index ~= nil then
+			if not self:IsExcluded(questId) then
+				self:ExcludeQuest(questId)
+			else
+				self:Print(format(L["%s is already excluded from group abandons!"], GetQuestLink(questId)))
+			end
+		else
+			self:Print(format(L["Unable to exclude quest, '%s' is not recognized. Either the quest is not in your quest log, or you may have entered the wrong id."], questId))
+		end
+	else
+		self:Print(L["Excluding quests from the command line is currently |cFFFF6B6Bdisabled|r. You can enable it in the configuration settings |cff888888/reckless config|r"])
 	end
 end
 
