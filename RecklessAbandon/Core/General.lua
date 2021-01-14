@@ -144,10 +144,16 @@ E.Options.args.general = {
                     order = 1,
                     type = "description",
                     width = "full",
-                    name = L["The quest exclusion list allows you to exclude quests from group abandons. To use it, simply right click a quest abandon button in the quest log.\n\n|cFF00D1FFEach character has their own exclusion list.|r\n\n"]
+                    name = L["The quest exclusion list allows you to exclude quests from group abandons. To use it, simply right click a quest abandon button in the quest log."] .. "\n\n"
+                },
+                exclusionDescription2 = {
+                    order = 2,
+                    type = "description",
+                    width = "full",
+                    name = L["|cFF00D1FFEach character has their own exclusion list.|r"] .. "\n\n"
                 },
                 excludedQuests = {
-                    order = 2,
+                    order = 3,
                     type = "description",
                     name = function()
                         if (E:IsEmpty(E.private.exclusions.excludedQuests)) then
@@ -155,21 +161,34 @@ E.Options.args.general = {
                         end
 
                         local exclusions = format("|cFFF2E699%s|r | %s\n--------------------", L["QuestID"], L["Title"])
+                        local titleFormat = "\n|cFFF2E699%s|r    | %s"
+                        local orphanTitleFormat = "\n|cFFF2E699%s|r    | |cFFFF6B6B%s|r"
                         for questId, title in pairs(E.private.exclusions.excludedQuests) do
-                            exclusions = exclusions .. format("\n|cFFF2E699%s|r    | %s", questId, title)
+                            local orphaned = C_QuestLog.GetLogIndexForQuestID(questId) == nil
+                            exclusions = exclusions .. format(orphaned and orphanTitleFormat or titleFormat, questId, title)
                         end
                         return exclusions
                     end
                 },
                 space1 = {
-                    order = 3,
+                    order = 4,
                     type = "description",
                     name = "\n"
                 },
+                pruneOrphans = {
+                    order = 5,
+                    type = "execute",
+                    name = L["Prune Exclusion List"],
+                    desc = L["Quests that appear in |cFFFF6B6Bred|r are no longer detected in your quest log.\n\nYou can prune them by clicking this button, or leave them and they will be excluded again the next time they are picked up."],
+                    func = function()
+                        E:PruneQuestExclusions()
+                    end
+                },
                 clearExclusions = {
-                    order = 4,
+                    order = 6,
                     type = "execute",
                     name = L["Clear Exclusion List"],
+                    desc = L["Clear the exclusion list by including quests that are still in your quest log and pruning those that aren't."],
                     func = function()
                         E:ClearQuestExclusions()
                     end

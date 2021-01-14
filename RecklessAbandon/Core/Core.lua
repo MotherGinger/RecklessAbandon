@@ -385,10 +385,33 @@ function E:CanQuestGroupAbandon(quests)
 	return false
 end
 
+function E:PruneQuestExclusion(questId, title)
+	E.private.exclusions.excludedQuests[questId] = nil
+	self:Print(format(L["Pruning '%s'..."], title))
+end
+
 function E:ClearQuestExclusions()
-	for questId, _ in pairs(E.private.exclusions.excludedQuests) do
-		self:IncludeQuest(questId)
+	for questId, title in pairs(E.private.exclusions.excludedQuests) do
+		local orphaned = C_QuestLog.GetLogIndexForQuestID(questId) == nil
+		if orphaned then
+			self:PruneQuestExclusion(questId, title)
+		else
+			self:IncludeQuest(questId)
+		end
 	end
+end
+
+function E:PruneQuestExclusions()
+	local count = 0
+	for questId, title in pairs(E.private.exclusions.excludedQuests) do
+		local orphaned = C_QuestLog.GetLogIndexForQuestID(questId) == nil
+		if orphaned then
+			count = count + 1
+			self:PruneQuestExclusion(questId, title)
+		end
+	end
+
+	self:Print(format(L["Pruned %s |4orphan:orphans; from the exclusion list!"], count))
 end
 
 function E:CliAbandonAllQuests()

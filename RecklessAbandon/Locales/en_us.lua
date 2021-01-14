@@ -68,8 +68,13 @@ L["Print debugging statements when this is enabled"] = true
 L["Exclusions"] = true
 L["Quest Exclusion List"] = true
 L["Clear Exclusion List"] = true
-L["The quest exclusion list allows you to exclude quests from group abandons. To use it, simply right click a quest abandon button in the quest log.\n\n|cFF00D1FFEach character has their own exclusion list.|r\n\n"] = true
+L["The quest exclusion list allows you to exclude quests from group abandons. To use it, simply right click a quest abandon button in the quest log."] = true
+L["|cFF00D1FFEach character has their own exclusion list.|r"] = true
+L["Quests that appear in |cFFFF6B6Bred|r are no longer detected in your quest log.\n\nYou can prune them by clicking this button, or leave them and they will be excluded again the next time they are picked up."] = true
 L["|cFF808080There are currently no quests being excluded.|r"] = true
+L["Pruning '%s'..."] = true
+L["Pruned %s |4orphan:orphans; from the exclusion list!"] = true
+L["Clear the exclusion list by including quests that are still in your quest log and pruning those that aren't."] = true
 
 L["Profiles"] = true
 L["Reset Profile"] = true
