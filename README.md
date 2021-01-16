@@ -16,6 +16,79 @@ A WoW addon that lets you quickly (and _recklessly_) abandon quests.
 
 Take a look at our [issue board](https://github.com/MotherGinger/RecklessAbandon/labels/enhancement) for scheduled enhancements and feature requests, or [submit your own](https://github.com/MotherGinger/RecklessAbandon/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=%5BFeature+Request%5D) if you have an idea.
 
+---
+
+# Screenshots
+
+## Quest Log Abandon Buttons
+
+![WoWScrnShot_011621_135806](https://user-images.githubusercontent.com/29235654/104820560-8be32f00-5803-11eb-95da-5c6f0daa0855.jpg)
+
+## Configuration Panel - General Options
+
+![WoWScrnShot_011621_135740](https://user-images.githubusercontent.com/29235654/104820564-8d145c00-5803-11eb-9da1-9980b7ca9fe2.jpg)
+
+## Configuration Panel - Exclusions
+
+![WoWScrnShot_011621_135744](https://user-images.githubusercontent.com/29235654/104820563-8c7bc580-5803-11eb-9a97-e7d0165964c8.jpg)
+
+## Configuration Panel - Commands
+
+![WoWScrnShot_011621_135747](https://user-images.githubusercontent.com/29235654/104820562-8c7bc580-5803-11eb-9c67-a6b4fa22a35d.jpg)
+
+## Configuration Panel - Profiles
+
+![WoWScrnShot_011621_135752](https://user-images.githubusercontent.com/29235654/104820561-8be32f00-5803-11eb-8526-14e58d8d7e87.jpg)
+
+---
+
+# Usage
+
+The following outlines how to use Reckless Abandon
+
+## Quest Log
+
+All quest log abandon buttons are shown by default with the exclusion of covenant callings
+
+### Abandoning a Quest
+
+Left click the abandon button next to a quest
+
+### Abandoning All Quests in a Zone or Campaign
+
+Left click the abandon button next to a zone or campaign header
+
+### Excluding a Quest From Group Abandons
+
+Right click the abandon button for an individual quest
+Right click the abandon button again to include it
+
+## Opening the Configuration Panel
+
+To open the configuration panel run `/reckless config`
+
+## Command Line Usage
+
+All commands are disabled by default. You can enable them in the configuration panel.
+
+### Abandon all quests
+
+`/reckless abandon all`
+
+### Abandon a quest by quest ID
+
+`/reckless abandon <questId>`
+
+### Exclude a quest from group abandons by questID
+
+`/reckless exclude <questID>`
+
+### Include a quest in group abandons by questID
+
+`/reckless include <questID>`
+
+---
+
 # Contributing
 
 Take a look at our [contribution guidelines](https://github.com/MotherGinger/RecklessAbandon/blob/main/CONTRIBUTING.md).
@@ -28,3 +101,7 @@ To report an issue please fill out a [bug report](https://github.com/MotherGinge
 
 - **Why can't I abandon covenant callings?**
   - _Blizzard currently [does not allow covenant callings to be abandoned](https://www.wowhead.com/guides/covenant-callings-shadowlands#:~:text=Like%20World%20Quests%2C%20Covenant%20Callings,Calling%20or%20let%20it%20expire.). You must let them expire._
+- **Does Reckless Abandon only work with ElvUI?**
+  - _No, I just happen to use ElvUI so the screenshots are skinned. Reckless Abandon works with or without ElvUI._
+- **Does Reckless Abandon work in classic?**
+  - _Not yet! It is high on my priority list though. The quest log in classic is a little different than in retail so it will require some time. I would expect it to be available sometime shortly after v1.3.0 of Reckless Abandon._
