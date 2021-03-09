@@ -488,8 +488,10 @@ function E:CliIncludeQuestById(questId)
 	end
 end
 
-function E:PrintWelcomMessage()
-	self:Print(format(L["You are running |cFFB5FFEBv%s|r. Type |cff888888/reckless config|r to configure settings."], E.version))
+function E:PrintWelcomeMessage()
+	if self.db.general.loginMessage then
+		self:Print(format(L["You are running |cFFB5FFEBv%s|r. Type |cff888888/reckless config|r to configure settings."], E.version))
+	end
 end
 
 function E:Initialize()

@@ -37,6 +37,7 @@ L["Zone Quests"] = true
 L["Campaign Quests"] = true
 L["Covenant Callings"] = true
 
+L["Show login message"] = true
 L["Show Abandon Button"] = true
 L["Show Group Abandon Button"] = true
 L["Show an abandon button for individual quests."] = true

@@ -156,7 +156,7 @@ function E:ChatCommand(input)
 end
 
 function E:PLAYER_ENTERING_WORLD(event, ...)
-	E:PrintWelcomMessage()
+	E:PrintWelcomeMessage()
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
 
