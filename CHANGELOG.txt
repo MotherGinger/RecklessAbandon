@@ -4,13 +4,17 @@ This project adheres to Semantic Versioning.
 
 - Unreleased
 
--v1.4.0 - 2021-09-03
+- v1.4.1 - 2021-28-05
+  - Fixed
+    - A potential lua error when auto exclusion list pruning is enabled
+
+- v1.4.0 - 2021-09-03
   - Added
     - New configuration toggle for showing the login message
   - Changed
     - Updated TOC for 9.0.5
 
--v1.3.0 - 2021-16-01
+- v1.3.0 - 2021-16-01
   - Added
     - New command line for abandoning quests by quest id
       - /reckless abandon <questId>
@@ -33,7 +37,7 @@ This project adheres to Semantic Versioning.
   - Fixed
     - Punctuation in the abandon all quests popup confirmation
 
--v1.2.1 - 2020-11-01
+- v1.2.1 - 2020-11-01
   - Fixed
     - Removed print statement that should have been a debug statement
 
