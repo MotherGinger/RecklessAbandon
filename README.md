@@ -104,4 +104,4 @@ To report an issue please fill out a [bug report](https://github.com/MotherGinge
 - **Does Reckless Abandon only work with ElvUI?**
   - _No, I just happen to use ElvUI so the screenshots are skinned. Reckless Abandon works with or without ElvUI._
 - **Does Reckless Abandon work in classic?**
-  - _Not yet! It is high on my priority list though. The quest log in classic is a little different than in retail so it will require some time. I would expect it to be available sometime shortly after v1.3.0 of Reckless Abandon._
+  - _Yes! Check it out [here](https://github.com/MotherGinger/RecklessAbandon-Classic) and on CurseForge._
