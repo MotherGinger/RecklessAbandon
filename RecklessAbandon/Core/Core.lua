@@ -90,7 +90,7 @@ StaticPopupDialogs["RECKLESS_ABANDON_GROUP_CONFIRMATION"] = {
 }
 
 StaticPopupDialogs["RECKLESS_ABANDON_CONFIRMATION"] = {
-	text = L["Are you sure you want to abandon %s?. This cannot be undone."],
+	text = L["Are you sure you want to abandon %s? This cannot be undone."],
 	button1 = L["Yes"],
 	button2 = L["No"],
 	OnAccept = function(self, data)
