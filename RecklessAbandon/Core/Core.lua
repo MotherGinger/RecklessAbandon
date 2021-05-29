@@ -390,9 +390,9 @@ function E:CanQuestGroupAbandon(quests)
 end
 
 function E:PruneQuestExclusion(questId)
-	local title = E.private.exclusions.excludedQuests[questId]
-	E.private.exclusions.excludedQuests[questId] = nil
+	local title = E.private.exclusions.excludedQuests[tonumber(questId)]
 	self:Print(format(L["Pruning '%s' from the exclusion list"], title))
+	E.private.exclusions.excludedQuests[tonumber(questId)] = nil
 end
 
 function E:ClearQuestExclusions()
