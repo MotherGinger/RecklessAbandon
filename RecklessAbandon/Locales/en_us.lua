@@ -27,6 +27,9 @@ L["Left Click: Abandon all '%s' quests"] = true
 L["covenant callings"] = true
 L["Left Click: Abandon all covenant calling quests"] = true
 
+L["|cFFFF9C00<Zone Header>|r"] = true
+L["    |cFFF2E699<Title>|r - |cFFB5FFEB<QuestID>|r"] = true
+
 L["General"] = true
 L["General Settings"] = true
 L["Debugging"] = true
@@ -52,6 +55,8 @@ L["Confirm group abandon"] = true
 L["Prompt for confirmation when abandoning multiple quests.\n\n|cFFFF6B6BCaution: Turning this off means a group of quests will be abandoned instantly. Be careful!|r"] = true
 
 L["Slash Commands"] = true
+L["Enable |cff888888/reckless list all|r"] = true
+L["This command lists all quests in a table."] = true
 L["Enable |cff888888/reckless abandonall|r"] = true
 L["|cFFFFF569Warning:|r This command abandons all quests in your quest log, use it wisely."] = true
 L["Enable |cff888888/reckless abandon <questID>|r"] = true

@@ -144,6 +144,8 @@ function E:ChatCommand(input)
 
 	if cmd == "config" and args == "" then
 		E:ToggleOptionsUI()
+	elseif cmd == "list" and args == "all" then
+		E:CliListAllQuests()
 	elseif cmd == "abandon" and args == "all" then
 		E:CliAbandonAllQuests()
 	elseif cmd == "abandon" and tonumber(args) then

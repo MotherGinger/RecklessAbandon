@@ -234,8 +234,22 @@ E.Options.args.general = {
                     type = "header",
                     name = L["Slash Commands"]
                 },
-                abandonAll = {
+                listAll = {
                     order = 1,
+                    name = L["Enable |cff888888/reckless list all|r"],
+                    desc = L["This command lists all quests in a table."],
+                    descStyle = "inline",
+                    width = "full",
+                    type = "toggle",
+                    get = function(info)
+                        return E.db.commands[info[#info]]
+                    end,
+                    set = function(info, value)
+                        E.db.commands[info[#info]] = value
+                    end
+                },
+                abandonAll = {
+                    order = 2,
                     name = L["Enable |cff888888/reckless abandon all|r"],
                     desc = L["|cFFFFF569Warning:|r This command abandons all quests in your quest log, use it wisely."],
                     descStyle = "inline",
@@ -249,7 +263,7 @@ E.Options.args.general = {
                     end
                 },
                 abandonByQuestId = {
-                    order = 2,
+                    order = 3,
                     name = L["Enable |cff888888/reckless abandon <questID>|r"],
                     desc = L["This command abandons a quest that matches the provided questID."],
                     descStyle = "inline",
@@ -263,7 +277,7 @@ E.Options.args.general = {
                     end
                 },
                 excludeByQuestId = {
-                    order = 3,
+                    order = 4,
                     name = L["Enable |cff888888/reckless exclude <questID>|r"],
                     desc = L["This command excludes a quest that matches the provided questID from group abandons."],
                     descStyle = "inline",
@@ -277,7 +291,7 @@ E.Options.args.general = {
                     end
                 },
                 includeByQuestId = {
-                    order = 4,
+                    order = 5,
                     name = L["Enable |cff888888/reckless include <questID>|r"],
                     desc = L["This command includes a quest that matches the provided questID in group abandons."],
                     descStyle = "inline",

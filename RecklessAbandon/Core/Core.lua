@@ -419,6 +419,23 @@ function E:PruneQuestExclusions()
 	self:Print(format(L["Pruned %s |4orphan:orphans;!"], count))
 end
 
+function E:CliListAllQuests()
+	if self.db.commands.listAll then
+		self:Print("-------------------------------------------")
+		self:Print(L["|cFFFF9C00<Zone Header>|r"])
+		self:Print(L["    |cFFF2E699<Title>|r - |cFFB5FFEB<QuestID>|r"])
+		self:Print("-------------------------------------------")
+		for i = 1, C_QuestLog.GetNumQuestLogEntries() do
+			local info = C_QuestLog.GetInfo(i)
+			if info.isHeader then
+				self:Print("|cFFFF9C00" .. info.title .. "|r")
+			else
+				self:Print("    |cFFF2E699" .. info.title .. "|r" .. " - " .. "|cFFB5FFEB" .. info.questID .. "|r")
+			end
+		end
+	end
+end
+
 function E:CliAbandonAllQuests()
 	if self.db.commands.abandonAll then
 		if self.db.general.confirmGroup then
