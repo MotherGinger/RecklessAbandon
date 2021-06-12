@@ -1,6 +1,7 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 
-local format = format
+local tostring = tostring
+local format, strlen, strrep = format, strlen, strrep
 
 E.Options.args.general = {
     type = "group",
@@ -42,7 +43,7 @@ E.Options.args.general = {
                 },
                 confirmIndividual = {
                     order = 3,
-                    name = L["Confirm individual abandon"],
+                    name = L["Confirm individual abandons"],
                     desc = L["Prompt for confirmation when abandoning individual quests.\n\n|cFFFF6B6BCaution: Turning this off means a quest will be abandoned instantly. Be careful!|r"],
                     type = "toggle",
                     get = function(info)
@@ -54,7 +55,7 @@ E.Options.args.general = {
                 },
                 confirmGroup = {
                     order = 4,
-                    name = L["Confirm group abandon"],
+                    name = L["Confirm group abandons"],
                     desc = L["Prompt for confirmation when abandoning multiple quests.\n\n|cFFFF6B6BCaution: Turning this off means a group of quests will be abandoned instantly. Be careful!|r"],
                     type = "toggle",
                     get = function(info)
@@ -179,6 +180,10 @@ E.Options.args.general = {
                         local exclusions = format("|cFFF2E699%s|r | %s\n--------------------", L["QuestID"], L["Title"])
                         local titleFormat = "\n|cFFF2E699%s|r    | %s"
                         local orphanTitleFormat = "\n|cFFF2E699%s|r    | |cFFFF6B6B%s|r"
+
+                        -- * Excluded quests are stored with the localized version of the title at time of exclusion
+                        -- * This cannot be updated when language changes since the title can only be fetched for quests still in your log
+                        -- * It would then be impossible to update titles for abandoned but still excluded quests
                         for questId, title in pairs(E.private.exclusions.excludedQuests) do
                             local orphaned = C_QuestLog.GetLogIndexForQuestID(questId) == nil
                             exclusions = exclusions .. format(orphaned and orphanTitleFormat or titleFormat, questId, title)
@@ -251,7 +256,7 @@ E.Options.args.general = {
                 abandonAll = {
                     order = 2,
                     name = L["Enable |cff888888/reckless abandon all|r"],
-                    desc = L["|cFFFFF569Warning:|r This command abandons all quests in your quest log, use it wisely."],
+                    desc = L["|cFFFFF569Warning:|r This command abandons all quests in your quest log that are not excluded from group abandons, use it wisely."],
                     descStyle = "inline",
                     width = "full",
                     type = "toggle",
@@ -276,8 +281,22 @@ E.Options.args.general = {
                         E.db.commands[info[#info]] = value
                     end
                 },
-                excludeByQuestId = {
+                abandonByQualifier = {
                     order = 4,
+                    name = L["Enable |cff888888/reckless abandon <qualifier>|r"],
+                    desc = format("%s\n\n%s\n\n%s", L["This command abandons all quests that match a given qualifier and are not excluded from group abandons."], L["Available Qualifiers:"], E:Tabulate(E:GetAvailableQualifiers(), "|cFFF2E699%s|r - %s\n")),
+                    descStyle = "inline",
+                    width = "full",
+                    type = "toggle",
+                    get = function(info)
+                        return E.db.commands[info[#info]]
+                    end,
+                    set = function(info, value)
+                        E.db.commands[info[#info]] = value
+                    end
+                },
+                excludeByQuestId = {
+                    order = 5,
                     name = L["Enable |cff888888/reckless exclude <questID>|r"],
                     desc = L["This command excludes a quest that matches the provided questID from group abandons."],
                     descStyle = "inline",
@@ -291,7 +310,7 @@ E.Options.args.general = {
                     end
                 },
                 includeByQuestId = {
-                    order = 5,
+                    order = 6,
                     name = L["Enable |cff888888/reckless include <questID>|r"],
                     desc = L["This command includes a quest that matches the provided questID in group abandons."],
                     descStyle = "inline",
@@ -319,7 +338,7 @@ E.Options.args.general = {
                 debugLogging = {
                     order = 1,
                     name = L["Enable Debugging"],
-                    desc = L["Print debugging statements when this is enabled"],
+                    desc = L["Print debugging statements when this is enabled.\n\n|cFF00D1FFNote:|r You can also toggle this quickly via |cff888888/reckless debug|r"],
                     type = "toggle",
                     get = function(info)
                         return E.db.debugging[info[#info]]

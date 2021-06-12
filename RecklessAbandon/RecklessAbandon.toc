@@ -7,8 +7,8 @@
 ## SavedVariablesPerCharacter: RecklessAbandonCharacterDB
 
 Libraries\load.xml
-Locales\load.xml
 init.lua
+Locales\load.xml
 Settings\load.xml
 Utils\load.xml
 Core\load.xml

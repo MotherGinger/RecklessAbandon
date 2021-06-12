@@ -7,6 +7,20 @@ This project adheres to Semantic Versioning.
     - New command line for listing quests in a table
       - /reckless list all
       - This command is enabled by default, and can be used in combination with other commands that require information such as questID
+    - New command line for toggling debugging
+      - /reckless debug
+      - This command is always enabled
+    - New command line for abandoning quests that match a qualifier
+      - Available qualifiers are daily, weekly, gray, green, yellow, orange, red
+        - These qualifiers are localized and will match your language
+      - /reckless abandon <qualifier>
+      - You can enable it in the configuration panel
+    - Localization for spanish
+  - Changed
+    - Text formatting for some popups
+    - Text for some configuration toggles
+    - Removed some unused strings
+    - Ignore hidden quests when abandoning all quests in a quest log
 
 - v1.4.1 - 2021-28-05
   - Fixed

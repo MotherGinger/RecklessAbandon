@@ -102,3 +102,23 @@ function E:IsEmpty(t)
     end
     return true
 end
+
+function E:Tabulate(t, template)
+    template = template or "%s %s\n"
+
+    local ordered_keys = {}
+    for k in pairs(t) do
+        table.insert(ordered_keys, k)
+    end
+
+    local result = {}
+    for i = 1, #ordered_keys do
+        local k, v = ordered_keys[i], t[ordered_keys[i]]
+
+        result[#result + 1] = template:format(k, v)
+    end
+
+    table.sort(result)
+
+    return table.concat(result)
+end
