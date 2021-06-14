@@ -124,6 +124,7 @@ function E:OnInitialize()
 end
 
 local LoadUI = CreateFrame("Frame")
+LoadUI:RegisterEvent("PLAYER_LEVEL_UP")
 LoadUI:RegisterEvent("QUEST_ACCEPTED")
 LoadUI:RegisterEvent("QUEST_TURNED_IN")
 LoadUI:RegisterEvent("QUEST_REMOVED")
@@ -170,4 +171,9 @@ end
 
 function E:QUEST_LOG_UPDATE()
 	E:GenerateQuestTable()
+end
+
+function E:PLAYER_LEVEL_UP(arg1, ...)
+	E:Debug(format("%s leveled up (%d -> %d)!", E.myname, E.mylevel, arg1))
+	E.mylevel = arg1
 end

@@ -50,6 +50,8 @@ E.wowpatch, E.wowbuild = GetBuildInfo()
 E.wowbuild = tonumber(E.wowbuild)
 E.isMacClient = IsMacClient()
 E.IsRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
+E.isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+E.isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
 E.screenwidth, E.screenheight = GetPhysicalScreenSize()
 E.resolution = format("%dx%d", E.screenwidth, E.screenheight)
 
