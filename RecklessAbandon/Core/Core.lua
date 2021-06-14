@@ -52,8 +52,14 @@ E.isMacClient = IsMacClient()
 E.IsRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
 E.isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 E.isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+E.validVersion = WOW_PROJECT_BURNING_CRUSADE_CLASSIC
 E.screenwidth, E.screenheight = GetPhysicalScreenSize()
 E.resolution = format("%dx%d", E.screenwidth, E.screenheight)
+E.wowVersionMatrix = {
+	[WOW_PROJECT_MAINLINE] = "Retail",
+	[WOW_PROJECT_CLASSIC] = "Classic Era",
+	[WOW_PROJECT_BURNING_CRUSADE_CLASSIC] = "Burning Crusade Classic"
+}
 
 local questGroupsByName = {}
 -- TODO: We might want to create custom textures for each type
@@ -294,6 +300,10 @@ end
 
 function E:Print(...)
 	print(strjoin("", E.title, ": ", ...))
+end
+
+function E:Critical(...)
+	print(strjoin("", E.title, format("|cFFFF6B6B: %s|r", ...)))
 end
 
 -- TODO Investigate having multiple debug levels
@@ -607,6 +617,10 @@ end
 function E:PrintWelcomeMessage()
 	if self.db.general.loginMessage then
 		self:Print(format(L["You are running |cFFB5FFEBv%s|r. Type |cff888888/reckless config|r to configure settings."], E.version))
+	end
+
+	if not WOW_PROJECT_ID == E.validVersion then
+		self:Critical(format(L["You have installed a version of this addon intended for |cFFFFFAB8%s|r, however you are currently playing |cFFFFFAB8%s|r. You may encounter serious issues with this setup. Please install the proper version from Github, CurseForge, or WoWInterface, and restart the game."], E.wowVersionMatrix[E.validVersion], E.wowVersionMatrix[WOW_PROJECT_ID]))
 	end
 end
 

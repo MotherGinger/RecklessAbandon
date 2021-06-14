@@ -6,6 +6,8 @@ L["Version"] = true
 L["Configuration"] = true
 L["Description"] = "A tool for quickly (and recklessly) abandoning quests"
 
+L["You have installed a version of this addon intended for |cFFFFFAB8%s|r, however you are currently playing |cFFFFFAB8%s|r. You may encounter serious issues with this setup. Please install the proper version from Github, CurseForge, or WoWInterface, and restart the game."] = true
+
 L["Enable"] = true
 L["Enable/Disable Reckless Abandon"] = true
 

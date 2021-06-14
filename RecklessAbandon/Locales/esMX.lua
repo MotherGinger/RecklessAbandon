@@ -10,6 +10,9 @@ L["Version"] = "Versión"
 L["Configuration"] = "Configuración"
 L["Description"] = "Una herramienta para abandonar misiones de forma rápida (e imprudente)"
 
+L["You have installed a version of this addon intended for |cFFFFFAB8%s|r, however you are currently playing |cFFFFFAB8%s|r. You may encounter serious issues with this setup. Please install the proper version from Github, CurseForge, or WoWInterface, and restart the game."] =
+    "Ha instalado una versión de este complemento destinada a |cFFFFFAB8%s|r, sin embargo, actualmente está jugando a |cFFFFFAB8%s|r. Puede encontrar problemas graves con esta configuración. Instale la versión adecuada de Github, CurseForge o WoWInterface y reinicie el juego."
+
 L["Enable"] = "Habilitar"
 L["Enable/Disable Reckless Abandon"] = "Habilitar / deshabilitar el Reckless Abandon"
 
