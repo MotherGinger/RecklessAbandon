@@ -22,6 +22,7 @@ This project adheres to Semantic Versioning.
     - Text for some configuration toggles
     - Removed some unused strings
     - Ignore hidden quests when abandoning all quests in a quest log
+    - Tooltip styling
 
 - v1.4.1 - 2021-28-05
   - Fixed

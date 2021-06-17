@@ -51,16 +51,18 @@ E.wowbuild = tonumber(E.wowbuild)
 E.isMacClient = IsMacClient()
 E.IsRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
 E.isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-E.isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+E.isBCC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC or 5
 E.validVersion = WOW_PROJECT_BURNING_CRUSADE_CLASSIC
 E.screenwidth, E.screenheight = GetPhysicalScreenSize()
 E.resolution = format("%dx%d", E.screenwidth, E.screenheight)
 E.wowVersionMatrix = {
 	[WOW_PROJECT_MAINLINE] = "Retail",
 	[WOW_PROJECT_CLASSIC] = "Classic Era",
-	[WOW_PROJECT_BURNING_CRUSADE_CLASSIC] = "Burning Crusade Classic"
+	[WOW_PROJECT_BURNING_CRUSADE_CLASSIC or 5] = "Burning Crusade Classic"
 }
 
+local abandonTooltipFormat = "|cFFFFFAB8%s|r\n\n|cFFFFF569%s|r\n|cFFB5FFEB%s|r"
+local groupAbandonTooltipFormat = "|cFFFFFAB8%s|r\n\n|cFFFFF569%s|r"
 local questGroupsByName = {}
 -- TODO: We might want to create custom textures for each type
 local questButtonPool = CreateFramePool("Button", QuestMapFrame.QuestsFrame, "RECKLESS_ABANDON_BUTTON")
@@ -144,7 +146,7 @@ end
 
 local function RenderAbandonButton(parent, offset, questId, excluded, title, tooltip)
 	title = title or parent:GetText()
-	tooltip = tooltip or title .. "\n\n" .. L["Left Click: Abandon quest"] .. "\n" .. (excluded and L["Right Click: Include quest in group abandons"] or L["Right Click: Exclude quest from group abandons"])
+	tooltip = tooltip or format(abandonTooltipFormat, title, L["Left Click: Abandon quest"], (excluded and L["Right Click: Include quest in group abandons"] or L["Right Click: Exclude quest from group abandons"]))
 
 	local button = questButtonPool:Acquire()
 	local texture = button:GetNormalTexture()
@@ -169,7 +171,7 @@ end
 
 local function RenderGroupAbandonButton(parent, offset, title, tooltip, key)
 	title = title or parent:GetText()
-	tooltip = tooltip or format(L["Left Click: Abandon all '%s' quests"], title)
+	tooltip = tooltip or format(groupAbandonTooltipFormat, title, L["Left Click: Abandon all quests"], title)
 	key = key or getKey(title)
 
 	if questGroupsByName[key] then
@@ -234,6 +236,7 @@ end
 function onButtonEnter(self)
 	GameTooltip:SetOwner(self)
 	GameTooltip:SetText(self.tooltip)
+	GameTooltip:SetBackdropBorderColor(255, 255, 255)
 	GameTooltip:Show()
 end
 
@@ -260,11 +263,11 @@ function onAbandonButtonClick(self, button)
 		if excluded then
 			E:IncludeQuest(self.questId)
 			texture:SetVertexColor(1, 1, 1, 1)
-			self.tooltip = self.title .. "\n\n" .. L["Left Click: Abandon quest"] .. "\n" .. L["Right Click: Exclude quest from group abandons"]
+			self.tooltip = format(abandonTooltipFormat, self.title, L["Left Click: Abandon quest"], L["Right Click: Exclude quest from group abandons"])
 		else
 			E:ExcludeQuest(self.questId)
 			texture:SetVertexColor(0.5, 0.5, 1, 0.7)
-			self.tooltip = self.title .. "\n\n" .. L["Left Click: Abandon quest"] .. "\n" .. L["Right Click: Include quest in group abandons"]
+			self.tooltip = format(abandonTooltipFormat, self.title, L["Left Click: Abandon quest"], L["Right Click: Include quest in group abandons"])
 		end
 
 		self:SetNormalTexture(texture)

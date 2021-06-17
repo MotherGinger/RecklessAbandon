@@ -22,7 +22,7 @@ L["Are you sure you want to abandon the following %s quests?\n\n|cFFF2E699%s|r\n
 L["Left Click: Abandon quest"] = true
 L["Right Click: Exclude quest from group abandons"] = true
 L["Right Click: Include quest in group abandons"] = true
-L["Left Click: Abandon all '%s' quests"] = true
+L["Left Click: Abandon all quests"] = true
 
 L["covenant callings"] = true
 L["Left Click: Abandon all covenant calling quests"] = true

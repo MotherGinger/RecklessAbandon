@@ -27,7 +27,7 @@ L["Are you sure you want to abandon the following %s quests?\n\n|cFFF2E699%s|r\n
 L["Left Click: Abandon quest"] = "Clic izquierdo: Abandonar misión"
 L["Right Click: Exclude quest from group abandons"] = "Clic derecho: excluir misiones de abandonos grupales"
 L["Right Click: Include quest in group abandons"] = "Clic derecho: Incluir misión en abandonos grupales"
-L["Left Click: Abandon all '%s' quests"] = "Clic izquierdo: abandona todas las misiones de '%s'"
+L["Left Click: Abandon all quests"] = "Clic izquierdo: abandona todas las misiones"
 
 L["covenant callings"] = "llamamientos del pacto"
 L["Left Click: Abandon all covenant calling quests"] = "Clic izquierdo: abandona todas las misiones de llamadas del pacto."
