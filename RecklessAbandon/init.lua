@@ -118,13 +118,13 @@ function E:OnInitialize()
 
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("QUEST_LOG_UPDATE")
+	self:RegisterEvent("PLAYER_LEVEL_UP")
 	self:RegisterChatCommand("reckless", "ChatCommand")
 
 	self.loadedtime = GetTime()
 end
 
 local LoadUI = CreateFrame("Frame")
-LoadUI:RegisterEvent("PLAYER_LEVEL_UP")
 LoadUI:RegisterEvent("QUEST_ACCEPTED")
 LoadUI:RegisterEvent("QUEST_TURNED_IN")
 LoadUI:RegisterEvent("QUEST_REMOVED")
@@ -173,7 +173,6 @@ function E:QUEST_LOG_UPDATE()
 	E:GenerateQuestTable()
 end
 
-function E:PLAYER_LEVEL_UP(arg1, ...)
-	E:Debug(format("%s leveled up (%d -> %d)!", E.myname, E.mylevel, arg1))
-	E.mylevel = arg1
+function E:PLAYER_LEVEL_UP(_, arg2, ...)
+	E:UpdatePlayerLevel(arg2)
 end

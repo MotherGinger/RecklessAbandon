@@ -16,6 +16,7 @@ This project adheres to Semantic Versioning.
       - /reckless abandon <qualifier>
       - You can enable it in the configuration panel
     - Localization for spanish
+    - Client version warnings
   - Changed
     - Text formatting for some popups
     - Text for some configuration toggles
