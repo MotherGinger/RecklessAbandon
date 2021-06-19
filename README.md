@@ -34,7 +34,7 @@ Take a look at our [issue board](https://github.com/MotherGinger/RecklessAbandon
 
 ## Configuration Panel - Commands
 
-![WoWScrnShot_011621_135747](https://user-images.githubusercontent.com/29235654/104820562-8c7bc580-5803-11eb-9c67-a6b4fa22a35d.jpg)
+![WoWScrnShot_061921_011625](https://user-images.githubusercontent.com/29235654/122631971-96993d00-d09d-11eb-8135-acc0eab74f08.jpg)
 
 ## Configuration Panel - Profiles
 
@@ -71,6 +71,10 @@ To open the configuration panel run `/reckless config`
 
 All commands are disabled by default. You can enable them in the configuration panel.
 
+### List all quests in a table
+
+`/reckless list all`
+
 ### Abandon all quests
 
 `/reckless abandon all`
@@ -86,6 +90,14 @@ All commands are disabled by default. You can enable them in the configuration p
 ### Include a quest in group abandons by questID
 
 `/reckless include <questID>`
+
+### Abandon all quests that match a qualifier
+
+`/reckless abandon <qualifier>`
+
+### Toggle debugging
+
+`/reckless debug`
 
 ---
 
