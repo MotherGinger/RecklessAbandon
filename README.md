@@ -8,6 +8,8 @@ A WoW addon that lets you quickly (and _recklessly_) abandon quests.
 - Abandon all zone quests with a single click (prompts for confirmation by default)
 - Abandon all campaign quests with a single click (prompts for confirmation by default)
 - Command line option to abandon your entire quest log (disabled by default)
+- Command line option to abandon groups of quests based on qualifiers (disabled by default)
+  - Available Qualifiers: `gray`, `green`, `yellow`, `orange`, `red`, `daily`, `weekly`
 - Exclude individual quests from group abandons
 - Configuration panel to toggle confirmations and hide/show abandon buttons
 - Super tiny, less than 1MB of memory
@@ -83,6 +85,10 @@ All commands are disabled by default. You can enable them in the configuration p
 
 `/reckless abandon <questId>`
 
+### Abandon all quests that match a qualifier
+
+`/reckless abandon <qualifier>`
+
 ### Exclude a quest from group abandons by questID
 
 `/reckless exclude <questID>`
@@ -90,10 +96,6 @@ All commands are disabled by default. You can enable them in the configuration p
 ### Include a quest in group abandons by questID
 
 `/reckless include <questID>`
-
-### Abandon all quests that match a qualifier
-
-`/reckless abandon <qualifier>`
 
 ### Toggle debugging
 
