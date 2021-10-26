@@ -162,6 +162,8 @@ function E:ChatCommand(input)
 	elseif cmd == "debug" then
 		E:CliToggleDebugging()
 	end
+
+	E:RefreshGUI()
 end
 
 function E:PLAYER_ENTERING_WORLD(event, ...)

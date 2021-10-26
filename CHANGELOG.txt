@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to Semantic Versioning.
 
 - Unreleased
+  - Fixed
+    - Refresh config gui on cli change
 
 - v1.5.1 - 2021-06-30
   - Changed
