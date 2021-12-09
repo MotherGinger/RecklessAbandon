@@ -234,9 +234,9 @@ local function HideAbandonButtons()
 end
 
 function onButtonEnter(self)
-	GameTooltip:SetOwner(self)
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 	GameTooltip:SetText(self.tooltip)
-	GameTooltip:SetBackdropBorderColor(255, 255, 255)
+	GameTooltip.NineSlice:SetBackdropBorderColor(255, 255, 255)
 	GameTooltip:Show()
 end
 
