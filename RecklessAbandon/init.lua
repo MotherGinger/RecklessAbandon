@@ -41,7 +41,7 @@ local AceAddOn, AceAddonMinor = _G.LibStub("AceAddon-3.0")
 local CallbackHandler = _G.LibStub("CallbackHandler-1.0")
 
 local AddOnName, Engine = ...
-local E = AceAddOn:NewAddon(AddOnName, "AceConsole-3.0", "AceEvent-3.0")
+local E = AceAddOn:NewAddon(AddOnName, "AceConsole-3.0", "AceEvent-3.0", "AceBucket-3.0")
 E.DF = {profile = {}, global = {}} -- Defaults
 E.privateVars = {profile = {}} -- Defaults
 E.Options = {type = "group", args = {}}
@@ -117,7 +117,7 @@ function E:OnInitialize()
 	end
 
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
-	self:RegisterEvent("QUEST_LOG_UPDATE")
+	self:RegisterBucketEvent("QUEST_LOG_UPDATE", 1, "QUEST_LOG_UPDATE")
 	self:RegisterEvent("PLAYER_LEVEL_UP")
 	self:RegisterChatCommand("reckless", "ChatCommand")
 

@@ -351,7 +351,7 @@ function E:GenerateQuestTable()
 
 	for i = 1, C_QuestLog.GetNumQuestLogEntries() do
 		local info = C_QuestLog.GetInfo(i)
-		if info.isHeader then
+		if info.isHeader then -- ! caused an issue, info undefined
 			currentGroup = {
 				title = info.title,
 				hidden = true,
