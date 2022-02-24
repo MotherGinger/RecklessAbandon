@@ -4,6 +4,13 @@ This project adheres to Semantic Versioning.
 
 - Unreleased
 
+- v1.5.4 - 2022-02-23
+  - Fixed
+    - Rare instances of lua errors when accepting quests very quickly via addons like AutoTurnIn or Leatrix Plus
+  - Changed
+    - Use AceBucket for event throttling
+    - Bump TOC for 9.2
+
 - v1.5.3 - 2021-12-09
   - Fixed
     - SetBackdropBorderColor lua errors related to api changes in 9.1.5
