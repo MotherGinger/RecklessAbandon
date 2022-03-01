@@ -236,7 +236,7 @@ end
 function onButtonEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 	GameTooltip:SetText(self.tooltip)
-	GameTooltip.NineSlice:SetBackdropBorderColor(255, 255, 255)
+	GameTooltip.NineSlice:SetBorderColor(255, 255, 255)
 	GameTooltip:Show()
 end
 
