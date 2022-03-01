@@ -4,6 +4,11 @@ This project adheres to Semantic Versioning.
 
 - Unreleased
 
+- v1.5.5 - 2022-03-01
+  - Fixed
+    - Missing AceBucket and AceTimer in libraries manifest (Thanks discordgregory!)
+    - Incorrect backdrop border call (Thanks discordgregory!)
+
 - v1.5.4 - 2022-02-23
   - Fixed
     - Rare instances of lua errors when accepting quests very quickly via addons like AutoTurnIn or Leatrix Plus
