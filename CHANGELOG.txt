@@ -121,7 +121,8 @@ This project adheres to Semantic Versioning.
     - Command line for abandoning all quests
     - Documentation
 
-[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.5.4...develop
+[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.5.5...develop
+[1.5.5]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.5.4..1.5.5
 [1.5.4]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.5.3..1.5.4
 [1.5.3]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.5.2..1.5.3
 [1.5.2]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.5.1..1.5.2
