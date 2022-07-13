@@ -28,11 +28,11 @@ Take a look at our [issue board](https://github.com/MotherGinger/RecklessAbandon
 
 ## Configuration Panel - General Options
 
-![WoWScrnShot_011621_135740](https://user-images.githubusercontent.com/29235654/104820564-8d145c00-5803-11eb-9da1-9980b7ca9fe2.jpg)
+![Screenshot 2022-07-13 013335](https://user-images.githubusercontent.com/29235654/178659482-0beccf0b-4130-4e3b-b088-d19d7ec226df.png)
 
 ## Configuration Panel - Exclusions
 
-![WoWScrnShot_011621_135744](https://user-images.githubusercontent.com/29235654/104820563-8c7bc580-5803-11eb-9a97-e7d0165964c8.jpg)
+![Screenshot 2022-07-13 013407](https://user-images.githubusercontent.com/29235654/178659477-8dc8fda0-6842-42db-9058-40b7e4e98d4a.png)
 
 ## Configuration Panel - Commands
 
