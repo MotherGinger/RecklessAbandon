@@ -1,13 +1,13 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Button name="RECKLESS_ABANDON_BUTTON" virtual="true" registerForClicks="LeftButtonUp,RightButtonUp" frameStrata="HIGH" frameLevel="6">
 		<Size>
-			<AbsDimension x="30" y="30"/>
+			<AbsDimension x="30" y="30" />
 		</Size>
-		<NormalFont style="GameFontNormal"/>
-		<NormalTexture file="Interface\Buttons\CancelButton-Up"/>
-		<PushedTexture file="Interface\Buttons\CancelButton-Down"/>
-		<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
-		
+		<NormalFont style="GameFontNormal" />
+		<NormalTexture file="Interface\Buttons\CancelButton-Up" />
+		<PushedTexture file="Interface\Buttons\CancelButton-Down" />
+		<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD" />
+
 		<Scripts>
 			<OnEnter>onButtonEnter(self)</OnEnter>
 			<OnLeave>onButtonLeave(self)</OnLeave>
@@ -18,13 +18,13 @@
 
 	<Button name="RECKLESS_GROUP_ABANDON_BUTTON" virtual="true" registerForClicks="LeftButtonUp,RightButtonUp" frameStrata="HIGH" frameLevel="6">
 		<Size>
-			<AbsDimension x="30" y="30"/>
+			<AbsDimension x="30" y="30" />
 		</Size>
-		<NormalFont style="GameFontNormal"/>
-		<NormalTexture file="Interface\Buttons\CancelButton-Up"/>
-		<PushedTexture file="Interface\Buttons\CancelButton-Down"/>
-		<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
-		
+		<NormalFont style="GameFontNormal" />
+		<NormalTexture file="Interface\Buttons\CancelButton-Up" />
+		<PushedTexture file="Interface\Buttons\CancelButton-Down" />
+		<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD" />
+
 		<Scripts>
 			<OnEnter>onButtonEnter(self)</OnEnter>
 			<OnLeave>onButtonLeave(self)</OnLeave>
@@ -32,9 +32,10 @@
 			<OnUpdate>onButtonUpdate(self)</OnUpdate>
 		</Scripts>
 	</Button>
-	
-	<Script file='Core.lua'/>
-	<Script file='Config.lua'/>
-	<Script file='General.lua'/>
-	<Script file='About.lua'/>
+
+	<Script file="Core.lua" />
+	<Script file="CommandLine.lua" />
+	<Script file="Config.lua" />
+	<Script file="General.lua" />
+	<Script file="About.lua" />
 </Ui>

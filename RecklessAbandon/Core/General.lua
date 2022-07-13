@@ -36,15 +36,41 @@ E.Options.args.general = {
                         E.db.general.loginMessage = value
                     end
                 },
-                space1 = {
+                logLevel = {
                     order = 2,
+                    type = "select",
+                    name = L["Messaging Rate"],
+                    desc = table.concat(
+                        {
+                            L["Adjust the amount of messages you will receive from actions taken against your quest log."],
+                            L["|cFF00D1FFNote:|r You will always be notified when a quest is abandoned on your behalf."]
+                        },
+                        "\n\n"
+                    ),
+                    values = E.logLevels,
+                    width = "double",
+                    get = function(info)
+                        return E.db.general.logLevel
+                    end,
+                    set = function(info, value)
+                        E.db.general.logLevel = value
+                    end
+                },
+                space1 = {
+                    order = 3,
                     type = "description",
                     name = ""
                 },
                 confirmIndividual = {
-                    order = 3,
+                    order = 4,
                     name = L["Confirm individual abandons"],
-                    desc = L["Prompt for confirmation when abandoning individual quests.\n\n|cFFFF6B6BCaution: Turning this off means a quest will be abandoned instantly. Be careful!|r"],
+                    desc = table.concat(
+                        {
+                            L["Prompt for confirmation when abandoning individual quests."],
+                            L["|cFFFF6B6BCaution: Turning this off means a quest will be abandoned instantly. Be careful!|r"]
+                        },
+                        "\n\n"
+                    ),
                     type = "toggle",
                     get = function(info)
                         return E.db.general.confirmIndividual
@@ -54,9 +80,15 @@ E.Options.args.general = {
                     end
                 },
                 confirmGroup = {
-                    order = 4,
+                    order = 5,
                     name = L["Confirm group abandons"],
-                    desc = L["Prompt for confirmation when abandoning multiple quests.\n\n|cFFFF6B6BCaution: Turning this off means a group of quests will be abandoned instantly. Be careful!|r"],
+                    desc = table.concat(
+                        {
+                            L["Prompt for confirmation when abandoning multiple quests."],
+                            L["|cFFFF6B6BCaution: Turning this off means a group of quests will be abandoned instantly. Be careful!|r"]
+                        },
+                        "\n\n"
+                    ),
                     type = "toggle",
                     get = function(info)
                         return E.db.general.confirmGroup
@@ -65,8 +97,13 @@ E.Options.args.general = {
                         E.db.general.confirmGroup = value
                     end
                 },
+                space2 = {
+                    order = 6,
+                    type = "description",
+                    name = "\n\n"
+                },
                 individualQuests = {
-                    order = 5,
+                    order = 7,
                     type = "group",
                     name = L["Individual Quests"],
                     inline = true,
@@ -82,11 +119,23 @@ E.Options.args.general = {
                             set = function(info, value)
                                 E.db.general.individualQuests.showAbandonButton = value
                             end
+                        },
+                        completeProtection = {
+                            order = 1,
+                            name = L["Complete Protection"],
+                            desc = L["Automatically exclude completed quests from group abandons and automation options."],
+                            type = "toggle",
+                            get = function(info)
+                                return E.db.general.individualQuests.completeProtection
+                            end,
+                            set = function(info, value)
+                                E.db.general.individualQuests.completeProtection = value
+                            end
                         }
                     }
                 },
                 zoneQuests = {
-                    order = 6,
+                    order = 8,
                     type = "group",
                     name = L["Zone Quests"],
                     inline = true,
@@ -106,7 +155,7 @@ E.Options.args.general = {
                     }
                 },
                 campaignQuests = {
-                    order = 7,
+                    order = 9,
                     type = "group",
                     name = L["Campaign Quests"],
                     inline = true,
@@ -126,7 +175,7 @@ E.Options.args.general = {
                     }
                 },
                 covenantCallings = {
-                    order = 8,
+                    order = 10,
                     type = "group",
                     name = L["Covenant Callings"],
                     inline = true,
@@ -144,6 +193,49 @@ E.Options.args.general = {
                             end
                         }
                     }
+                },
+                automationHeader = {
+                    order = 11,
+                    type = "header",
+                    name = L["Automation Options"]
+                },
+                automationDescription = {
+                    order = 12,
+                    type = "description",
+                    name = table.concat(
+                        {
+                            L["These options will act upon your quest log automatically. This can save you time, however care should be taken when using them."],
+                            L["|cFF00D1FFNote:|r Each character has their own automation options."]
+                        },
+                        "\n\n"
+                    )
+                },
+                space3 = {
+                    order = 13,
+                    type = "description",
+                    name = "\n"
+                },
+                autoAbandonQuests = {
+                    order = 14,
+                    name = L["Abandon Quests"],
+                    desc = table.concat(
+                        {
+                            L["Automatically abandon quests of the given type if they are included in group abandons."],
+                            L["|cFFFF6B6BCaution:|r These quests will be abandoned for you, confirmation settings will be ignored."]
+                        },
+                        "\n\n"
+                    ),
+                    type = "multiselect",
+                    values = function()
+                        local _, values = E:GetAvailableQualifiers()
+                        return values
+                    end,
+                    get = function(info, value)
+                        return E.private.general.autoAbandonQuests[value]
+                    end,
+                    set = function(info, value)
+                        E.private.general.autoAbandonQuests[value] = not E.private.general.autoAbandonQuests[value]
+                    end
                 }
             }
         },
@@ -172,24 +264,24 @@ E.Options.args.general = {
                 excludedQuests = {
                     order = 3,
                     type = "description",
+                    disabled = true,
                     name = function()
-                        if (E:IsEmpty(E.private.exclusions.excludedQuests)) then
-                            return L["|cFF808080There are currently no quests being excluded.|r"]
-                        end
+                        local exclusionTable = {{L["QuestID"], L["Source"], L["Title"]}}
 
-                        local exclusions = format("|cFFF2E699%s|r | %s\n--------------------", L["QuestID"], L["Title"])
-                        local titleFormat = "\n|cFFF2E699%s|r    | %s"
-                        local orphanTitleFormat = "\n|cFFF2E699%s|r    | |cFFFF6B6B%s|r"
-
-                        -- * Excluded quests are stored with the localized version of the title at time of exclusion
-                        -- * This cannot be updated when language changes since the title can only be fetched for quests still in your log
-                        -- * It would then be impossible to update titles for abandoned but still excluded quests
-                        for questId, title in pairs(E.private.exclusions.excludedQuests) do
+                        for questId, meta in pairs(E.private.exclusions.excludedQuests) do
+                            local title = meta.title
+                            local source = meta.source == MANUAL and L["Manual"] or L["Automation"]
                             local orphaned = C_QuestLog.GetLogIndexForQuestID(questId) == nil
-                            exclusions = exclusions .. format(orphaned and orphanTitleFormat or titleFormat, questId, title)
+
+                            -- * Excluded quests are stored with the localized version of the title at time of exclusion
+                            -- * This cannot be updated when language changes since the title can only be fetched for quests still in your log
+                            -- * It would then be impossible to update titles for abandoned but still excluded quests
+                            tinsert(exclusionTable, {questId, source, title, orphaned})
                         end
-                        return exclusions
-                    end
+
+                        return E:TableToString(exclusionTable)
+                    end,
+                    dialogControl = "ExclusionTable"
                 },
                 space1 = {
                     order = 4,
@@ -200,7 +292,14 @@ E.Options.args.general = {
                     order = 5,
                     type = "toggle",
                     name = L["Automatic Pruning"],
-                    desc = L["Automatically prune quests from the exclusion list when they are abandoned.\n\n|cFF00D1FFNote:|r This does not retroactively prune quests that have already been abandoned, but are still in the exclusion list.\n\nUse the 'Prune Exclusion List' button below to do this manually."],
+                    desc = table.concat(
+                        {
+                            L["Automatically prune quests from the exclusion list when they are abandoned, or when they are no longer in your quest log and were excluded via automation."],
+                            L["|cFF00D1FFNote:|r This does not retroactively prune quests that have already been abandoned, but are still in the exclusion list."],
+                            L["Use the 'Prune Exclusion List' button below to do this manually."]
+                        },
+                        "\n\n"
+                    ),
                     width = "full",
                     get = function(info)
                         return E.private.exclusions.autoPrune
@@ -213,7 +312,13 @@ E.Options.args.general = {
                     order = 6,
                     type = "execute",
                     name = L["Prune Exclusion List"],
-                    desc = L["Quests that appear in |cFFFF6B6Bred|r are no longer detected in your quest log.\n\nYou can prune them by clicking this button, or leave them and they will be excluded again the next time they are picked up."],
+                    desc = table.concat(
+                        {
+                            L["Quests that appear in |cFFFF6B6Bred|r are no longer detected in your quest log."],
+                            L["You can prune them by clicking this button, or leave them and they will be excluded again the next time they are picked up."]
+                        },
+                        "\n\n"
+                    ),
                     func = function()
                         E:PruneQuestExclusions()
                     end
@@ -222,7 +327,13 @@ E.Options.args.general = {
                     order = 7,
                     type = "execute",
                     name = L["Clear Exclusion List"],
-                    desc = L["Clear the exclusion list by including quests that are still in your quest log and pruning those that aren't."],
+                    desc = table.concat(
+                        {
+                            L["Print debugging statements when this is enabled."],
+                            L["|cFF00D1FFNote:|r You can also toggle this quickly via |cff888888/reckless debug|r"]
+                        },
+                        "\n\n"
+                    ),
                     func = function()
                         E:ClearQuestExclusions()
                     end

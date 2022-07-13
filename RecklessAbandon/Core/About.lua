@@ -44,7 +44,7 @@ E.Options.args.about = {
                 cob = {
                     order = 2,
                     type = "description",
-                    name = "Cob"
+                    name = "|T626000:0|t |cFFABD473Cob-Thrall (US)|r"
                 }
             }
         },

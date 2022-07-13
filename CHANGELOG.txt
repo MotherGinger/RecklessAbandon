@@ -3,6 +3,23 @@ All notable changes to this project will be documented in this file.
 This project adheres to Semantic Versioning.
 
 - Unreleased
+  - Added
+    - New automation options for automatically abandoning quests of a given type
+      - Automation options are character specific
+    - New complete protection option for individual quests
+      - When enabled, complete protection will automatically exclude completed quests
+      - Complete protection is enabled by default
+    - New messaging rate option for adjusting how chatty Reckless Abandon is
+  - Changed
+    - Updated the quest exclusion list
+      - The exclusion list now updates in realtime
+      - Long exclusion lists are now scrollable
+      - Added a source column
+        - Manual: The quest was manually excluded
+        - Automation: The quest was excluded by an automation option
+    - The automatic pruning option will now also prune quests excluded via automation options that are no longer in your quest log
+  - Fixed
+    - Various spanish localization strings
 
 - v1.5.6 - 2022-06-02
   - Changed
