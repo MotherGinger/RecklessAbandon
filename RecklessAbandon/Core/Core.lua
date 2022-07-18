@@ -387,7 +387,7 @@ function E:GetQuestColor(level)
 		return L["orange"]
 	elseif levelDiff >= -2 then
 		return L["yellow"]
-	elseif -levelDiff <= GetQuestGreenRange("player") then
+	elseif -levelDiff <= UnitQuestTrivialLevelRange("player") then
 		return L["green"]
 	else
 		return L["gray"]
