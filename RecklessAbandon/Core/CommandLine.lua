@@ -6,15 +6,15 @@ local E, L = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, Profil
 
 function E:CliToggleDebugging()
     self.db.debugging.debugLogging = not self.db.debugging.debugLogging
-    self:Print(self.db.debugging.debugLogging and L["Debugging is now on."] or L["Debugging is now off."])
+    self:Info(self.db.debugging.debugLogging and L["Debugging is now on."] or L["Debugging is now off."])
 end
 
 function E:CliListAllQuests()
     if self.db.commands.listAll then
-        self:Print("-------------------------------------------")
-        self:Print(L["|cFFFF9C00<Zone Header>|r"])
-        self:Print(L["    |cFFF2E699<Title>|r - |cFFB5FFEB<QuestID>|r"])
-        self:Print("-------------------------------------------")
+        self:Info("-------------------------------------------")
+        self:Info(L["|cFFFF9C00<Zone Header>|r"])
+        self:Info(L["    |cFFF2E699<Title>|r - |cFFB5FFEB<QuestID>|r"])
+        self:Info("-------------------------------------------")
         for i = 1, C_QuestLog.GetNumQuestLogEntries() do
             local info = C_QuestLog.GetInfo(i)
             -- * Some quest headers still exist in your quest log, but have no children and are not hidden
@@ -23,9 +23,9 @@ function E:CliListAllQuests()
             -- * It might be possible to filter these out by checking for two consecutive headers
             if not info.isHidden then
                 if info.isHeader then
-                    self:Print("|cFFFF9C00" .. info.title .. "|r")
+                    self:Info("|cFFFF9C00" .. info.title .. "|r")
                 else
-                    self:Print("    |cFFF2E699" .. info.title .. "|r" .. " - " .. "|cFFB5FFEB" .. info.questID .. "|r")
+                    self:Info("    |cFFF2E699" .. info.title .. "|r" .. " - " .. "|cFFB5FFEB" .. info.questID .. "|r")
                 end
             end
         end
@@ -40,7 +40,7 @@ function E:CliAbandonAllQuests()
             self:AbandonAllQuests()
         end
     else
-        self:Print(L["Abandoning all quests from the command line is currently |cFFFF6B6Bdisabled|r. You can enable it in the configuration settings |cff888888/reckless config|r"])
+        self:Warn(L["Abandoning all quests from the command line is currently |cFFFF6B6Bdisabled|r. You can enable it in the configuration settings |cff888888/reckless config|r"])
     end
 end
 
@@ -60,10 +60,10 @@ function E:CliAbandonQuestById(questId)
                 self:AbandonQuest(questId)
             end
         else
-            self:Print(format(L["Unable to abandon quest, '%s' is not recognized. Either the quest is not in your quest log, or you may have entered the wrong id."], questId))
+            self:Error(format(L["Unable to abandon quest, '%s' is not recognized. Either the quest is not in your quest log, or you may have entered the wrong id."], questId))
         end
     else
-        self:Print(L["Abandoning quests from the command line is currently |cFFFF6B6Bdisabled|r. You can enable it in the configuration settings |cff888888/reckless config|r"])
+        self:Warn(L["Abandoning quests from the command line is currently |cFFFF6B6Bdisabled|r. You can enable it in the configuration settings |cff888888/reckless config|r"])
     end
 end
 
@@ -112,10 +112,10 @@ function E:CliAbandonByQualifier(qualifier)
                 }
             end
         else
-            self:Print(format(L["|cFF808080There are no quests that match the qualifier '%s'.|r"], qualifier))
+            self:Error(format(L["|cFF808080There are no quests that match the qualifier '%s'.|r"], qualifier))
         end
     else
-        self:Print(L["Abandoning quests from the command line is currently |cFFFF6B6Bdisabled|r. You can enable it in the configuration settings |cff888888/reckless config|r"])
+        self:Warn(L["Abandoning quests from the command line is currently |cFFFF6B6Bdisabled|r. You can enable it in the configuration settings |cff888888/reckless config|r"])
     end
 end
 
@@ -126,13 +126,13 @@ function E:CliExcludeQuestById(questId)
             if not self:IsExcluded(questId) then
                 self:ExcludeQuest(questId)
             else
-                self:Print(format(L["%s is already excluded from group abandons!"], GetQuestLink(questId)))
+                self:Warn(format(L["%s is already excluded from group abandons!"], GetQuestLink(questId)))
             end
         else
-            self:Print(format(L["Unable to exclude quest, '%s' is not recognized. Either the quest is not in your quest log, or you may have entered the wrong id."], questId))
+            self:Error(format(L["Unable to exclude quest, '%s' is not recognized. Either the quest is not in your quest log, or you may have entered the wrong id."], questId))
         end
     else
-        self:Print(L["Excluding quests from the command line is currently |cFFFF6B6Bdisabled|r. You can enable it in the configuration settings |cff888888/reckless config|r"])
+        self:Warn(L["Excluding quests from the command line is currently |cFFFF6B6Bdisabled|r. You can enable it in the configuration settings |cff888888/reckless config|r"])
     end
 end
 
@@ -143,12 +143,12 @@ function E:CliIncludeQuestById(questId)
             if self:IsExcluded(questId) then
                 self:IncludeQuest(questId)
             else
-                self:Print(format(L["%s is already included in group abandons!"], GetQuestLink(questId)))
+                self:Warn(format(L["%s is already included in group abandons!"], GetQuestLink(questId)))
             end
         else
-            self:Print(format(L["Unable to include quest, '%s' is not recognized. Either the quest is not in your quest log, or you may have entered the wrong id."], questId))
+            self:Error(format(L["Unable to include quest, '%s' is not recognized. Either the quest is not in your quest log, or you may have entered the wrong id."], questId))
         end
     else
-        self:Print(L["Including quests from the command line is currently |cFFFF6B6Bdisabled|r. You can enable it in the configuration settings |cff888888/reckless config|r"])
+        self:Warn(L["Including quests from the command line is currently |cFFFF6B6Bdisabled|r. You can enable it in the configuration settings |cff888888/reckless config|r"])
     end
 end
