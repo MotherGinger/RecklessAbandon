@@ -589,7 +589,7 @@ function E:AutoAbandonQuests()
 		local level = info.level
 		local isDaily = info.frequency == 1
 		local isWeekly = info.frequency == 2
-		local isComplete = C_QuestLog.IsQuestFlaggedCompleted(questId)
+		local isComplete = C_QuestLog.IsComplete(questId)
 
 		if not info.isHeader then
 			local levelDiff = level - E.mylevel
@@ -623,7 +623,7 @@ function E:AutoExcludeQuests()
 	for i = 1, C_QuestLog.GetNumQuestLogEntries() do
 		local info = C_QuestLog.GetInfo(i)
 		local questId = info.questID
-		local isComplete = C_QuestLog.IsQuestFlaggedCompleted(questId)
+		local isComplete = C_QuestLog.IsComplete(questId)
 
 		if not info.isHeader then
 			if self.db.general.individualQuests.completeProtection and isComplete and not self:IsExcluded(questId) then
