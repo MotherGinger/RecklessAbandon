@@ -447,8 +447,8 @@ function E:GenerateQuestTable()
 		end
 	end
 
-	self:Debug("Quest Table: " .. self:Dump(questGroupsByName))
-	self:Debug("Excluded Quests: " .. self:Dump(self.private.exclusions.excludedQuests))
+	self:Debug(L["Quest Table: "] .. self:Dump(questGroupsByName))
+	self:Debug(L["Excluded Quests: "] .. self:Dump(self.private.exclusions.excludedQuests))
 end
 
 function E:AbandonAllQuests()
@@ -595,15 +595,19 @@ function E:AutoAbandonQuests()
 			local levelDiff = level - E.mylevel
 			local color = self:GetQuestColor(level)
 
-			local gray = self.private.general.autoAbandonQuests.gray and L["gray"] == color
-			local green = self.private.general.autoAbandonQuests.green and L["green"] == color
-			local orange = self.private.general.autoAbandonQuests.orange and L["orange"] == color
-			local red = self.private.general.autoAbandonQuests.red and L["red"] == color
-			local daily = self.private.general.autoAbandonQuests.daily and isDaily
-			local weekly = self.private.general.autoAbandonQuests.weekly and isWeekly
-			local yellow = self.private.general.autoAbandonQuests.yellow and L["yellow"] == color
+			local autoAbandonQuests = self.private.general.autoAbandonQuests
+			local ids = autoAbandonQuests.ids or "" -- These should never be nil, but lets guard against a corrupt config
 
-			if gray or green or orange or red or daily or yellow or weekly then
+			local abandonQuestId = E:TableContainsValue({strsplit(",", ids)}, questId)
+			local gray = autoAbandonQuests.questType.gray and L["gray"] == color
+			local green = autoAbandonQuests.questType.green and L["green"] == color
+			local orange = autoAbandonQuests.questType.orange and L["orange"] == color
+			local red = autoAbandonQuests.questType.red and L["red"] == color
+			local daily = autoAbandonQuests.questType.daily and isDaily
+			local weekly = autoAbandonQuests.questType.weekly and isWeekly
+			local yellow = autoAbandonQuests.questType.yellow and L["yellow"] == color
+
+			if abandonQuestId or gray or green or orange or red or daily or yellow or weekly then
 				-- ! This triggers a second UNIT_QUEST_LOG_CHANGED event which reattempts to abandon excluded quests
 				-- ! This is a bit spammy and needs to be throttled somehow
 				if self:AbandonQuest(questId) then
@@ -635,7 +639,7 @@ end
 
 function E:PrintWelcomeMessage()
 	if self.db.general.loginMessage then
-		self:System(format(L["You are running |cFFB5FFEBv%s|r. Type |cff888888/reckless config|r to configure settings."], E.version))
+		self:System(format(L["You are running |cFFB5FFEBv%s|r. Type |cff888888/rab|r to configure settings."], E.version))
 	end
 
 	if not WOW_PROJECT_ID == E.validVersion then
@@ -658,6 +662,21 @@ function E:NormalizeSettings()
 				E.private.exclusions.excludedQuests[k] = {["title"] = v, ["source"] = MANUAL}
 			end
 		end
+	end
+
+	-- Rebuild automation options
+	if E.private.general.autoAbandonQuests.questType == nil or E:IsEmpty(E.private.general.autoAbandonQuests.questType) then
+		E.private.general.autoAbandonQuests.questType = nil
+		E.private.general.autoAbandonQuests = {
+			["questType"] = E.private.general.autoAbandonQuests
+		}
+	end
+
+	-- Rebuild command settings
+	if E.db.commands.generic == nil or E:IsEmpty(E.db.commands.generic) then
+		E.db.commands = {
+			["generic"] = E.db.commands
+		}
 	end
 end
 

@@ -10,7 +10,7 @@ function E:CliToggleDebugging()
 end
 
 function E:CliListAllQuests()
-    if self.db.commands.listAll then
+    if self.db.commands.generic.listAll then
         self:Info("-------------------------------------------")
         self:Info(L["|cFFFF9C00<Zone Header>|r"])
         self:Info(L["    |cFFF2E699<Title>|r - |cFFB5FFEB<QuestID>|r"])
@@ -33,7 +33,7 @@ function E:CliListAllQuests()
 end
 
 function E:CliAbandonAllQuests()
-    if self.db.commands.abandonAll then
+    if self.db.commands.generic.abandonAll then
         if self.db.general.confirmGroup then
             StaticPopup_Show("RECKLESS_ABANDON_ALL_CONFIRMATION")
         else
@@ -45,7 +45,7 @@ function E:CliAbandonAllQuests()
 end
 
 function E:CliAbandonQuestById(questId)
-    if self.db.commands.abandonByQuestId then
+    if self.db.commands.generic.abandonByQuestId then
         local index = C_QuestLog.GetLogIndexForQuestID(questId)
         if index ~= nil then
             if self.db.general.confirmIndividual then
@@ -73,7 +73,7 @@ function E:CliAbandonByQualifier(qualifier)
     self:Debug(format(L["Abandon invoked with qualifier '%s'"], qualifier))
     self:Debug(format(L["Available Qualifiers:%s"], self:Tabulate(qualifiers, " %s")))
 
-    if self.db.commands.abandonByQualifier then
+    if self.db.commands.generic.abandonByQualifier then
         local questIds = {}
         local questTitles = {}
         for i = 1, C_QuestLog.GetNumQuestLogEntries() do
@@ -120,7 +120,7 @@ function E:CliAbandonByQualifier(qualifier)
 end
 
 function E:CliExcludeQuestById(questId)
-    if self.db.commands.excludeByQuestId then
+    if self.db.commands.generic.excludeByQuestId then
         local index = C_QuestLog.GetLogIndexForQuestID(questId)
         if index ~= nil then
             if not self:IsExcluded(questId) then
@@ -137,7 +137,7 @@ function E:CliExcludeQuestById(questId)
 end
 
 function E:CliIncludeQuestById(questId)
-    if self.db.commands.includeByQuestId then
+    if self.db.commands.generic.includeByQuestId then
         local index = C_QuestLog.GetLogIndexForQuestID(questId)
         if index ~= nil then
             if self:IsExcluded(questId) then

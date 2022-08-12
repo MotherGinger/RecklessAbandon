@@ -1,7 +1,7 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 
 local tostring = tostring
-local format, strlen, strrep = format, strlen, strrep
+local format, strlen, strrep, strsplit = format, strlen, strrep, strsplit
 
 E.Options.args.general = {
     type = "group",
@@ -217,25 +217,62 @@ E.Options.args.general = {
                 },
                 autoAbandonQuests = {
                     order = 14,
+                    type = "group",
                     name = L["Abandon Quests"],
-                    desc = table.concat(
-                        {
-                            L["Automatically abandon quests of the given type if they are included in group abandons."],
-                            L["|cFFFF6B6BCaution:|r These quests will be abandoned for you, confirmation settings will be ignored."]
+                    args = {
+                        questType = {
+                            order = 0,
+                            name = L["Quest Type"],
+                            desc = table.concat(
+                                {
+                                    L["Automatically abandon quests of the given type if they are included in group abandons."],
+                                    L["|cFFFF6B6BCaution:|r These quests will be abandoned for you, confirmation settings will be ignored."]
+                                },
+                                "\n\n"
+                            ),
+                            type = "multiselect",
+                            values = function()
+                                local _, values = E:GetAvailableQualifiers()
+                                return values
+                            end,
+                            get = function(info, value)
+                                return E.private.general.autoAbandonQuests.questType[value]
+                            end,
+                            set = function(info, value)
+                                E.private.general.autoAbandonQuests.questType[value] = not E.private.general.autoAbandonQuests.questType[value]
+                            end
                         },
-                        "\n\n"
-                    ),
-                    type = "multiselect",
-                    values = function()
-                        local _, values = E:GetAvailableQualifiers()
-                        return values
-                    end,
-                    get = function(info, value)
-                        return E.private.general.autoAbandonQuests[value]
-                    end,
-                    set = function(info, value)
-                        E.private.general.autoAbandonQuests[value] = not E.private.general.autoAbandonQuests[value]
-                    end
+                        space4 = {
+                            order = 1,
+                            type = "description",
+                            name = "\n"
+                        },
+                        ids = {
+                            order = 2,
+                            type = "input",
+                            name = L["Quest IDs"],
+                            desc = table.concat(
+                                {
+                                    L["Enter quest ids seperated by a comma. These quests will be abandoned automatically if they are included in group abandons."],
+                                    "e.g. 4563,7562,2345"
+                                },
+                                "\n\n"
+                            ),
+                            multiline = 5,
+                            width = "full",
+                            get = function(info, values)
+                                return E.private.general.autoAbandonQuests.ids
+                            end,
+                            set = function(info, value)
+                                -- * Remove all non digit and comma characters
+                                -- * Replace all consecutive commas with one comma
+                                -- * Remove any trailing comma
+                                local ids = value:gsub("[^%d,]+", ""):gsub(",+", ","):gsub("^,+", ""):gsub(",*$", "")
+                                E:Debug(L["Auto Abandon: "], E:Dump({strsplit(",", ids)}))
+                                E.private.general.autoAbandonQuests.ids = ids
+                            end
+                        }
+                    }
                 }
             }
         },
@@ -350,89 +387,106 @@ E.Options.args.general = {
                     type = "header",
                     name = L["Slash Commands"]
                 },
-                listAll = {
+                commandsDescription = {
                     order = 1,
-                    name = L["Enable |cff888888/reckless list all|r"],
-                    desc = L["This command lists all quests in a table."],
-                    descStyle = "inline",
-                    width = "full",
-                    type = "toggle",
-                    get = function(info)
-                        return E.db.commands[info[#info]]
-                    end,
-                    set = function(info, value)
-                        E.db.commands[info[#info]] = value
-                    end
+                    type = "description",
+                    name = L["|cFF00D1FFNote:|r The token |cff888888reckless|r can be replaced by |cff888888rab|r for all commands."]
                 },
-                abandonAll = {
+                space1 = {
                     order = 2,
-                    name = L["Enable |cff888888/reckless abandon all|r"],
-                    desc = L["|cFFFFF569Warning:|r This command abandons all quests in your quest log that are not excluded from group abandons, use it wisely."],
-                    descStyle = "inline",
-                    width = "full",
-                    type = "toggle",
-                    get = function(info)
-                        return E.db.commands[info[#info]]
-                    end,
-                    set = function(info, value)
-                        E.db.commands[info[#info]] = value
-                    end
+                    type = "description",
+                    name = "\n"
                 },
-                abandonByQuestId = {
+                generic = {
                     order = 3,
-                    name = L["Enable |cff888888/reckless abandon <questID>|r"],
-                    desc = L["This command abandons a quest that matches the provided questID."],
-                    descStyle = "inline",
-                    width = "full",
-                    type = "toggle",
-                    get = function(info)
-                        return E.db.commands[info[#info]]
-                    end,
-                    set = function(info, value)
-                        E.db.commands[info[#info]] = value
-                    end
-                },
-                abandonByQualifier = {
-                    order = 4,
-                    name = L["Enable |cff888888/reckless abandon <qualifier>|r"],
-                    desc = format("%s\n\n%s\n\n%s", L["This command abandons all quests that match a given qualifier and are not excluded from group abandons."], L["Available Qualifiers:"], E:Tabulate(E:GetAvailableQualifiers(), "|cFFF2E699%s|r - %s\n")),
-                    descStyle = "inline",
-                    width = "full",
-                    type = "toggle",
-                    get = function(info)
-                        return E.db.commands[info[#info]]
-                    end,
-                    set = function(info, value)
-                        E.db.commands[info[#info]] = value
-                    end
-                },
-                excludeByQuestId = {
-                    order = 5,
-                    name = L["Enable |cff888888/reckless exclude <questID>|r"],
-                    desc = L["This command excludes a quest that matches the provided questID from group abandons."],
-                    descStyle = "inline",
-                    width = "full",
-                    type = "toggle",
-                    get = function(info)
-                        return E.db.commands[info[#info]]
-                    end,
-                    set = function(info, value)
-                        E.db.commands[info[#info]] = value
-                    end
-                },
-                includeByQuestId = {
-                    order = 6,
-                    name = L["Enable |cff888888/reckless include <questID>|r"],
-                    desc = L["This command includes a quest that matches the provided questID in group abandons."],
-                    descStyle = "inline",
-                    width = "full",
-                    type = "toggle",
-                    get = function(info)
-                        return E.db.commands[info[#info]]
-                    end,
-                    set = function(info, value)
-                        E.db.commands[info[#info]] = value
-                    end
+                    type = "group",
+                    name = L["Generic"],
+                    args = {
+                        listAll = {
+                            order = 0,
+                            name = L["Enable |cff888888/reckless list all|r"],
+                            desc = L["This command lists all quests in a table."],
+                            descStyle = "inline",
+                            width = "full",
+                            type = "toggle",
+                            get = function(info)
+                                return E.db.commands.generic[info[#info]]
+                            end,
+                            set = function(info, value)
+                                E.db.commands.generic[info[#info]] = value
+                            end
+                        },
+                        abandonAll = {
+                            order = 1,
+                            name = L["Enable |cff888888/reckless abandon all|r"],
+                            desc = L["|cFFFFF569Warning:|r This command abandons all quests in your quest log that are not excluded from group abandons, use it wisely."],
+                            descStyle = "inline",
+                            width = "full",
+                            type = "toggle",
+                            get = function(info)
+                                return E.db.commands.generic[info[#info]]
+                            end,
+                            set = function(info, value)
+                                E.db.commands.generic[info[#info]] = value
+                            end
+                        },
+                        abandonByQuestId = {
+                            order = 2,
+                            name = L["Enable |cff888888/reckless abandon <questID>|r"],
+                            desc = L["This command abandons a quest that matches the provided questID."],
+                            descStyle = "inline",
+                            width = "full",
+                            type = "toggle",
+                            get = function(info)
+                                return E.db.commands.generic[info[#info]]
+                            end,
+                            set = function(info, value)
+                                E.db.commands.generic[info[#info]] = value
+                            end
+                        },
+                        abandonByQualifier = {
+                            order = 3,
+                            name = L["Enable |cff888888/reckless abandon <qualifier>|r"],
+                            desc = format("%s\n\n%s\n\n%s", L["This command abandons all quests that match a given qualifier and are not excluded from group abandons."], L["Available Qualifiers:"], E:Tabulate(E:GetAvailableQualifiers(), "|cFFF2E699%s|r - %s\n")),
+                            descStyle = "inline",
+                            width = "full",
+                            type = "toggle",
+                            get = function(info)
+                                return E.db.commands.generic[info[#info]]
+                            end,
+                            set = function(info, value)
+                                E.db.commands.generic[info[#info]] = value
+                            end
+                        },
+                        excludeByQuestId = {
+                            order = 4,
+                            name = L["Enable |cff888888/reckless exclude <questID>|r"],
+                            desc = L["This command excludes a quest that matches the provided questID from group abandons."],
+                            descStyle = "inline",
+                            width = "full",
+                            type = "toggle",
+                            get = function(info)
+                                return E.db.commands.generic[info[#info]]
+                            end,
+                            set = function(info, value)
+                                E.db.commands.generic[info[#info]] = value
+                            end
+                        },
+                        includeByQuestId = {
+                            order = 5,
+                            name = L["Enable |cff888888/reckless include <questID>|r"],
+                            desc = L["This command includes a quest that matches the provided questID in group abandons."],
+                            descStyle = "inline",
+                            width = "full",
+                            type = "toggle",
+                            get = function(info)
+                                return E.db.commands.generic[info[#info]]
+                            end,
+                            set = function(info, value)
+                                E.db.commands.generic[info[#info]] = value
+                            end
+                        }
+                    }
                 }
             }
         },

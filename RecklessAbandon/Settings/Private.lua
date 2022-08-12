@@ -2,7 +2,10 @@ local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateD
 
 V.general = {
     autoAbandonQuests = {
-        ["*"] = false
+        questType = {
+            ["*"] = false
+        },
+        ids = ""
     }
 }
 

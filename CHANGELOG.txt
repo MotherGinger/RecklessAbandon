@@ -6,6 +6,7 @@ This project adheres to Semantic Versioning.
   - Added
     - New automation options for automatically abandoning quests of a given type
       - Automation options are character specific
+    - New automation option for automatically abandoning a list of quest ids
     - New complete protection option for individual quests
       - When enabled, complete protection will automatically exclude completed quests
       - Complete protection is enabled by default
@@ -18,6 +19,8 @@ This project adheres to Semantic Versioning.
         - Manual: The quest was manually excluded
         - Automation: The quest was excluded by an automation option
     - The automatic pruning option will now also prune quests excluded via automation options that are no longer in your quest log
+    - Commands can now be executed with /ra in addition to /reckless
+      - e.g. /ra is the same as /ra config or /reckless config
   - Fixed
     - Various spanish localization strings
 

@@ -124,6 +124,7 @@ function E:OnInitialize()
 	self:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "PruneQuestExclusionsFromAutomation")
 	self:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "RefreshGUI")
 	self:RegisterChatCommand("reckless", "ChatCommand")
+	self:RegisterChatCommand("rab", "ChatCommand")
 
 	self.loadedtime = GetTime()
 end
@@ -142,24 +143,24 @@ LoadUI:SetScript(
 
 function E:ChatCommand(input)
 	-- /reckless cmd args
-	local _, _, cmd, args = string.find(input, "%s?(%w+)%s?(.*)")
+	local cmd, arg1, arg2 = E:GetArgs(input, 3)
 	local qualifiers = E:GetAvailableQualifiers()
 
 	-- TODO localize commands
-	if cmd == "config" and args == "" then
+	if cmd == "config" or cmd == nil then
 		E:ToggleOptionsUI()
-	elseif cmd == "list" and args == "all" then
+	elseif cmd == "list" and arg1 == "all" then
 		E:CliListAllQuests()
-	elseif cmd == "abandon" and args == "all" then
+	elseif cmd == "abandon" and arg1 == "all" then
 		E:CliAbandonAllQuests()
-	elseif cmd == "abandon" and tonumber(args) ~= nil then
-		E:CliAbandonQuestById(args)
-	elseif cmd == "abandon" and qualifiers[args] ~= nil then
-		E:CliAbandonByQualifier(args)
-	elseif cmd == "exclude" and tonumber(args) then
-		E:CliExcludeQuestById(args)
-	elseif cmd == "include" and tonumber(args) then
-		E:CliIncludeQuestById(args)
+	elseif cmd == "abandon" and tonumber(arg1) ~= nil then
+		E:CliAbandonQuestById(arg1)
+	elseif cmd == "abandon" and qualifiers[arg1] ~= nil then
+		E:CliAbandonByQualifier(arg1)
+	elseif cmd == "exclude" and tonumber(arg1) ~= nil then
+		E:CliExcludeQuestById(arg1)
+	elseif cmd == "include" and tonumber(arg1) ~= nil then
+		E:CliIncludeQuestById(arg1)
 	elseif cmd == "debug" then
 		E:CliToggleDebugging()
 	end

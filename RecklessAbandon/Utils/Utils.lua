@@ -165,3 +165,17 @@ function E:SerializeTable(val, name, skipnewlines, depth)
 
     return tmp
 end
+
+function E:TableContainsValue(table, value)
+    for _, v in ipairs(table) do
+        if type(value) == "number" then
+            v = tonumber(v)
+        end
+
+        if v == value then
+            return true
+        end
+    end
+
+    return false
+end
