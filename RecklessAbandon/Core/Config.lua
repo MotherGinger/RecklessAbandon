@@ -3,7 +3,7 @@ local E, L = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, Profil
 local _G = _G
 
 local DEFAULT_WIDTH = 900
-local DEFAULT_HEIGHT = 700
+local DEFAULT_HEIGHT = 825
 
 local EnableAddOn = EnableAddOn
 local LoadAddOn = LoadAddOn
