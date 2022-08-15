@@ -364,13 +364,7 @@ E.Options.args.general = {
                     order = 7,
                     type = "execute",
                     name = L["Clear Exclusion List"],
-                    desc = table.concat(
-                        {
-                            L["Print debugging statements when this is enabled."],
-                            L["|cFF00D1FFNote:|r You can also toggle this quickly via |cff888888/reckless debug|r"]
-                        },
-                        "\n\n"
-                    ),
+                    desc = L["Clear the exclusion list by including quests that are still in your quest log and pruning those that aren't."],
                     func = function()
                         E:ClearQuestExclusions()
                     end
