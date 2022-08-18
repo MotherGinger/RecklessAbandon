@@ -193,14 +193,21 @@ E.Options.args.general = {
                             end
                         }
                     }
-                },
+                }
+            }
+        },
+        automationOptions = {
+            order = 1,
+            type = "group",
+            name = L["Automation Options"],
+            args = {
                 automationHeader = {
-                    order = 11,
+                    order = 0,
                     type = "header",
                     name = L["Automation Options"]
                 },
                 automationDescription = {
-                    order = 12,
+                    order = 1,
                     type = "description",
                     name = table.concat(
                         {
@@ -211,12 +218,12 @@ E.Options.args.general = {
                     )
                 },
                 space3 = {
-                    order = 13,
+                    order = 2,
                     type = "description",
                     name = "\n"
                 },
                 autoAbandonQuests = {
-                    order = 14,
+                    order = 3,
                     type = "group",
                     name = L["Abandon Quests"],
                     args = {
@@ -236,10 +243,10 @@ E.Options.args.general = {
                                 return values
                             end,
                             get = function(info, value)
-                                return E.private.general.autoAbandonQuests.questType[value]
+                                return E.private.automationOptions.autoAbandonQuests.questType[value]
                             end,
                             set = function(info, value)
-                                E.private.general.autoAbandonQuests.questType[value] = not E.private.general.autoAbandonQuests.questType[value]
+                                E.private.automationOptions.autoAbandonQuests.questType[value] = not E.private.automationOptions.autoAbandonQuests.questType[value]
                             end
                         },
                         space4 = {
@@ -261,7 +268,7 @@ E.Options.args.general = {
                             multiline = 5,
                             width = "full",
                             get = function(info, values)
-                                return E.private.general.autoAbandonQuests.ids
+                                return E.private.automationOptions.autoAbandonQuests.ids
                             end,
                             set = function(info, value)
                                 -- * Remove all non digit and comma characters
@@ -269,7 +276,7 @@ E.Options.args.general = {
                                 -- * Remove any trailing comma
                                 local ids = value:gsub("[^%d,]+", ""):gsub(",+", ","):gsub("^,+", ""):gsub(",*$", "")
                                 E:Debug(L["Auto Abandon: "], E:Dump({strsplit(",", ids)}))
-                                E.private.general.autoAbandonQuests.ids = ids
+                                E.private.automationOptions.autoAbandonQuests.ids = ids
                             end
                         }
                     }
@@ -277,7 +284,7 @@ E.Options.args.general = {
             }
         },
         exclusions = {
-            order = 1,
+            order = 2,
             type = "group",
             name = L["Exclusions"],
             args = {
@@ -372,7 +379,7 @@ E.Options.args.general = {
             }
         },
         commands = {
-            order = 2,
+            order = 3,
             type = "group",
             name = L["Commands"],
             args = {
@@ -485,7 +492,7 @@ E.Options.args.general = {
             }
         },
         debug = {
-            order = 3,
+            order = 4,
             type = "group",
             name = L["Debugging"],
             args = {

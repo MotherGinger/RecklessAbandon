@@ -3,7 +3,7 @@ local E, L = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, Profil
 local _G = _G
 
 local DEFAULT_WIDTH = 900
-local DEFAULT_HEIGHT = 825
+local DEFAULT_HEIGHT = 700
 
 local EnableAddOn = EnableAddOn
 local LoadAddOn = LoadAddOn
@@ -43,7 +43,7 @@ function E:ToggleOptionsUI(msg)
 	end
 
 	if pages then
-		ACD:SelectGroup("RecklessAbandon", unpack(pages))
+		ACD:SelectGroup(E.name, unpack(pages))
 	end
 
 	GameTooltip:Hide() --Just in case you're mouseovered something and it closes.
@@ -51,11 +51,11 @@ end
 
 -- Function we can call on profile change to update GUI
 function E:RefreshGUI()
-	E.Libs.AceConfigRegistry:NotifyChange("RecklessAbandon")
+	E.Libs.AceConfigRegistry:NotifyChange(E.name)
 end
 
-E.Libs.AceConfig:RegisterOptionsTable("RecklessAbandon", E.Options)
-E.Libs.AceConfigDialog:SetDefaultSize("RecklessAbandon", DEFAULT_WIDTH, DEFAULT_HEIGHT)
+E.Libs.AceConfig:RegisterOptionsTable(E.name, E.Options)
+E.Libs.AceConfigDialog:SetDefaultSize(E.name, DEFAULT_WIDTH, DEFAULT_HEIGHT)
 E.Options.name = format("Reckless Abandon %s", L["Configuration"])
 E.Options.args = {
 	header = {
