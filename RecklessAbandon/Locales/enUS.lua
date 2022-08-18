@@ -64,6 +64,7 @@ L["Automation Options"] = true
 L["These options will act upon your quest log automatically. This can save you time, however care should be taken when using them."] = true
 L["|cFF00D1FFNote:|r Each character has their own automation options."] = true
 L["Abandon Quests"] = true
+L["Quest Type"] = true
 L["Automatically abandon quests of the given type if they are included in group abandons."] = true
 L["|cFFFF6B6BCaution:|r These quests will be abandoned for you, confirmation settings will be ignored."] = true
 L["Automatically abandoned %s |4quest:quests;!"] = true
