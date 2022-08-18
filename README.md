@@ -28,15 +28,19 @@ Take a look at our [issue board](https://github.com/MotherGinger/RecklessAbandon
 
 ## Configuration Panel - General Options
 
-![Screenshot 2022-07-13 013335](https://user-images.githubusercontent.com/29235654/178659482-0beccf0b-4130-4e3b-b088-d19d7ec226df.png)
+![image](https://user-images.githubusercontent.com/29235654/185288738-02f37447-49aa-4965-a9a5-5f26d8d5d73e.png)
+
+## Configuration Panel - Automation Options
+
+![image2](https://user-images.githubusercontent.com/29235654/185288903-c1567d80-d930-4900-baec-0e54d5ed7688.png)
 
 ## Configuration Panel - Exclusions
 
-![Screenshot 2022-07-13 013407](https://user-images.githubusercontent.com/29235654/178659477-8dc8fda0-6842-42db-9058-40b7e4e98d4a.png)
+![image3](https://user-images.githubusercontent.com/29235654/185288977-35e65f00-99fd-4395-9a45-afb3210d164c.png)
 
 ## Configuration Panel - Commands
 
-![WoWScrnShot_061921_011625](https://user-images.githubusercontent.com/29235654/122631971-96993d00-d09d-11eb-8135-acc0eab74f08.jpg)
+![image4](https://user-images.githubusercontent.com/29235654/185289043-560f106a-c837-49f0-9389-d4431bf18f01.png)
 
 ## Configuration Panel - Profiles
 
