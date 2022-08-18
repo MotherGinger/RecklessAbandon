@@ -24,7 +24,7 @@ This project adheres to Semantic Versioning.
     - Commands can now be executed with /ra in addition to /reckless
       - e.g. /ra is the same as /ra config or /reckless config
     - Automation options are now their own tab
-    - Bumpt TOC to 9.2.7
+    - Bump TOC to 9.2.7
   - Fixed
     - Various spanish localization strings
 
