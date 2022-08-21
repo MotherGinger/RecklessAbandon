@@ -21,8 +21,8 @@ This project adheres to Semantic Versioning.
         - Manual: The quest was manually excluded
         - Automation: The quest was excluded by an automation option
     - The automatic pruning option will now also prune quests excluded via automation options that are no longer in your quest log
-    - Commands can now be executed with /ra in addition to /reckless
-      - e.g. /ra is the same as /ra config or /reckless config
+    - Commands can now be executed with /rab in addition to /reckless
+      - e.g. /rab is the same as /rab config or /reckless config
     - Automation options are now their own tab
     - Bump TOC to 9.2.7
   - Fixed
