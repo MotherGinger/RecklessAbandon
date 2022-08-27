@@ -72,10 +72,10 @@ E.wowVersionMatrix = {
 	[WOW_PROJECT_BURNING_CRUSADE_CLASSIC or 5] = "Burning Crusade Classic"
 }
 E.logLevels = {
-	[LOG_LEVEL_ERROR] = "Only show messages for errors",
-	[LOG_LEVEL_WARN] = "Only show messages for warnings and errors",
-	[LOG_LEVEL_INFO] = "Only show important messages",
-	[LOG_LEVEL_VERBOSE] = "Show all messages (default)"
+	[LOG_LEVEL_ERROR] = L["Only show messages for errors"],
+	[LOG_LEVEL_WARN] = L["Only show messages for warnings and errors"],
+	[LOG_LEVEL_INFO] = L["Only show important messages"],
+	[LOG_LEVEL_VERBOSE] = L["Show all messages (default)"]
 }
 
 local abandonTooltipFormat = "|cFFFFFAB8%s|r\n\n|cFFFFF569%s|r\n|cFFB5FFEB%s|r"

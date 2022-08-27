@@ -20,6 +20,11 @@ L["Are you sure you want to abandon |cFFF2E699%s|r?"] = true
 L["Are you sure you want to abandon all of the quests in your questlog?"] = true
 L["Are you sure you want to abandon the following %s quests?"] = true
 
+L["Only show messages for errors"] = true
+L["Only show messages for warnings and errors"] = true
+L["Only show important messages"] = true
+L["Show all messages (default)"] = true
+
 L["Left Click: Abandon quest"] = true
 L["Right Click: Exclude quest from group abandons"] = true
 L["Right Click: Include quest in group abandons"] = true

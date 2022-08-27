@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to Semantic Versioning.
 
 - Unreleased
+  - Added
+    - Additional spanish localization strings
 
 - v1.6.0 - 2022-08-17
   - Added
