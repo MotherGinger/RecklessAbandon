@@ -185,23 +185,33 @@ local function RenderAbandonButton(parent, offset, questId, excluded, title, too
 	tooltip = tooltip or format(abandonTooltipFormat, title, L["Left Click: Abandon quest"], (excluded and L["Right Click: Include quest in group abandons"] or L["Right Click: Exclude quest from group abandons"]))
 
 	local button = questButtonPool:Acquire()
-	local texture = button:GetNormalTexture()
 	local canAbandon = C_QuestLog.CanAbandonQuest(questId)
+
+	local ntex = button:GetNormalTexture()
+	local ptex = button:GetPushedTexture()
+	local htex = button:GetHighlightTexture()
+
+	ntex:SetTexCoord(0.25, 0.80, 0.20, 0.75)
+	ptex:SetTexCoord(0.25, 0.80, 0.20, 0.75)
+	htex:SetTexCoord(0.25, 0.80, 0.20, 0.75)
 
 	button.title = title
 	button.tooltip = tooltip
 	button.questId = questId
-	button:SetPoint("CENTER", parent, "CENTER", offset, 0)
-	button:SetEnabled(canAbandon)
-	texture:SetDesaturated(not canAbandon)
+
+	ntex:SetDesaturated(not canAbandon)
 
 	if canAbandon and excluded then
-		texture:SetVertexColor(0.5, 0.5, 1, 0.7)
+		ntex:SetVertexColor(0.5, 0.5, 1, 0.7)
 	else
-		texture:SetVertexColor(1, 1, 1, 1)
+		ntex:SetVertexColor(1, 1, 1, 1)
 	end
 
-	button:SetNormalTexture(texture)
+	button:SetPoint("CENTER", parent, "CENTER", offset, 0)
+	button:SetEnabled(canAbandon)
+	button:SetNormalTexture(ntex)
+	button:SetPushedTexture(ptex)
+	button:SetHighlightTexture(htex)
 	button:Show()
 end
 
@@ -212,17 +222,28 @@ local function RenderGroupAbandonButton(parent, offset, title, tooltip, key)
 
 	if questGroupsByName[key] then
 		local button = groupButtonPool:Acquire()
-		local texture = button:GetNormalTexture()
 		local hasQuests = not E:IsEmpty(questGroupsByName[key].quests)
 		local canAbandonAny = E:CanQuestGroupAbandon(questGroupsByName[key].quests)
+
+		local ntex = button:GetNormalTexture()
+		local ptex = button:GetPushedTexture()
+		local htex = button:GetHighlightTexture()
+
+		ntex:SetTexCoord(0.25, 0.80, 0.20, 0.75)
+		ptex:SetTexCoord(0.25, 0.80, 0.20, 0.75)
+		htex:SetTexCoord(0.25, 0.80, 0.20, 0.75)
 
 		button.title = title
 		button.tooltip = tooltip
 		button.key = key
+
+		ntex:SetDesaturated(not hasQuests or not canAbandonAny)
+
 		button:SetPoint("CENTER", parent, "CENTER", offset, 0)
 		button:SetEnabled(hasQuests and canAbandonAny)
-		texture:SetDesaturated(not hasQuests or not canAbandonAny)
-		button:SetNormalTexture(texture)
+		button:SetNormalTexture(ntex)
+		button:SetPushedTexture(ptex)
+		button:SetHighlightTexture(htex)
 		button:Show()
 	end
 end

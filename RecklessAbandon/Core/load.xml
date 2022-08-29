@@ -1,7 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Button name="RECKLESS_ABANDON_BUTTON" virtual="true" registerForClicks="LeftButtonUp,RightButtonUp" frameStrata="HIGH" frameLevel="6">
 		<Size>
-			<AbsDimension x="30" y="30" />
+			<AbsDimension x="16" y="16" />
 		</Size>
 		<NormalFont style="GameFontNormal" />
 		<NormalTexture file="Interface\Buttons\CancelButton-Up" />
@@ -18,7 +18,7 @@
 
 	<Button name="RECKLESS_GROUP_ABANDON_BUTTON" virtual="true" registerForClicks="LeftButtonUp,RightButtonUp" frameStrata="HIGH" frameLevel="6">
 		<Size>
-			<AbsDimension x="30" y="30" />
+			<AbsDimension x="16" y="16" />
 		</Size>
 		<NormalFont style="GameFontNormal" />
 		<NormalTexture file="Interface\Buttons\CancelButton-Up" />
