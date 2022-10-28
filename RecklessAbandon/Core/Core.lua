@@ -252,35 +252,38 @@ local function ShowAbandonButtons()
 	questButtonPool:ReleaseAll()
 	groupButtonPool:ReleaseAll()
 
-	if E.db.general.campaignQuests.showAbandonButton then
-		for header in QuestScrollFrame.campaignHeaderFramePool:EnumerateActive() do
-			RenderGroupAbandonButton(header.LoreButton, -25, header.Text:GetText())
-		end
-	end
-
-	if E.db.general.covenantCallings.showAbandonButton then
-		for calling in QuestScrollFrame.covenantCallingsHeaderFramePool:EnumerateActive() do
-			local info = C_QuestLog.GetInfo(calling.questLogIndex)
-			if info then
-				local title = info.title
-				local key = getKey(title)
-				RenderGroupAbandonButton(calling, QuestScrollFrame:GetWidth() - 50, L["covenant callings"], L["Left Click: Abandon all covenant calling quests"], key)
+	-- Guard against a bad cache (https://github.com/MotherGinger/RecklessAbandon/issues/25)
+	if E.db ~= nil and E.db.general ~= nil then
+		if E.db.general.campaignQuests.showAbandonButton then
+			for header in QuestScrollFrame.campaignHeaderFramePool:EnumerateActive() do
+				RenderGroupAbandonButton(header.LoreButton, -25, header.Text:GetText())
 			end
 		end
-	end
 
-	if E.db.general.zoneQuests.showAbandonButton then
-		for header in QuestScrollFrame.headerFramePool:EnumerateActive() do
-			RenderGroupAbandonButton(header, QuestScrollFrame:GetWidth() - 25)
+		if E.db.general.covenantCallings.showAbandonButton then
+			for calling in QuestScrollFrame.covenantCallingsHeaderFramePool:EnumerateActive() do
+				local info = C_QuestLog.GetInfo(calling.questLogIndex)
+				if info then
+					local title = info.title
+					local key = getKey(title)
+					RenderGroupAbandonButton(calling, QuestScrollFrame:GetWidth() - 50, L["covenant callings"], L["Left Click: Abandon all covenant calling quests"], key)
+				end
+			end
 		end
-	end
 
-	if E.db.general.individualQuests.showAbandonButton then
-		for quest in QuestScrollFrame.titleFramePool:EnumerateActive() do
-			local questId = quest.questID
-			local text = quest.Text:GetText()
-			local excluded = E:IsExcluded(questId)
-			RenderAbandonButton(quest.TaskIcon, QuestScrollFrame:GetWidth() - 50, questId, excluded, text)
+		if E.db.general.zoneQuests.showAbandonButton then
+			for header in QuestScrollFrame.headerFramePool:EnumerateActive() do
+				RenderGroupAbandonButton(header, QuestScrollFrame:GetWidth() - 25)
+			end
+		end
+
+		if E.db.general.individualQuests.showAbandonButton then
+			for quest in QuestScrollFrame.titleFramePool:EnumerateActive() do
+				local questId = quest.questID
+				local text = quest.Text:GetText()
+				local excluded = E:IsExcluded(questId)
+				RenderAbandonButton(quest.TaskIcon, QuestScrollFrame:GetWidth() - 50, questId, excluded, text)
+			end
 		end
 	end
 end
@@ -708,7 +711,11 @@ function E:Initialize()
 
 	E.myguid = UnitGUID("player")
 	E.data = E.Libs.AceDB:New("RecklessAbandonDB", E.DF, true)
+	E.data.RegisterCallback(E, "OnProfileChanged", "RefreshOptions")
+	E.data.RegisterCallback(E, "OnProfileCopied", "RefreshOptions")
+	E.data.RegisterCallback(E, "OnProfileReset", "RefreshOptions")
 	E.charSettings = E.Libs.AceDB:New("RecklessAbandonPrivateDB", E.privateVars)
+	E.charSettings.RegisterCallback(E, "OnProfileReset", "RefreshOptions")
 
 	E.private = E.charSettings.profile
 	E.db = E.data.profile

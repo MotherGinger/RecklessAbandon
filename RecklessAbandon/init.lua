@@ -35,6 +35,7 @@ local GameMenuFrame = GameMenuFrame
 local GameMenuButtonAddons = GameMenuButtonAddons
 local GameMenuButtonLogout = GameMenuButtonLogout
 local ERR_NOT_IN_COMBAT = ERR_NOT_IN_COMBAT
+
 -- GLOBALS: RecklessAbandonCharacterDB, RecklessAbandonPrivateDB, RecklessAbandonDB
 
 local AceAddOn, AceAddonMinor = _G.LibStub("AceAddon-3.0")
@@ -140,6 +141,14 @@ LoadUI:SetScript(
 		end
 	end
 )
+
+function E:RefreshOptions(event, database, _)
+	E.db = database.profile
+
+	if event == "OnProfileChanged" or event == "OnProfileCopied" then
+		E:NormalizeSettings()
+	end
+end
 
 function E:ChatCommand(input)
 	-- /reckless cmd args
