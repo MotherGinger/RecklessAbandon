@@ -4,6 +4,10 @@ This project adheres to Semantic Versioning.
 
 - Unreleased
 
+- v1.6.5 - 2022-01-25
+  - Changed
+    - Bump TOC to 10.0.5
+
 -v1.6.4 - 2022-11-15
   - Changed
     - Bump TOC to 10.0.2
@@ -169,7 +173,8 @@ This project adheres to Semantic Versioning.
     - Command line for abandoning all quests
     - Documentation
 
-[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.4...develop
+[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.5...develop
+[1.6.5]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.4..v1.6.5
 [1.6.4]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.3..v1.6.4
 [1.6.3]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.2..v1.6.3
 [1.6.2]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.1..v1.6.2
