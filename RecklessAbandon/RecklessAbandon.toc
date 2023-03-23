@@ -1,6 +1,6 @@
-## Interface: 100005
+## Interface: 100007
 ## Author: Arrila-Thrall (US)
-## Version: 1.6.5
+## Version: 1.6.6
 ## Title: |cFF80528CReckless Abandon|r
 ## Notes: A tool for quickly (and recklessly) abandoning quests
 ## SavedVariables: RecklessAbandonDB, RecklessAbandonPrivateDB
