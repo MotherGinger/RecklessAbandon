@@ -481,7 +481,7 @@ function E:AbandonAllQuests()
 		local questId = info.questID
 
 		if not info.isHeader and not info.isHidden then
-			self:AbandonQuest(questID)
+			self:AbandonQuest(questId)
 		end
 	end
 end
