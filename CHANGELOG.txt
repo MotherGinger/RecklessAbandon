@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to Semantic Versioning.
 
 - Unreleased
+
+- v1.6.8 - 2023-05-25
   - Fixed
     - Lua error when attempting to abandon all quests in the quest log
 
@@ -183,7 +185,8 @@ This project adheres to Semantic Versioning.
     - Command line for abandoning all quests
     - Documentation
 
-[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.7...develop
+[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.8...develop
+[1.6.8]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.7..v1.6.8
 [1.6.7]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.6..v1.6.7
 [1.6.6]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.5..v1.6.6
 [1.6.5]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.4..v1.6.5
