@@ -131,6 +131,142 @@ E.Options.args.general = {
                             set = function(info, value)
                                 E.db.general.individualQuests.completeProtection = value
                             end
+                        },
+                        space1 = {
+                            order = 2,
+                            type = "description",
+                            name = "\n"
+                        },
+                        keybindingsHeader = {
+                            order = 3,
+                            type = "header",
+                            name = L["Keybindings"]
+                        },
+                        abandonBinding = {
+                            order = 4,
+                            type = "keybinding",
+                            dialogControl = "RecklessKeybinding",
+                            name = L["Abandon Quest"],
+                            desc = L["Use this keybinding on a quest in your quest log to abandon it."],
+                            get = function()
+                                return E.db.general.individualQuests.abandonBinding
+                            end,
+                            set = function(_, value)
+                                E.db.general.individualQuests.abandonBinding = value
+
+                                if E.db.general.individualQuests.excludeBinding == value then
+                                    E.db.general.individualQuests.excludeBinding = ""
+                                end
+
+                                if E.db.general.individualQuests.includeBinding == value then
+                                    E.db.general.individualQuests.includeBinding = ""
+                                end
+                            end,
+                            confirm = function(_, key)
+                                if key == "BUTTON1" or key == "BUTTON2" then
+                                    return table.concat(
+                                        {
+                                            format(L["Are you sure you want to bind %s?"], key),
+                                            L["|cFFFF6B6BCaution: This can cause you to accidently abandon a quest when trying to select a quest in your quest log.|r"]
+                                        },
+                                        "\n\n"
+                                    )
+                                elseif key == "SHIFT-BUTTON1" or key == "SHIFT-BUTTON2" then
+                                    return table.concat(
+                                        {
+                                            format(L["Are you sure you want to bind %s?"], key),
+                                            L["|cFFFF6B6BCaution: This can cause you to accidently abandon a quest when trying to track a quest in your quest log.|r"]
+                                        },
+                                        "\n\n"
+                                    )
+                                end
+
+                                return false
+                            end
+                        },
+                        excludeBinding = {
+                            order = 5,
+                            type = "keybinding",
+                            dialogControl = "RecklessKeybinding",
+                            name = L["Exclude Quest"],
+                            desc = L["Use this keybinding on a quest in your quest log to exclude it from group abandons."],
+                            get = function()
+                                return E.db.general.individualQuests.excludeBinding
+                            end,
+                            set = function(_, value)
+                                E.db.general.individualQuests.excludeBinding = value
+
+                                if E.db.general.individualQuests.abandonBinding == value then
+                                    E.db.general.individualQuests.abandonBinding = ""
+                                end
+
+                                if E.db.general.individualQuests.includeBinding == value then
+                                    E.db.general.individualQuests.includeBinding = ""
+                                end
+                            end,
+                            confirm = function(_, key)
+                                if key == "BUTTON1" or key == "BUTTON2" then
+                                    return table.concat(
+                                        {
+                                            format(L["Are you sure you want to bind %s?"], key),
+                                            L["|cFFFF6B6BCaution: This can cause you to accidently exclude a quest from group abandons when trying to select a quest in your quest log.|r"]
+                                        },
+                                        "\n\n"
+                                    )
+                                elseif key == "SHIFT-BUTTON1" or key == "SHIFT-BUTTON2" then
+                                    return table.concat(
+                                        {
+                                            format(L["Are you sure you want to bind %s?"], key),
+                                            L["|cFFFF6B6BCaution: This can cause you to accidently exclude a quest from group abandons when trying to track a quest in your quest log.|r"]
+                                        },
+                                        "\n\n"
+                                    )
+                                end
+
+                                return false
+                            end
+                        },
+                        includeBinding = {
+                            order = 6,
+                            type = "keybinding",
+                            dialogControl = "RecklessKeybinding",
+                            name = L["Include Quest"],
+                            desc = L["Use this keybinding on a quest in your quest log to include it in group abandons."],
+                            get = function()
+                                return E.db.general.individualQuests.includeBinding
+                            end,
+                            set = function(_, value)
+                                E.db.general.individualQuests.includeBinding = value
+
+                                if E.db.general.individualQuests.abandonBinding == value then
+                                    E.db.general.individualQuests.abandonBinding = ""
+                                end
+
+                                if E.db.general.individualQuests.excludeBinding == value then
+                                    E.db.general.individualQuests.excludeBinding = ""
+                                end
+                            end,
+                            confirm = function(_, key)
+                                if key == "BUTTON1" or key == "BUTTON2" then
+                                    return table.concat(
+                                        {
+                                            format(L["Are you sure you want to bind %s?"], key),
+                                            L["|cFFFF6B6BCaution: This can cause you to accidently include a quest in group abandons when trying to select a quest in your quest log.|r"]
+                                        },
+                                        "\n\n"
+                                    )
+                                elseif key == "SHIFT-BUTTON1" or key == "SHIFT-BUTTON2" then
+                                    return table.concat(
+                                        {
+                                            format(L["Are you sure you want to bind %s?"], key),
+                                            L["|cFFFF6B6BCaution: This can cause you to accidently include a quest in group abandons when trying to track a quest in your quest log.|r"]
+                                        },
+                                        "\n\n"
+                                    )
+                                end
+
+                                return false
+                            end
                         }
                     }
                 },
@@ -150,6 +286,37 @@ E.Options.args.general = {
                             end,
                             set = function(info, value)
                                 E.db.general.zoneQuests.showAbandonButton = value
+                            end
+                        },
+                        keybindingsHeader = {
+                            order = 1,
+                            type = "header",
+                            name = L["Keybindings"]
+                        },
+                        abandonKeybinding = {
+                            order = 2,
+                            type = "keybinding",
+                            dialogControl = "RecklessKeybinding",
+                            name = L["Abandon Quests"],
+                            desc = L["Use this keybinding on a zone header in your quest log to abandon all quests for that zone that are included in group abandons."],
+                            get = function()
+                                return E.db.general.zoneQuests.abandonBinding
+                            end,
+                            set = function(_, value)
+                                E.db.general.zoneQuests.abandonBinding = value
+                            end,
+                            confirm = function(_, key)
+                                if key == "BUTTON1" or key == "BUTTON2" then
+                                    return table.concat(
+                                        {
+                                            format(L["Are you sure you want to bind %s?"], key),
+                                            L["|cFFFF6B6BCaution: This can cause you to accidently abandon all quests in a zone when trying to expand a zone header in your quest log.|r"]
+                                        },
+                                        "\n\n"
+                                    )
+                                end
+
+                                return false
                             end
                         }
                     }

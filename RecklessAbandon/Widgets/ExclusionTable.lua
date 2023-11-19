@@ -31,8 +31,8 @@ local function UpdateData(tbl)
     data = tbl
 end
 
-local function CreateRow(parent)
-    local row = CreateFrame("Frame", nil, parent)
+local function CreateRow(parent, i)
+    local row = CreateFrame("Frame", "RecklessAbandon_ExclusionListRow" .. i, parent)
     row.columns = {} -- creating columns for the row
 
     for j = 1, 3 do
@@ -74,7 +74,7 @@ local Methods = {
         for i = 1, #data do
             -- Create a row if not created yet (buttons[i] is a whole row; buttons[i].columns[j] are columns)
             if not content.rows[i] then
-                content.rows[i] = CreateRow(content)
+                content.rows[i] = CreateRow(content, i)
                 content.rows[i]:SetSize(CELL_WIDTH * NUM_COLUMNS, CELL_HEIGHT)
                 content.rows[i]:SetPoint("TOPLEFT", 0, -(i - 1) * CELL_HEIGHT)
             end
@@ -122,15 +122,15 @@ local Methods = {
 
 local function Constructor()
     -- Container Frame
-    local Frame = CreateFrame("Frame", nil, UIParent)
+    local Frame = CreateFrame("Frame", "RecklessAbandon_ExclusionListFrame", UIParent)
     Frame:SetSize(CELL_WIDTH * NUM_COLUMNS + 40, 300)
     Frame:SetPoint("CENTER")
 
-    Frame.scrollFrame = CreateFrame("ScrollFrame", nil, Frame, "UIPanelScrollFrameTemplate")
+    Frame.scrollFrame = CreateFrame("ScrollFrame", "RecklessAbandon_ExclusionListScrollFrame", Frame, "UIPanelScrollFrameTemplate")
     Frame.scrollFrame:SetPoint("TOPLEFT", 12, -8)
     Frame.scrollFrame:SetPoint("BOTTOMRIGHT", -34, 8)
 
-    Frame.scrollFrame.scrollChild = CreateFrame("Frame", nil, Frame.scrollFrame)
+    Frame.scrollFrame.scrollChild = CreateFrame("Frame", "RecklessAbandon_ExclusionListScrollChildFrame", Frame.scrollFrame)
     Frame.scrollFrame.scrollChild:SetSize(100, 100)
     Frame.scrollFrame.scrollChild:SetPoint("TOPLEFT", 5, -5)
     Frame.scrollFrame:SetScrollChild(Frame.scrollFrame.scrollChild)

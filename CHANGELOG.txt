@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 This project adheres to Semantic Versioning.
 
 - Unreleased
+  - Added
+    - Configuration options for abandoning, excluding, and including quests via keybindings in your quest log
+    - New Localizations
+      - Russian
+      - French
+      - German
+      - Chinese
+      - These localizations may have issues like clipped text. Please create a github issue for any discoveries
 
 - v1.6.11 - 2023-11-07
   - Changed

@@ -7,10 +7,14 @@ P.general = {
     confirmGroup = true,
     individualQuests = {
         showAbandonButton = true,
-        completeProtection = true
+        completeProtection = true,
+        abandonBinding = "ALT-BUTTON1",
+        excludeBinding = "ALT-BUTTON2",
+        includeBinding = "ALT-BUTTON3"
     },
     zoneQuests = {
-        showAbandonButton = true
+        showAbandonButton = true,
+        abandonBinding = "ALT-BUTTON1"
     },
     campaignQuests = {
         showAbandonButton = true

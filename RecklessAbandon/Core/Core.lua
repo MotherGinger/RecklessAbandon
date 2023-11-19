@@ -180,6 +180,34 @@ local function getKey(value)
 	end
 end
 
+local function getKeybinding(button)
+	if button == "LeftButton" then
+		button = "BUTTON1"
+	elseif button == "RightButton" then
+		button = "BUTTON2"
+	elseif button == "MiddleButton" then
+		button = "BUTTON3"
+	elseif button == "Button4" then
+		button = "BUTTON4"
+	elseif button == "Button5" then
+		button = "BUTTON5"
+	end
+
+	if IsShiftKeyDown() then
+		button = "SHIFT-" .. button
+	end
+
+	if IsControlKeyDown() then
+		button = "CTRL-" .. button
+	end
+
+	if IsAltKeyDown() then
+		button = "ALT-" .. button
+	end
+
+	return button
+end
+
 local function RenderAbandonButton(parent, offset, questId, excluded, title, tooltip)
 	title = title or parent:GetText()
 	tooltip = tooltip or format(abandonTooltipFormat, title, L["Left Click: Abandon quest"], (excluded and L["Right Click: Include quest in group abandons"] or L["Right Click: Exclude quest from group abandons"]))
@@ -291,6 +319,68 @@ end
 local function HideAbandonButtons()
 	questButtonPool:ReleaseAll()
 	groupButtonPool:ReleaseAll()
+end
+
+local function onQuestLogEntryClick(self, button, down)
+	local abandonQuestBinding = E.db.general.individualQuests.abandonBinding
+	local excludeQuestBinding = E.db.general.individualQuests.excludeBinding
+	local includeQuestBinding = E.db.general.individualQuests.includeBinding
+	local binding = getKeybinding(button)
+	local isBound = (isHeader and binding == groupAbandonQuestBinding) or binding == abandonQuestBinding or binding == excludeQuestBinding or binding == includeQuestBinding
+
+	-- * If the click matches a binding, disable default behaviors
+	-- * In retail this prevents things like the right click context menu or the full page quest description
+	if self.origOnClick and not isBound then
+		self:origOnClick(button, down)
+	end
+end
+
+local function onQuestLogEntryMouseDown(self, button)
+	local info = C_QuestLog.GetInfo(self.questLogIndex)
+	local title = info.title
+	local isHeader = info.isHeader
+	local questId = info.questID
+	local abandonQuestBinding = E.db.general.individualQuests.abandonBinding
+	local excludeQuestBinding = E.db.general.individualQuests.excludeBinding
+	local includeQuestBinding = E.db.general.individualQuests.includeBinding
+	local groupAbandonQuestBinding = E.db.general.zoneQuests.abandonBinding
+	local binding = getKeybinding(button)
+
+	if isHeader and binding == groupAbandonQuestBinding then
+		if E.db.general.confirmGroup then
+			local dialog = StaticPopup_Show("RECKLESS_ABANDON_GROUP_CONFIRMATION", title)
+			if dialog then
+				dialog.data = getKey(title)
+			end
+		else
+			E:AbandonZoneQuests(getKey(title))
+		end
+		E:Debug(format(L["%s abandoned via keybinding (%s)"], title, binding))
+	elseif binding == abandonQuestBinding then
+		if E.db.general.confirmIndividual then
+			local dialog = StaticPopup_Show("RECKLESS_ABANDON_CONFIRMATION", title)
+			if dialog then
+				dialog.data = {
+					questId = questId
+				}
+			end
+		else
+			E:AbandonQuest(questId)
+		end
+		E:Debug(format(L["%s abandoned via keybinding (%s)"], title, binding))
+	elseif binding == excludeQuestBinding then
+		E:ExcludeQuest(questId, MANUAL)
+		ShowAbandonButtons()
+		E:Debug(format(L["%s excluded via keybinding (%s)"], title, binding))
+	elseif binding == includeQuestBinding then
+		E:IncludeQuest(questId)
+		ShowAbandonButtons()
+		E:Debug(format(L["%s included via keybinding (%s)"], title, binding))
+	end
+
+	if self.origOnMouseDown then
+		self:origOnMouseDown(button)
+	end
 end
 
 function onButtonEnter(self)
@@ -704,6 +794,30 @@ function E:NormalizeSettings()
 	end
 end
 
+function E:RegisterHotkeys()
+	for quest in QuestScrollFrame.titleFramePool:EnumerateActive() do
+		if not quest.hasOnMouseDownScript then
+			quest.origOnClick = quest:GetScript("OnClick")
+			quest.origOnMouseDown = quest:GetScript("OnMouseDown")
+
+			quest:SetScript("OnClick", onQuestLogEntryClick)
+			quest:SetScript("OnMouseDown", onQuestLogEntryMouseDown)
+
+			quest.hasOnMouseDownScript = true
+		end
+	end
+
+	for header in QuestScrollFrame.headerFramePool:EnumerateActive() do
+		if not header.hasOnMouseDownScript then
+			header.origOnMouseDown = header:GetScript("OnMouseDown")
+
+			header:SetScript("OnMouseDown", onQuestLogEntryMouseDown)
+
+			header.hasOnMouseDownScript = true
+		end
+	end
+end
+
 function E:Initialize()
 	twipe(E.db)
 	twipe(E.global)
@@ -726,13 +840,27 @@ function E:Initialize()
 
 	E:NormalizeSettings()
 
-	QuestMapFrame:HookScript("OnShow", ShowAbandonButtons)
-	QuestMapFrame:HookScript("OnEvent", ShowAbandonButtons)
+	QuestMapFrame:HookScript(
+		"OnShow",
+		function()
+			ShowAbandonButtons()
+			E:RegisterHotkeys()
+		end
+	)
+	QuestMapFrame:HookScript(
+		"OnEvent",
+		function()
+			ShowAbandonButtons()
+			E:RegisterHotkeys()
+		end
+	)
 	QuestMapFrame:HookScript("OnHide", HideAbandonButtons)
 
 	QuestScrollFrame:HookScript(
 		"OnVerticalScroll",
 		function()
+			E:RegisterHotkeys()
+
 			for button in questButtonPool:EnumerateActive() do
 				onButtonUpdate(button)
 			end
