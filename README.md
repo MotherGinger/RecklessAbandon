@@ -11,7 +11,8 @@ A WoW addon that lets you quickly (and _recklessly_) abandon quests.
 - Command line option to abandon groups of quests based on qualifiers (disabled by default)
   - Available Qualifiers: `gray`, `green`, `yellow`, `orange`, `red`, `daily`, `weekly`
 - Exclude individual quests from group abandons
-- Configuration panel to toggle confirmations and hide/show abandon buttons
+- Automation options to abandon quests automatically
+- Configuration panel to toggle confirmations, hide/show abandon buttons, and setup keybindings
 - Super tiny, less than 1MB of memory
 
 # Upcoming features
@@ -28,7 +29,7 @@ Take a look at our [issue board](https://github.com/MotherGinger/RecklessAbandon
 
 ## Configuration Panel - General Options
 
-![image](https://user-images.githubusercontent.com/29235654/185288738-02f37447-49aa-4965-a9a5-5f26d8d5d73e.png)
+![image](https://github.com/MotherGinger/RecklessAbandon/assets/29235654/efc35b15-0dbd-4b25-84b9-6067f1f55e06)
 
 ## Configuration Panel - Automation Options
 
