@@ -1,6 +1,6 @@
 -- Italian localization file for enUS and enGB.
 local E = unpack(select(2, ...)) -- Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local L = E.Libs.ACL:NewLocale("RecklessAbandon", "itIT", true, true)
+local L = E.Libs.ACL:NewLocale("RecklessAbandon", "itIT")
 
 if not L then
     return

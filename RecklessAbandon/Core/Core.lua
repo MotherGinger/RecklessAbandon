@@ -324,9 +324,8 @@ end
 local function onQuestLogEntryClick(self, button, down)
 	local abandonQuestBinding = E.db.general.individualQuests.abandonBinding
 	local excludeQuestBinding = E.db.general.individualQuests.excludeBinding
-	local includeQuestBinding = E.db.general.individualQuests.includeBinding
 	local binding = getKeybinding(button)
-	local isBound = (isHeader and binding == groupAbandonQuestBinding) or binding == abandonQuestBinding or binding == excludeQuestBinding or binding == includeQuestBinding
+	local isBound = (isHeader and binding == groupAbandonQuestBinding) or binding == abandonQuestBinding or binding == excludeQuestBinding
 
 	-- * If the click matches a binding, disable default behaviors
 	-- * In retail this prevents things like the right click context menu or the full page quest description

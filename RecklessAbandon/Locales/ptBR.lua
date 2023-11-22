@@ -1,6 +1,6 @@
 -- Portuguese localization file for enUS and enGB.
 local E = unpack(select(2, ...)) -- Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local L = E.Libs.ACL:NewLocale("RecklessAbandon", "ptBR", true, true)
+local L = E.Libs.ACL:NewLocale("RecklessAbandon", "ptBR")
 
 if not L then
     return
