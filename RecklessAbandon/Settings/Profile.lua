@@ -9,8 +9,7 @@ P.general = {
         showAbandonButton = true,
         completeProtection = true,
         abandonBinding = "ALT-BUTTON1",
-        excludeBinding = "ALT-BUTTON2",
-        includeBinding = "ALT-BUTTON3"
+        excludeBinding = "ALT-BUTTON2"
     },
     zoneQuests = {
         showAbandonButton = true,

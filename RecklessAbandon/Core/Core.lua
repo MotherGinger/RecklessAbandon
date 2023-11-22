@@ -342,7 +342,6 @@ local function onQuestLogEntryMouseDown(self, button)
 	local questId = info.questID
 	local abandonQuestBinding = E.db.general.individualQuests.abandonBinding
 	local excludeQuestBinding = E.db.general.individualQuests.excludeBinding
-	local includeQuestBinding = E.db.general.individualQuests.includeBinding
 	local groupAbandonQuestBinding = E.db.general.zoneQuests.abandonBinding
 	local binding = getKeybinding(button)
 
@@ -369,13 +368,17 @@ local function onQuestLogEntryMouseDown(self, button)
 		end
 		E:Debug(format(L["%s abandoned via keybinding (%s)"], title, binding))
 	elseif binding == excludeQuestBinding then
-		E:ExcludeQuest(questId, MANUAL)
+		local excluded = E:IsExcluded(questId)
+
+		if excluded then
+			E:IncludeQuest(questId)
+			E:Debug(format(L["%s included via keybinding (%s)"], title, binding))
+		else
+			E:ExcludeQuest(questId, MANUAL)
+			E:Debug(format(L["%s excluded via keybinding (%s)"], title, binding))
+		end
+
 		ShowAbandonButtons()
-		E:Debug(format(L["%s excluded via keybinding (%s)"], title, binding))
-	elseif binding == includeQuestBinding then
-		E:IncludeQuest(questId)
-		ShowAbandonButtons()
-		E:Debug(format(L["%s included via keybinding (%s)"], title, binding))
 	end
 
 	if self.origOnMouseDown then
