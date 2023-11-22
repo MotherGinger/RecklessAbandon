@@ -3,6 +3,8 @@
 	<Script file='esMX.lua' />
 	<Script file="deDE.lua" />
 	<Script file="frFR.lua" />
+	<Script file="itIT.lua" />
 	<Script file="ruRU.lua" />
+	<Script file="ptBR.lua" />
 	<Script file="zhCN.lua" />
 </Ui>
