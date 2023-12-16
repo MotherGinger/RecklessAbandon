@@ -94,7 +94,7 @@ L["Orange"] = true
 L["Red"] = true
 L["Gray"] = true
 L["Quest IDs"] = true
-L["Enter quest ids seperated by a comma. These quests will be abandoned automatically if they are included in group abandons."] = true
+L["Enter quest ids separated by a comma. These quests will be abandoned automatically if they are included in group abandons."] = true
 
 L["Slash Commands"] = true
 L["|cFF00D1FFNote:|r The token |cff888888reckless|r can be replaced by |cff888888rab|r for all commands."] = true

@@ -377,7 +377,7 @@ E.Options.args.general = {
                             name = L["Quest IDs"],
                             desc = table.concat(
                                 {
-                                    L["Enter quest ids seperated by a comma. These quests will be abandoned automatically if they are included in group abandons."],
+                                    L["Enter quest ids separated by a comma. These quests will be abandoned automatically if they are included in group abandons."],
                                     "e.g. 4563,7562,2345"
                                 },
                                 "\n\n"
