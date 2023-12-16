@@ -1,5 +1,5 @@
 -- French localization file for esMX and esES.
-local E = unpack(select(2, ...)) -- Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E = unpack(RecklessAbandon) -- Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local L = E.Libs.ACL:NewLocale("RecklessAbandon", "frFR")
 
 if not L then
@@ -58,6 +58,8 @@ L["Adjust the amount of messages you will receive from actions taken against you
 L["|cFF00D1FFNote:|r You will always be notified when a quest is abandoned on your behalf."] = "|cFF00D1FFNote :|r Vous serez toujours averti lorsqu'une quête est abandonnée en votre nom."
 L["Show Abandon Button"] = "Afficher le bouton Abandonner"
 L["Show Group Abandon Button"] = "Afficher le bouton d'abandon de groupe"
+L["Complete Protection"] = "Protection Complète"
+L["Automatically exclude completed quests from group abandons and automation options."] = "Excluez automatiquement les quêtes terminées des abandons de groupe et des options d'automatisation."
 L["Show an abandon button for individual quests."] = "Affiche un bouton d'abandon pour les quêtes individuelles."
 L["Abandon Quest"] = "Abandonner la quête"
 L["Use this keybinding on a quest in your quest log to abandon it."] = "Utilisez ce raccourci sur une quête de votre journal pour l'abandonner."
@@ -143,7 +145,7 @@ L["Exclusions"] = "Exclusions"
 L["Quest Exclusion List"] = "Liste d'exclusion des quêtes"
 L["Prune Exclusion List"] = "Élaguer la liste d'exclusion"
 L["Clear Exclusion List"] = "Effacer la liste d'exclusion"
-L["The quest exclusion list allows you to exclude quests from group abandons. To use it, simply right-click a quest abandon button in the quest log."] = "La liste d'exclusion des quêtes vous permet d'exclure des quêtes des abandons de groupe. Pour l'utiliser, faites simplement un clic droit sur un bouton d'abandon de quête dans le journal de quêtes."
+L["The quest exclusion list allows you to exclude quests from group abandons. To use it, simply right click a quest abandon button in the quest log."] = "La liste d'exclusion des quêtes vous permet d'exclure des quêtes des abandons de groupe. Pour l'utiliser, faites simplement un clic droit sur un bouton d'abandon de quête dans le journal de quêtes."
 L["|cFF00D1FFNote:|r Each character has their own exclusion list."] = "|cFF00D1FFNote :|r Chaque personnage a sa propre liste d'exclusion."
 L["Quests that appear in |cFFFF6B6Bred|r are no longer detected in your quest log."] = "Les quêtes qui apparaissent en |cFFFF6B6Brouge|r ne sont plus détectées dans votre journal de quêtes."
 L["You can prune them by clicking this button, or leave them and they will be excluded again the next time they are picked up."] = "Vous pouvez les élaguer en cliquant sur ce bouton, ou les laisser et ils seront exclus à nouveau la prochaine fois qu'ils seront récupérés."

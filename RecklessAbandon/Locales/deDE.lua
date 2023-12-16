@@ -1,5 +1,5 @@
 -- German localization file for deDE.
-local E = unpack(select(2, ...)) -- Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E = unpack(RecklessAbandon) -- Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local L = E.Libs.ACL:NewLocale("RecklessAbandon", "deDE")
 
 if not L then
@@ -58,6 +58,8 @@ L["Adjust the amount of messages you will receive from actions taken against you
 L["|cFF00D1FFNote:|r You will always be notified when a quest is abandoned on your behalf."] = "|cFF00D1FFHinweis:|r Sie werden immer benachrichtigt, wenn eine Quest in Ihrem Auftrag aufgegeben wird."
 L["Show Abandon Button"] = "Abbruchknopf anzeigen"
 L["Show Group Abandon Button"] = "Gruppenabbruchknopf anzeigen"
+L["Complete Protection"] = "Vollständiger Schutz"
+L["Automatically exclude completed quests from group abandons and automation options."] = "Schließe automatisch abgeschlossene Quests von Gruppenaufgaben und Automatisierungsoptionen aus."
 L["Show an abandon button for individual quests."] = "Zeigen Sie einen Abbruchknopf für einzelne Quests an."
 L["Abandon Quest"] = "Quest aufgeben"
 L["Use this keybinding on a quest in your quest log to abandon it."] = "Verwenden Sie diese Tastenbelegung auf einer Quest in Ihrem Quest-Log, um sie aufzugeben."

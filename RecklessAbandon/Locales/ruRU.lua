@@ -1,5 +1,5 @@
 -- Russian localization for ruRU.
-local E = unpack(select(2, ...)) -- Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E = unpack(RecklessAbandon) -- Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local L = E.Libs.ACL:NewLocale("RecklessAbandon", "ruRU")
 
 if not L then
@@ -58,6 +58,8 @@ L["Adjust the amount of messages you will receive from actions taken against you
 L["|cFF00D1FFNote:|r You will always be notified when a quest is abandoned on your behalf."] = "|cFF00D1FFПримечание:|r Вас всегда будут уведомлять, когда задание будет отказано от вашего имени."
 L["Show Abandon Button"] = "Показать кнопку отказа"
 L["Show Group Abandon Button"] = "Показать кнопку группового отказа"
+L["Complete Protection"] = "Полная защита"
+L["Automatically exclude completed quests from group abandons and automation options."] = "Автоматически исключайте завершенные задания из групповых отказов и опций автоматизации."
 L["Show an abandon button for individual quests."] = "Показать кнопку отказа для отдельных заданий."
 L["Abandon Quest"] = "Отказаться от задания"
 L["Use this keybinding on a quest in your quest log to abandon it."] = "Используйте этот метод привязки к клавише на задании в вашем журнале, чтобы отказаться от него."
@@ -84,7 +86,7 @@ L["Prompt for confirmation when abandoning multiple quests."] = "Запраши�
 L["|cFFFF6B6BCaution: Turning this off means a group of quests will be abandoned instantly. Be careful!|r"] = "|cFFFF6B6BCaution: Если отключить это, группа заданий будет отказана мгновенно. Будьте осторожны!|r"
 
 L["Automation Options"] = "Опции автоматизации"
-L["These options will act upon your quest log automatically. This can save you time, however care should be taken when using them."] = "Эти опции будут действовать автоматически в вашем журнале заданий. Это может сэкономить вам время, однако следует быть осторожным при их использовании."
+L["These options will act upon your quest log automatically. This can save you time, however, care should be taken when using them."] = "Эти опции будут действовать автоматически в вашем журнале заданий. Это может сэкономить вам время, однако следует быть осторожным при их использовании."
 L["|cFF00D1FFNote:|r Each character has their own automation options."] = "|cFF00D1FFПримечание:|r У каждого персонажа свои опции автоматизации."
 L["Abandon Quests"] = "Отказ от заданий"
 L["Quest Type"] = "Тип задания"

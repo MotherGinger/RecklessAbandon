@@ -1,5 +1,5 @@
 -- English localization file for enUS and enGB.
-local E = unpack(select(2, ...)) -- Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E = unpack(RecklessAbandon) -- Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local L = E.Libs.ACL:NewLocale("RecklessAbandon", "enUS", true, true)
 
 L["Version"] = true
@@ -53,6 +53,8 @@ L["Adjust the amount of messages you will receive from actions taken against you
 L["|cFF00D1FFNote:|r You will always be notified when a quest is abandoned on your behalf."] = true
 L["Show Abandon Button"] = true
 L["Show Group Abandon Button"] = true
+L["Complete Protection"] = true
+L["Automatically exclude completed quests from group abandons and automation options."] = true
 L["Show an abandon button for individual quests."] = true
 L["Abandon Quest"] = true
 L["Use this keybinding on a quest in your quest log to abandon it."] = true
@@ -79,7 +81,7 @@ L["Prompt for confirmation when abandoning multiple quests."] = true
 L["|cFFFF6B6BCaution: Turning this off means a group of quests will be abandoned instantly. Be careful!|r"] = true
 
 L["Automation Options"] = true
-L["These options will act upon your quest log automatically. This can save you time, however care should be taken when using them."] = true
+L["These options will act upon your quest log automatically. This can save you time, however, care should be taken when using them."] = true
 L["|cFF00D1FFNote:|r Each character has their own automation options."] = true
 L["Abandon Quests"] = true
 L["Quest Type"] = true

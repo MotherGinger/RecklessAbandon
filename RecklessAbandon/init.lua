@@ -83,7 +83,7 @@ do
 
 	E:AddLib("AceAddon", AceAddon, AceAddonMinor)
 	E:AddLib("AceDB", "AceDB-3.0")
-	E:AddLib("ACL", "AceLocale-3.0")
+	E:AddLib("ACL", "AceLocale-3.0-Reckless")
 	E:AddLib("AceGUI", "AceGUI-3.0")
 	E:AddLib("AceConfig", "AceConfig-3.0")
 	E:AddLib("AceConfigDialog", "AceConfigDialog-3.0")

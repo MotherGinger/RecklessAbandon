@@ -328,7 +328,7 @@ E.Options.args.general = {
                     type = "description",
                     name = table.concat(
                         {
-                            L["These options will act upon your quest log automatically. This can save you time, however care should be taken when using them."],
+                            L["These options will act upon your quest log automatically. This can save you time, however, care should be taken when using them."],
                             L["|cFF00D1FFNote:|r Each character has their own automation options."]
                         },
                         "\n\n"

@@ -13,6 +13,9 @@ This project adheres to Semantic Versioning.
       - Portuguese (ptBR, ptPT)
       - Italian (itIT)
       - These localizations may have issues like clipped text or general errors in the translation. Please create a github issue for any discoveries!
+  - Fixed
+    - An issue where localizations were not properly loading
+    - Missing localized strings
 
 - v1.6.11 - 2023-11-07
   - Changed

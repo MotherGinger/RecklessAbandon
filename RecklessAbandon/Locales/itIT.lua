@@ -1,5 +1,5 @@
 -- Italian localization file for enUS and enGB.
-local E = unpack(select(2, ...)) -- Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E = unpack(RecklessAbandon) -- Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local L = E.Libs.ACL:NewLocale("RecklessAbandon", "itIT")
 
 if not L then
@@ -58,6 +58,8 @@ L["Adjust the amount of messages you will receive from actions taken against you
 L["|cFF00D1FFNote:|r You will always be notified when a quest is abandoned on your behalf."] = "|cFF00D1FFNota:|r Sarai sempre avvisato quando una missione viene abbandonata per tuo conto."
 L["Show Abandon Button"] = "Mostra pulsante Abbandona"
 L["Show Group Abandon Button"] = "Mostra pulsante Abbandona di gruppo"
+L["Complete Protection"] = "Protezione Completa"
+L["Automatically exclude completed quests from group abandons and automation options."] = "Escludi automaticamente le missioni completate dagli abbandoni di gruppo e dalle opzioni di automazione."
 L["Show an abandon button for individual quests."] = "Mostra un pulsante Abbandona per le missioni singole."
 L["Abandon Quest"] = "Abbandona missione"
 L["Use this keybinding on a quest in your quest log to abandon it."] = "Usa questa assegnazione del tasto su una missione nel tuo registro missioni per abbandonarla."

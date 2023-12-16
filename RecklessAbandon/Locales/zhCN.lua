@@ -1,5 +1,5 @@
 -- Chinese localization file for zhCN.
-local E = unpack(select(2, ...)) -- Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E = unpack(RecklessAbandon) -- Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local L = E.Libs.ACL:NewLocale("RecklessAbandon", "zhCN")
 
 if not L then
@@ -57,6 +57,8 @@ L["Adjust the amount of messages you will receive from actions taken against you
 L["|cFF00D1FFNote:|r You will always be notified when a quest is abandoned on your behalf."] = "|cFF00D1FF注意：|r 当代表你放弃任务时，你将始终收到通知。"
 L["Show Abandon Button"] = "显示放弃按钮"
 L["Show Group Abandon Button"] = "显示组放弃按钮"
+L["Complete Protection"] = "完全保护"
+L["Automatically exclude completed quests from group abandons and automation options."] = "自动排除已完成的任务，不包括在组队放弃和自动化选项中。"
 L["Show an abandon button for individual quests."] = "为单个任务显示一个放弃按钮。"
 L["Abandon Quest"] = "放弃任务"
 L["Use this keybinding on a quest in your quest log to abandon it."] = "在你的任务日志中使用这个按键绑定来放弃任务。"
@@ -83,7 +85,7 @@ L["Prompt for confirmation when abandoning multiple quests."] = "放弃多个任
 L["|cFFFF6B6BCaution: Turning this off means a group of quests will be abandoned instantly. Be careful!|r"] = "|cFFFF6B6B注意：关闭此选项意味着一组任务将立即被放弃。请小心！|r"
 
 L["Automation Options"] = "自动化选项"
-L["These options will act upon your quest log automatically. This can save you time, however care should be taken when using them."] = "这些选项将自动处理你的任务日志。这可以节省时间，但在使用时应谨慎。"
+L["These options will act upon your quest log automatically. This can save you time, however, care should be taken when using them."] = "这些选项将自动处理你的任务日志。这可以节省时间，但在使用时应谨慎。"
 L["|cFF00D1FFNote:|r Each character has their own automation options."] = "|cFF00D1FF注意：|r 每个角色都有自己的自动化选项。"
 L["Abandon Quests"] = "放弃任务"
 L["Quest Type"] = "任务类型"
@@ -142,7 +144,7 @@ L["Exclusions"] = "排除"
 L["Quest Exclusion List"] = "任务排除列表"
 L["Prune Exclusion List"] = "修剪排除列表"
 L["Clear Exclusion List"] = "清除排除列表"
-L["The quest exclusion list allows you to exclude quests from group abandons. To use it, simply right-click a quest abandon button in the quest log."] = "任务排除列表允许你从组放弃中排除任务。要使用它，只需右键单击任务日志中的任务放弃按钮。"
+L["The quest exclusion list allows you to exclude quests from group abandons. To use it, simply right click a quest abandon button in the quest log."] = "任务排除列表允许你从组放弃中排除任务。要使用它，只需右键单击任务日志中的任务放弃按钮。"
 L["|cFF00D1FFNote:|r Each character has their own exclusion list."] = "|cFF00D1FF注意：|r 每个角色都有自己的排除列表。"
 L["Quests that appear in |cFFFF6B6Bred|r are no longer detected in your quest log."] = "出现在 |cFFFF6B6B红色|r 的任务在你的任务日志中不再被检测到。"
 L["You can prune them by clicking this button, or leave them and they will be excluded again the next time they are picked up."] = "你可以通过点击此按钮修剪它们，或者留下它们，它们下次被接受时将再次被排除。"
