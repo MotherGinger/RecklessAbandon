@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to Semantic Versioning.
 
 - Unreleased
+
+- v1.7.0 - 2024-18-01
   - Added
     - Configuration options for abandoning, excluding, and including quests via keybindings in your quest log
     - New Localizations
@@ -13,6 +15,8 @@ This project adheres to Semantic Versioning.
       - Portuguese (ptBR, ptPT)
       - Italian (itIT)
       - These localizations may have issues like clipped text or general errors in the translation. Please create a github issue for any discoveries!
+  - Changed
+    - Bump TOC to 10.2.5
   - Fixed
     - An issue where localizations were not properly loading
     - Missing localized strings
@@ -211,7 +215,8 @@ This project adheres to Semantic Versioning.
     - Command line for abandoning all quests
     - Documentation
 
-[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.11...develop
+[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.7.0...develop
+[1.7.0]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.11..v1.7.0
 [1.6.11]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.10..v1.6.11
 [1.6.10]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.9..v1.6.10
 [1.6.9]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.8..v1.6.9
