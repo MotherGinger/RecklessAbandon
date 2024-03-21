@@ -4,6 +4,10 @@ This project adheres to Semantic Versioning.
 
 - Unreleased
 
+- v1.7.1 - 2024-21-03
+  - Changed
+    - Bump TOC to 10.2.6
+
 - v1.7.0 - 2024-18-01
   - Added
     - Configuration options for abandoning, excluding, and including quests via keybindings in your quest log
@@ -215,7 +219,8 @@ This project adheres to Semantic Versioning.
     - Command line for abandoning all quests
     - Documentation
 
-[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.7.0...develop
+[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.7.1...develop
+[1.7.1]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.7.0..v1.7.1
 [1.7.0]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.11..v1.7.0
 [1.6.11]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.10..v1.6.11
 [1.6.10]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.9..v1.6.10
