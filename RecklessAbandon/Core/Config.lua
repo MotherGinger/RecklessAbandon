@@ -7,7 +7,6 @@ local DEFAULT_HEIGHT = 700
 
 local EnableAddOn = EnableAddOn
 local LoadAddOn = LoadAddOn
-local GetAddOnMetadata = GetAddOnMetadata
 local GetAddOnInfo = GetAddOnInfo
 local GameTooltip = GameTooltip
 local InCombatLockdown = InCombatLockdown

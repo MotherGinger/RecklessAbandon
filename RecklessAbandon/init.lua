@@ -21,7 +21,6 @@ local IsInInstance = IsInInstance
 local CreateFrame = CreateFrame
 local GetAddOnInfo = GetAddOnInfo
 local GetAddOnEnableState = GetAddOnEnableState
-local GetAddOnMetadata = GetAddOnMetadata
 local GetLocale = GetLocale
 local GetTime = GetTime
 local HideUIPanel = HideUIPanel
@@ -119,7 +118,7 @@ function E:OnInitialize()
 
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PLAYER_LEVEL_UP")
-	self:RegisterBucketEvent("QUEST_LOG_UPDATE", 1, "GenerateQuestTable")
+	self:RegisterBucketEvent({"QUEST_LOG_UPDATE", "AJ_QUEST_LOG_OPEN"}, 1, "GenerateQuestTable")
 	self:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "AutoAbandonQuests")
 	self:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "AutoExcludeQuests")
 	self:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "PruneQuestExclusionsFromAutomation")

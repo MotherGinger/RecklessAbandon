@@ -47,8 +47,8 @@ local C_ChatInfo_SendAddonMessage = C_ChatInfo.SendAddonMessage
 E.noop = function()
 end
 E.title = format("|cFF80528C%s|r", "Reckless Abandon")
-E.version = GetAddOnMetadata("RecklessAbandon", "Version")
-E.author = GetAddOnMetadata("RecklessAbandon", "Author")
+E.version = C_AddOns.GetAddOnMetadata("RecklessAbandon", "Version")
+E.author = C_AddOns.GetAddOnMetadata("RecklessAbandon", "Author")
 E.myfaction, E.myLocalizedFaction = UnitFactionGroup("player")
 E.mylevel = UnitLevel("player")
 E.myLocalizedClass, E.myclass, E.myClassID = UnitClass("player")
@@ -284,7 +284,7 @@ local function ShowAbandonButtons()
 	if E.db ~= nil and E.db.general ~= nil then
 		if E.db.general.campaignQuests.showAbandonButton then
 			for header in QuestScrollFrame.campaignHeaderFramePool:EnumerateActive() do
-				RenderGroupAbandonButton(header.LoreButton, -25, header.Text:GetText())
+				RenderGroupAbandonButton(header.CollapseButton, -25, header.Text:GetText())
 			end
 		end
 
@@ -294,14 +294,14 @@ local function ShowAbandonButtons()
 				if info then
 					local title = info.title
 					local key = getKey(title)
-					RenderGroupAbandonButton(calling, QuestScrollFrame:GetWidth() - 50, L["covenant callings"], L["Left Click: Abandon all covenant calling quests"], key)
+					RenderGroupAbandonButton(calling.CollapseButton, -25, L["covenant callings"], L["Left Click: Abandon all covenant calling quests"], key)
 				end
 			end
 		end
 
 		if E.db.general.zoneQuests.showAbandonButton then
 			for header in QuestScrollFrame.headerFramePool:EnumerateActive() do
-				RenderGroupAbandonButton(header, QuestScrollFrame:GetWidth() - 25)
+				RenderGroupAbandonButton(header.CollapseButton, -25, header.ButtonText:GetText())
 			end
 		end
 
@@ -310,7 +310,7 @@ local function ShowAbandonButtons()
 				local questId = quest.questID
 				local text = quest.Text:GetText()
 				local excluded = E:IsExcluded(questId)
-				RenderAbandonButton(quest.TaskIcon, QuestScrollFrame:GetWidth() - 50, questId, excluded, text)
+				RenderAbandonButton(quest.Checkbox, -25, questId, excluded, text)
 			end
 		end
 	end
