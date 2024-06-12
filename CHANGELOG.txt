@@ -6,6 +6,8 @@ This project adheres to Semantic Versioning.
   - Changed
     - Bump TOC to 11.0.0
     - Adjust abandon button rendering to support new quest log frames
+    - Code cleanup
+    - Pre-release version warnings
 
 - v1.7.2 - 2024-09-05
   - Changed

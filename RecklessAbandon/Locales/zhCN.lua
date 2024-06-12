@@ -10,7 +10,8 @@ L["Version"] = "版本"
 L["Configuration"] = "配置"
 L["Description"] = "一个快速（而且鲁莽）放弃任务的工具"
 
-L["You have installed a version of this addon intended for |cFFFFFAB8%s|r, however you are currently playing |cFFFFFAB8%s|r. You may encounter serious issues with this setup. Please install the proper version from Github, CurseForge, or WoWInterface, and restart the game."] = "你安装了适用于 |cFFFFFAB8%s|r 的插件版本，但你当前正在玩 |cFFFFFAB8%s|r。在这种设置下，你可能会遇到严重的问题。请从Github、CurseForge或WoWInterface安装正确版本，并重新启动游戏。"
+L["You have installed a version of this addon intended for |cFFFFFAB8%s|r, however you are currently playing |cFFFFFAB8%s|r. You may encounter serious issues with this setup. Please install the proper version from Github, CurseForge, Wago, or WoWInterface, and restart the game."] = "你安装了适用于 |cFFFFFAB8%s|r 的插件版本，但你当前正在玩 |cFFFFFAB8%s|r。在这种设置下，你可能会遇到严重的问题。请从Github、CurseForge、Wago或WoWInterface安装正确版本，并重新启动游戏。"
+L["You are currently running a pre-release version of %s. Please report any issues on github (|cFFB5FFEB%s|r) so they can be addressed quickly. Thank you for your interest in testing new features!"] = "您当前正在运行 %s 的预发布版本。请在 GitHub (|cFFB5FFEB%s|r) 上报告任何问题，以便能够迅速解决。感谢您对测试新功能的兴趣！"
 
 L["Enable"] = "启用"
 L["Enable/Disable Reckless Abandon"] = "启用/禁用 Reckless Abandon"

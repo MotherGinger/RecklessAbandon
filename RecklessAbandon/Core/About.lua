@@ -59,7 +59,7 @@ E.Options.args.about = {
             name = L["Please report any bugs or request features on our issue board:"],
             width = "double",
             get = function()
-                return "https://github.com/MotherGinger/RecklessAbandon/issues"
+                return E.github
             end,
             set = E.noop
         }

@@ -10,8 +10,9 @@ L["Version"] = "Versione"
 L["Configuration"] = "Configurazione"
 L["Description"] = "Uno strumento per abbandonare rapidamente (e imprudentemente) missioni"
 
-L["You have installed a version of this addon intended for |cFFFFFAB8%s|r, however, you are currently playing |cFFFFFAB8%s|r. You may encounter serious issues with this setup. Please install the proper version from Github, CurseForge, or WoWInterface, and restart the game."] =
-    "Hai installato una versione di questo addon destinata a |cFFFFFAB8%s|r, ma attualmente stai giocando con |cFFFFFAB8%s|r. Potresti incontrare problemi gravi con questa configurazione. Installa la versione corretta da Github, CurseForge o WoWInterface, e riavvia il gioco."
+L["You have installed a version of this addon intended for |cFFFFFAB8%s|r, however, you are currently playing |cFFFFFAB8%s|r. You may encounter serious issues with this setup. Please install the proper version from Github, CurseForge, Wago, or WoWInterface, and restart the game."] =
+    "Hai installato una versione di questo addon destinata a |cFFFFFAB8%s|r, ma attualmente stai giocando con |cFFFFFAB8%s|r. Potresti incontrare problemi gravi con questa configurazione. Installa la versione corretta da Github, CurseForge, Wago o WoWInterface, e riavvia il gioco."
+L["You are currently running a pre-release version of %s. Please report any issues on github (|cFFB5FFEB%s|r) so they can be addressed quickly. Thank you for your interest in testing new features!"] = "Stai attualmente utilizzando una versione pre-release di %s. Si prega di segnalare eventuali problemi su GitHub (|cFFB5FFEB%s|r) in modo che possano essere risolti rapidamente. Grazie per il tuo interesse nel testare nuove funzionalità!"
 
 L["Enable"] = "Abilita"
 L["Enable/Disable Reckless Abandon"] = "Abilita/Disabilita Reckless Abandon"
