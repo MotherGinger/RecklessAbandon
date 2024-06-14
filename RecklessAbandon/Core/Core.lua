@@ -884,6 +884,15 @@ function E:Initialize()
 	)
 	QuestMapFrame:HookScript("OnHide", HideAbandonButtons)
 
+	QuestMapFrame.QuestsFrame.SearchBox:HookScript(
+		"OnTextChanged", 
+		function()
+			-- * This is inefficient since these really only need to be adjusted when search results change
+			-- * However, there does not appear to be an exposed API to hook into to do this
+			ShowAbandonButtons()
+		end
+	)
+
 	QuestScrollFrame:HookScript(
 		"OnVerticalScroll",
 		function()

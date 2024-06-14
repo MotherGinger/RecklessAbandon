@@ -1,6 +1,11 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 
-function E:Dump(o)
+function E:Dump(o, devtools)
+    if (devtools) then
+        DevTools_Dump(o)
+        return
+    end
+
     local cache, stack, output = {}, {}, {}
     local depth = 1
     local output_str = "{\n"
