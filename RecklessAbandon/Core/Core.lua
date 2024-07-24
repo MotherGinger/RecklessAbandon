@@ -296,7 +296,14 @@ local function ShowAbandonButtons()
 
 		if E.db.general.zoneQuests.showAbandonButton then
 			for header in QuestScrollFrame.headerFramePool:EnumerateActive() do
-				RenderGroupAbandonButton(header.CollapseButton, -25, header.ButtonText:GetText())
+				local hasElvUI, _ = C_AddOns.IsAddOnLoaded("ElvUI")
+
+				-- * Adjust render position due to ElvUI moving the collapse button to the left
+				if hasElvUI then
+					RenderGroupAbandonButton(header.ButtonText, header.ButtonText:GetWidth() - 75, header.ButtonText:GetText())
+				else
+					RenderGroupAbandonButton(header.CollapseButton, -25, header.ButtonText:GetText())
+				end
 			end
 		end
 
@@ -883,6 +890,7 @@ function E:Initialize()
 	QuestMapFrame:HookScript(
 		"OnShow",
 		function()
+			E:GenerateQuestTable()
 			ShowAbandonButtons()
 			E:RegisterHotkeys()
 		end
@@ -890,6 +898,7 @@ function E:Initialize()
 	QuestMapFrame:HookScript(
 		"OnEvent",
 		function()
+			E:GenerateQuestTable()
 			ShowAbandonButtons()
 			E:RegisterHotkeys()
 		end
