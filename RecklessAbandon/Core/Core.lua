@@ -305,6 +305,10 @@ local function ShowAbandonButtons()
 				local questId = quest.questID
 				local text = quest.Text:GetText()
 				local excluded = E:IsExcluded(questId)
+
+				-- * This tag shows up in both the tooltip and the details pane, so lets hide it and collect more real estate for our button
+				-- TODO: This is a partial workaround since this will pop back in when hiding the details pane
+				quest.TagTexture:Hide()
 				RenderAbandonButton(quest.Checkbox, -25, questId, excluded, text)
 			end
 		end
@@ -782,7 +786,15 @@ function E:PrintWelcomeMessage()
 	end
 
 	if strfind(E.version, "alpha") or strfind(E.version, "beta") then
-		self:System(format(L["You are currently running a pre-release version of %s. Please report any issues on github (|cFFB5FFEB%s|r) so they can be addressed quickly. Thank you for your interest in testing new features!"], E.title, E.github))
+		self:System(
+			format(
+				L[
+					"You are currently running a pre-release version of %s. Please report any issues on github (|cFFB5FFEB%s|r) so they can be addressed quickly. Thank you for your interest in testing new features!"
+				],
+				E.title,
+				E.github
+			)
+		)
 	end
 end
 
@@ -885,7 +897,7 @@ function E:Initialize()
 	QuestMapFrame:HookScript("OnHide", HideAbandonButtons)
 
 	QuestMapFrame.QuestsFrame.SearchBox:HookScript(
-		"OnTextChanged", 
+		"OnTextChanged",
 		function()
 			-- * This is inefficient since these really only need to be adjusted when search results change
 			-- * However, there does not appear to be an exposed API to hook into to do this
