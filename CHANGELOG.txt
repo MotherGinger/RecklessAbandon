@@ -3,8 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to Semantic Versioning.
 
 - Unreleased
+
+- v2.0.0 - 2024-23-07
   - Changed
-    - Bump TOC to 11.0.0
+    - Bump TOC to 11.0.2
     - Adjust abandon button rendering to support new quest log frames
     - Code cleanup
     - Pre-release version warnings
@@ -228,7 +230,8 @@ This project adheres to Semantic Versioning.
     - Command line for abandoning all quests
     - Documentation
 
-[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.7.2...develop
+[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v2.0.0...develop
+[2.0.0]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.7.2..v2.0.0
 [1.7.2]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.7.1..v1.7.2
 [1.7.1]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.7.0..v1.7.1
 [1.7.0]: https://github.com/MotherGinger/RecklessAbandon/compare/v1.6.11..v1.7.0
