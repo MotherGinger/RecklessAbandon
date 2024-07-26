@@ -1,13 +1,8 @@
 local E, L = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 
-local _G = _G
-
 local DEFAULT_WIDTH = 900
 local DEFAULT_HEIGHT = 700
 
-local EnableAddOn = EnableAddOn
-local LoadAddOn = LoadAddOn
-local GetAddOnInfo = GetAddOnInfo
 local GameTooltip = GameTooltip
 local InCombatLockdown = InCombatLockdown
 local ERR_NOT_IN_COMBAT = ERR_NOT_IN_COMBAT
@@ -29,7 +24,7 @@ function E:ToggleOptionsUI(msg)
 
 	local pages
 	if (msg and msg ~= "") then
-		pages = {strsplit(",", msg)}
+		pages = { strsplit(",", msg) }
 	end
 
 	local mode = "Close"

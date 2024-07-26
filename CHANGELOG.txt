@@ -3,7 +3,14 @@ All notable changes to this project will be documented in this file.
 This project adheres to Semantic Versioning.
 
 - Unreleased
-
+  - Changed
+    - Unified retail and classic codebases
+    - Code cleanup
+  - Fixed
+    - Keybinding for abandoning zone quests not binding properly
+    - Automated abandons not working for dungeon quest types in classic
+    - Profile issues in classic
+  
 - v2.0.2 - 2024-24-07
   - Fixed
     - Group abandon button alignment when using ElvUI
