@@ -1,7 +1,6 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 
-local tostring = tostring
-local format, strlen, strrep, strsplit = format, strlen, strrep, strsplit
+local format, strsplit = format, strsplit
 
 E.Options.args.general = {
     type = "group",
@@ -29,10 +28,10 @@ E.Options.args.general = {
                     order = 1,
                     type = "toggle",
                     name = L["Show login message"],
-                    get = function(info)
+                    get = function()
                         return E.db.general.loginMessage
                     end,
-                    set = function(info, value)
+                    set = function(_, value)
                         E.db.general.loginMessage = value
                     end
                 },
@@ -49,10 +48,10 @@ E.Options.args.general = {
                     ),
                     values = E.logLevels,
                     width = "double",
-                    get = function(info)
+                    get = function()
                         return E.db.general.logLevel
                     end,
-                    set = function(info, value)
+                    set = function(_, value)
                         E.db.general.logLevel = value
                     end
                 },
@@ -72,10 +71,10 @@ E.Options.args.general = {
                         "\n\n"
                     ),
                     type = "toggle",
-                    get = function(info)
+                    get = function()
                         return E.db.general.confirmIndividual
                     end,
-                    set = function(info, value)
+                    set = function(_, value)
                         E.db.general.confirmIndividual = value
                     end
                 },
@@ -90,10 +89,10 @@ E.Options.args.general = {
                         "\n\n"
                     ),
                     type = "toggle",
-                    get = function(info)
+                    get = function()
                         return E.db.general.confirmGroup
                     end,
-                    set = function(info, value)
+                    set = function(_, value)
                         E.db.general.confirmGroup = value
                     end
                 },
@@ -113,10 +112,10 @@ E.Options.args.general = {
                             name = L["Show Abandon Button"],
                             desc = L["Show an abandon button for individual quests."],
                             type = "toggle",
-                            get = function(info)
+                            get = function()
                                 return E.db.general.individualQuests.showAbandonButton
                             end,
-                            set = function(info, value)
+                            set = function(_, value)
                                 E.db.general.individualQuests.showAbandonButton = value
                             end
                         },
@@ -125,10 +124,10 @@ E.Options.args.general = {
                             name = L["Complete Protection"],
                             desc = L["Automatically exclude completed quests from group abandons and automation options."],
                             type = "toggle",
-                            get = function(info)
+                            get = function()
                                 return E.db.general.individualQuests.completeProtection
                             end,
-                            set = function(info, value)
+                            set = function(_, value)
                                 E.db.general.individualQuests.completeProtection = value
                             end
                         },
@@ -231,10 +230,10 @@ E.Options.args.general = {
                             name = L["Show Group Abandon Button"],
                             desc = L["Show a group abandon button for zone quests."],
                             type = "toggle",
-                            get = function(info)
+                            get = function()
                                 return E.db.general.zoneQuests.showAbandonButton
                             end,
-                            set = function(info, value)
+                            set = function(_, value)
                                 E.db.general.zoneQuests.showAbandonButton = value
                             end
                         },
@@ -243,7 +242,7 @@ E.Options.args.general = {
                             type = "header",
                             name = L["Keybindings"]
                         },
-                        abandonKeybinding = {
+                        abandonBinding = {
                             order = 2,
                             type = "keybinding",
                             dialogControl = "RecklessKeybinding",
@@ -267,46 +266,6 @@ E.Options.args.general = {
                                 end
 
                                 return false
-                            end
-                        }
-                    }
-                },
-                campaignQuests = {
-                    order = 9,
-                    type = "group",
-                    name = L["Campaign Quests"],
-                    inline = true,
-                    args = {
-                        showAbandonButton = {
-                            order = 0,
-                            name = L["Show Group Abandon Button"],
-                            desc = L["Show a group abandon button for campaign quests."],
-                            type = "toggle",
-                            get = function(info)
-                                return E.db.general.campaignQuests.showAbandonButton
-                            end,
-                            set = function(info, value)
-                                E.db.general.campaignQuests.showAbandonButton = value
-                            end
-                        }
-                    }
-                },
-                covenantCallings = {
-                    order = 10,
-                    type = "group",
-                    name = L["Covenant Callings"],
-                    inline = true,
-                    args = {
-                        showAbandonButton = {
-                            order = 0,
-                            name = L["Show Group Abandon Button"],
-                            desc = L["Show a group abandon button for covenant callings."] .. "\n\n" .. L["|cFF00D1FFNote:|r Blizzard currently does not allow covenant callings to be abandoned. This button will be disabled if shown."],
-                            type = "toggle",
-                            get = function(info)
-                                return E.db.general.covenantCallings.showAbandonButton
-                            end,
-                            set = function(info, value)
-                                E.db.general.covenantCallings.showAbandonButton = value
                             end
                         }
                     }
@@ -359,10 +318,10 @@ E.Options.args.general = {
                                 local _, values = E:GetAvailableQualifiers()
                                 return values
                             end,
-                            get = function(info, value)
+                            get = function(_, value)
                                 return E.private.automationOptions.autoAbandonQuests.questType[value]
                             end,
-                            set = function(info, value)
+                            set = function(_, value)
                                 E.private.automationOptions.autoAbandonQuests.questType[value] = not E.private.automationOptions.autoAbandonQuests.questType[value]
                             end
                         },
@@ -384,15 +343,15 @@ E.Options.args.general = {
                             ),
                             multiline = 5,
                             width = "full",
-                            get = function(info, values)
+                            get = function()
                                 return E.private.automationOptions.autoAbandonQuests.ids
                             end,
-                            set = function(info, value)
+                            set = function(_, value)
                                 -- * Remove all non digit and comma characters
                                 -- * Replace all consecutive commas with one comma
                                 -- * Remove any trailing comma
                                 local ids = value:gsub("[^%d,]+", ""):gsub(",+", ","):gsub("^,+", ""):gsub(",*$", "")
-                                E:Debug(L["Auto Abandon: "], E:Dump({strsplit(",", ids)}))
+                                E:Debug(L["Auto Abandon: "], E:Dump({ strsplit(",", ids) }))
                                 E.private.automationOptions.autoAbandonQuests.ids = ids
                             end
                         }
@@ -427,17 +386,17 @@ E.Options.args.general = {
                     type = "description",
                     disabled = true,
                     name = function()
-                        local exclusionTable = {{L["QuestID"], L["Source"], L["Title"]}}
+                        local exclusionTable = { { L["QuestID"], L["Source"], L["Title"] } }
 
                         for questId, meta in pairs(E.private.exclusions.excludedQuests) do
                             local title = meta.title
                             local source = meta.source == MANUAL and L["Manual"] or L["Automation"]
-                            local orphaned = C_QuestLog.GetLogIndexForQuestID(questId) == nil
+                            local orphaned = Shim:GetLogIndexForQuestID(questId) == nil
 
                             -- * Excluded quests are stored with the localized version of the title at time of exclusion
                             -- * This cannot be updated when language changes since the title can only be fetched for quests still in your log
                             -- * It would then be impossible to update titles for abandoned but still excluded quests
-                            tinsert(exclusionTable, {questId, source, title, orphaned})
+                            tinsert(exclusionTable, { questId, source, title, orphaned })
                         end
 
                         return E:TableToString(exclusionTable)
@@ -462,10 +421,10 @@ E.Options.args.general = {
                         "\n\n"
                     ),
                     width = "full",
-                    get = function(info)
+                    get = function()
                         return E.private.exclusions.autoPrune
                     end,
-                    set = function(info, value)
+                    set = function(_, value)
                         E.private.exclusions.autoPrune = value
                     end
                 },
@@ -634,3 +593,47 @@ E.Options.args.general = {
         }
     }
 }
+
+if E.isRetail then
+    E.Options.args.general.args.general.args.campaignQuests = {
+        order = 9,
+        type = "group",
+        name = L["Campaign Quests"],
+        inline = true,
+        args = {
+            showAbandonButton = {
+                order = 0,
+                name = L["Show Group Abandon Button"],
+                desc = L["Show a group abandon button for campaign quests."],
+                type = "toggle",
+                get = function()
+                    return E.db.general.campaignQuests.showAbandonButton
+                end,
+                set = function(_, value)
+                    E.db.general.campaignQuests.showAbandonButton = value
+                end
+            }
+        }
+    }
+
+    E.Options.args.general.args.general.args.covenantCallings = {
+        order = 10,
+        type = "group",
+        name = L["Covenant Callings"],
+        inline = true,
+        args = {
+            showAbandonButton = {
+                order = 0,
+                name = L["Show Group Abandon Button"],
+                desc = L["Show a group abandon button for covenant callings."] .. "\n\n" .. L["|cFF00D1FFNote:|r Blizzard currently does not allow covenant callings to be abandoned. This button will be disabled if shown."],
+                type = "toggle",
+                get = function()
+                    return E.db.general.covenantCallings.showAbandonButton
+                end,
+                set = function(_, value)
+                    E.db.general.covenantCallings.showAbandonButton = value
+                end
+            }
+        }
+    }
+end

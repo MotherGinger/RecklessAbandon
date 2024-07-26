@@ -10,30 +10,12 @@ To load the AddOn engine inside another addon add this to the top of your file:
 	local E, L, V, P, G = unpack(RecklessAbandon) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 ]]
 --Lua functions
+---@class _G
 local _G = _G
-local pairs, unpack, strsplit, format, tcopy, strlower = pairs, unpack, string.split, string.format, table.copy, string.lower
-
---WoW API / Variables
-local hooksecurefunc = hooksecurefunc
-local issecurevariable = issecurevariable
-local IsInInstance = IsInInstance
 
 local CreateFrame = CreateFrame
-local GetAddOnInfo = GetAddOnInfo
-local GetAddOnEnableState = GetAddOnEnableState
 local GetLocale = GetLocale
 local GetTime = GetTime
-local HideUIPanel = HideUIPanel
-local InCombatLockdown = InCombatLockdown
-local IsAddOnLoaded = IsAddOnLoaded
-local LoadAddOn = LoadAddOn
-local DisableAddOn = DisableAddOn
-local ReloadUI = ReloadUI
-
-local GameMenuFrame = GameMenuFrame
-local GameMenuButtonAddons = GameMenuButtonAddons
-local GameMenuButtonLogout = GameMenuButtonLogout
-local ERR_NOT_IN_COMBAT = ERR_NOT_IN_COMBAT
 
 -- GLOBALS: RecklessAbandonCharacterDB, RecklessAbandonPrivateDB, RecklessAbandonDB
 
@@ -41,10 +23,11 @@ local AceAddOn, AceAddonMinor = _G.LibStub("AceAddon-3.0")
 local CallbackHandler = _G.LibStub("CallbackHandler-1.0")
 
 local AddOnName, Engine = ...
+---@class AceAddon
 local E = AceAddOn:NewAddon(AddOnName, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceBucket-3.0")
-E.DF = {profile = {}, global = {}} -- Defaults
-E.privateVars = {profile = {}} -- Defaults
-E.Options = {type = "group", args = {}}
+E.DF = { profile = {}, global = {} } -- Defaults
+E.privateVars = { profile = {} }     -- Defaults
+E.Options = { type = "group", args = {} }
 E.callbacks = E.callbacks or CallbackHandler:New(E)
 E.locale = GetLocale()
 
@@ -56,7 +39,7 @@ Engine[5] = E.DF.global
 _G.RecklessAbandon = Engine
 
 do
-	local convert = {enGB = "enUS", esES = "esMX", zhTW = "zhCN", ptPT = "ptBR"}
+	local convert = { enGB = "enUS", esES = "esMX", zhTW = "zhCN", ptPT = "ptBR" }
 	local gameLocale = convert[E.locale] or E.locale or "enUS"
 
 	function E:GetLocale()
@@ -80,7 +63,7 @@ do
 		end
 	end
 
-	E:AddLib("AceAddon", AceAddon, AceAddonMinor)
+	E:AddLib("AceAddon", AceAddOn, AceAddonMinor)
 	E:AddLib("AceDB", "AceDB-3.0")
 	E:AddLib("ACL", "AceLocale-3.0-Reckless")
 	E:AddLib("AceGUI", "AceGUI-3.0")
@@ -89,6 +72,8 @@ do
 	E:AddLib("AceConfigRegistry", "AceConfigRegistry-3.0")
 end
 
+
+---@diagnostic disable-next-line: duplicate-set-field
 function E:OnInitialize()
 	if not RecklessAbandonCharacterDB then
 		RecklessAbandonCharacterDB = {}
@@ -171,16 +156,18 @@ function E:ChatCommand(input)
 		E:CliIncludeQuestById(arg1)
 	elseif cmd == "debug" then
 		E:CliToggleDebugging()
+	elseif cmd == "dump" and arg1 ~= nil then
+		E:CliDump(arg1)
 	end
 
 	E:RefreshGUI()
 end
 
-function E:PLAYER_ENTERING_WORLD(event, ...)
+function E:PLAYER_ENTERING_WORLD()
 	E:PrintWelcomeMessage()
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
 
-function E:PLAYER_LEVEL_UP(_, arg2, ...)
+function E:PLAYER_LEVEL_UP(_, arg2)
 	E:UpdatePlayerLevel(arg2)
 end

@@ -1,9 +1,0 @@
-package-as: RecklessAbandon
-enable-nolib-creation: no
-ignore: # Files and directories beginning with a dot (such as .git) are automatically ignored, as is the pgkmeta file itself.
-  - scripts
-  - CONTRIBUTING.md
-  - README.md
-  - LICENSE
-manual-changelog: CHANGELOG.txt
-license-output: LICENSE

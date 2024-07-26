@@ -6,7 +6,6 @@ L["Version"] = true
 L["Configuration"] = true
 L["Description"] = "A tool for quickly (and recklessly) abandoning quests"
 
-L["You have installed a version of this addon intended for |cFFFFFAB8%s|r, however you are currently playing |cFFFFFAB8%s|r. You may encounter serious issues with this setup. Please install the proper version from Github, CurseForge, Wago, or WoWInterface, and restart the game."] = true
 L["You are currently running a pre-release version of %s. Please report any issues on github (|cFFB5FFEB%s|r) so they can be addressed quickly. Thank you for your interest in testing new features!"] = true
 
 L["Enable"] = true
@@ -114,9 +113,14 @@ L["This command abandons all quests that match a given qualifier and are not exc
 
 L["Available Qualifiers:"] = true
 
-L["daily"] = true
 L["Matches all daily quests."] = true
-L["weekly"] = true
+L["Matches all failed quests."] = true
+L["Matches all dungeon quests."] = true
+L["Matches all raid quests."] = true
+L["Matches all group quests."] = true
+L["Matches all heroic quests."] = true
+L["Matches all elite quests."] = true
+L["Matches all pvp quests."] = true
 L["Matches all weekly quests."] = true
 L["gray"] = true
 L["Matches all gray quests."] = true

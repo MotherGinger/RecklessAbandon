@@ -10,8 +10,6 @@ L["Version"] = "Версия"
 L["Configuration"] = "Настройки"
 L["Description"] = "Инструмент для быстрого (и безрассудного) отказа от заданий"
 
-L["You have installed a version of this addon intended for |cFFFFFAB8%s|r, however you are currently playing |cFFFFFAB8%s|r. You may encounter serious issues with this setup. Please install the proper version from Github, CurseForge, Wago, or WoWInterface, and restart the game."] =
-    "Вы установили версию этого аддона, предназначенную для |cFFFFFAB8%s|r, однако в настоящее время вы играете на |cFFFFFAB8%s|r. Возможны серьезные проблемы с этой конфигурацией. Пожалуйста, установите правильную версию с Github, CurseForge, Wago или WoWInterface и перезапустите игру."
 L["You are currently running a pre-release version of %s. Please report any issues on github (|cFFB5FFEB%s|r) so they can be addressed quickly. Thank you for your interest in testing new features!"] = "В настоящее время вы используете предварительную версию %s. Пожалуйста, сообщите о любых проблемах на GitHub (|cFFB5FFEB%s|r), чтобы их можно было быстро устранить. Спасибо за ваш интерес к тестированию новых функций!"
 
 L["Enable"] = "Включить"
@@ -119,9 +117,14 @@ L["This command abandons all quests that match a given qualifier and are not exc
 
 L["Available Qualifiers:"] = "Доступные критерии:"
 
-L["daily"] = "ежедневные"
 L["Matches all daily quests."] = "Совпадает со всеми ежедневными квестами."
-L["weekly"] = "еженедельные"
+L["Matches all failed quests."] = "Соответствует всем проваленным заданиям."
+L["Matches all dungeon quests."] = "Соответствует всем заданиям в подземельях."
+L["Matches all raid quests."] = "Соответствует всем заданиям рейда."
+L["Matches all group quests."] = "Соответствует всем групповым заданиям."
+L["Matches all heroic quests."] = "Соответствует всем героическим заданиям."
+L["Matches all elite quests."] = "Соответствует всем элитным заданиям."
+L["Matches all pvp quests."] = "Соответствует всем PvP-заданиям."
 L["Matches all weekly quests."] = "Совпадает со всеми еженедельными квестами."
 L["gray"] = "серый"
 L["Matches all gray quests."] = "Соответствует всем серым заданиям."
