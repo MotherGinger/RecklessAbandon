@@ -1,4 +1,4 @@
-## Interface: 110007
+## Interface: 11503
 ## Author: Frauke Betz
 ## Version: 3.0.0-alpha.1
 ## Title: |cFF80528CReckless Abandon|r
@@ -12,8 +12,6 @@
 ## Notes-ptBR: Uma ferramenta para abandonar missões rapidamente (e imprudentemente)
 ## Notes-zhCN: 一个快速（且鲁莽）放弃任务的工具
 ## Notes-zhTW: 一個快速（且魯莽）放棄任務的工具
-## IconTexture: 135818
-## Category: Quests
 ## SavedVariables: RecklessAbandonDB, RecklessAbandonPrivateDB
 ## SavedVariablesPerCharacter: RecklessAbandonCharacterDB
 
