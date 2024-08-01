@@ -227,14 +227,7 @@ function E:RetailRenderer()
 
         if E.db.general.zoneQuests.showAbandonButton then
             for header in QuestScrollFrame.headerFramePool:EnumerateActive() do
-                local hasElvUI, _ = C_AddOns.IsAddOnLoaded("ElvUI")
-
-                -- * Adjust render position due to ElvUI moving the collapse button to the left
-                if hasElvUI then
-                    E:RenderGroupAbandonButton(header.ButtonText, header.ButtonText:GetWidth() - 75, header.ButtonText:GetText())
-                else
-                    E:RenderGroupAbandonButton(header.CollapseButton, -25, header.ButtonText:GetText())
-                end
+                E:RenderGroupAbandonButton(header.CollapseButton, -25, header.ButtonText:GetText())
             end
         end
 

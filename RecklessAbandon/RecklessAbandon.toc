@@ -1,6 +1,6 @@
 ## Interface: 110000, 110002
 ## Author: Frauke Betz
-## Version: 3.0.0-alpha.1
+## Version: 3.0.0-beta.1
 ## Title: |cFF80528CReckless Abandon|r
 ## Notes: A tool for quickly (and recklessly) abandoning quests
 ## Notes-esES: Una herramienta para abandonar misiones rápidamente (y sin escrúpulos)

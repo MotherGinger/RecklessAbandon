@@ -40,14 +40,6 @@ E.myLocalizedRace, E.myrace = UnitRace("player")
 E.myname = UnitName("player")
 E.myrealm = GetRealmName()
 E.mynameRealm = format("%s - %s", E.myname, E.myrealm) -- contains spaces/dashes in realm (for profile keys)
-E.wowpatch, E.wowbuild = GetBuildInfo()
-E.wowbuild = tonumber(E.wowbuild)
-E.isMacClient = IsMacClient()
-E.isRetail = WOW_PROJECT_ID == (WOW_PROJECT_MAINLINE or 1)
-E.isClassic = WOW_PROJECT_ID == (WOW_PROJECT_CLASSIC or 2)
-E.isBC = WOW_PROJECT_ID == (WOW_PROJECT_BURNING_CRUSADE_CLASSIC or 5)
-E.isWrath = WOW_PROJECT_ID == (WOW_PROJECT_WRATH_CLASSIC or 11)
-E.isCata = WOW_PROJECT_ID == (WOW_PROJECT_CATACLYSM_CLASSIC or 14)
 E.screenwidth, E.screenheight = GetPhysicalScreenSize()
 E.resolution = format("%dx%d", E.screenwidth, E.screenheight)
 E.logLevels = {
@@ -621,6 +613,12 @@ function E:Initialize()
 	E.data.RegisterCallback(E, "OnProfileReset", "RefreshOptions")
 	E.charSettings = E.Libs.AceDB:New("RecklessAbandonPrivateDB", E.privateVars)
 	E.charSettings.RegisterCallback(E, "OnProfileReset", "RefreshOptions")
+
+	E:RegisterBucketEvent("QUEST_LOG_UPDATE", 1, "GenerateQuestTable")
+	E:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "AutoAbandonQuests")
+	E:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "AutoExcludeQuests")
+	E:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "PruneQuestExclusionsFromAutomation")
+	E:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "RefreshGUI")
 
 	E.private = E.charSettings.profile
 	E.db = E.data.profile

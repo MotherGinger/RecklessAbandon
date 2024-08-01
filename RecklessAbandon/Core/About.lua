@@ -18,7 +18,19 @@ E.Options.args.about = {
             order = 1,
             type = "description",
             fontSize = "medium",
-            name = format(L["Written by |T626001:0|t |cFF3FC7EB%s|r"], E.author)
+            name = format(
+                L["Written by %s%s%s%s %s"],
+                E.classIcons.paladin,
+                E.classIcons.mage,
+                E.classIcons.warrior,
+                E.classIcons.priest,
+                E:FormatGradient(E.author, {
+                    E.classColors.paladin.rgb,
+                    E.classColors.mage.rgb,
+                    E.classColors.warrior.rgb,
+                    E.classColors.priest.rgb
+                })
+            )
         },
         space1 = {
             order = 2,
@@ -31,20 +43,25 @@ E.Options.args.about = {
             inline = true,
             name = format(L["Testers"]),
             args = {
-                arrila = {
+                rawrhax = {
                     order = 0,
                     type = "description",
-                    name = format("|T626001:0|t |cFF3FC7EB%s|r", E.author)
-                },
-                rawrhax = {
-                    order = 1,
-                    type = "description",
-                    name = "|T626000:0|t |cFFABD473Rawrsnax-Thrall (US)|r"
+                    name = format("%s %s", E.classIcons.hunter, E:ColorFormat(E.classColors.hunter.hex, "Rawrsnax"))
                 },
                 cob = {
-                    order = 2,
+                    order = 1,
                     type = "description",
-                    name = "|T626000:0|t |cFFABD473Cob-Thrall (US)|r"
+                    name = format(
+                        "%s%s%s %s",
+                        E.classIcons.hunter,
+                        E.classIcons.druid,
+                        E.classIcons.evoker,
+                        E:FormatGradient("Cob", {
+                            E.classColors.hunter.rgb,
+                            E.classColors.druid.rgb,
+                            E.classColors.evoker.rgb
+                        })
+                    )
                 }
             }
         },
