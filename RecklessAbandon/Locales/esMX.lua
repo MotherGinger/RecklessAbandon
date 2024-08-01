@@ -168,7 +168,7 @@ L["Unable to prune quests from the exclusion list from source '%s'"] = "No se pu
 
 L["About"] = "Acerca de"
 L["Testers"] = "Probadores"
-L["Written by |T626001:0|t |cFF3FC7EB%s|r"] = "Escrito por |T626001:0|t |cFF3FC7EB%s|r"
+L["Written by %s%s%s%s %s"] = "Escrito por %s%s%s%s %s"
 L["Please report any bugs or request features on our issue board:"] = "Informe cualquier error o solicite funciones en nuestro tablero de problemas:"
 
 L["|cFFFFFF00Abandoned quest %s|r"] = "|cFFFFFF00Misión abandonada %s|r"

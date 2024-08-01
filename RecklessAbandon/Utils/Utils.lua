@@ -1,5 +1,54 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 
+local floor = math.floor
+local format = format
+
+---@param color string Hex color code
+---@param str string The string to color
+---@return string formattedString A colored string
+function E:ColorFormat(color, str)
+    return format("|%s%s|r", color, str)
+end
+
+---@param r number Red (0-255)
+---@param g number Green (0-255)
+---@param b number Blue (0-255)
+---@return string hex A hex color code
+function E:RGBToHex(r, g, b)
+    return format("|cff%02x%02x%02x", r, g, b)
+end
+
+---@param color1 table The first RGB (0-255) color
+---@param color2 table The second RGB (0-255) color
+---@param t number The factor (0 to 1)
+---@return table color An interpolated RGB (0-255) color
+function E:InterpolateColor(color1, color2, t)
+    local r = color1[1] + (color2[1] - color1[1]) * t
+    local g = color1[2] + (color2[2] - color1[2]) * t
+    local b = color1[3] + (color2[3] - color1[3]) * t
+    return { floor(r), floor(g), floor(b) }
+end
+
+---@param text string The string to color with a gradient
+---@param colors table The colors of the gradient
+---@return string result The resulting formatted string
+function E:FormatGradient(text, colors)
+    local len = #text
+    local num_segments = #colors - 1
+    local chars_per_segment = len / num_segments
+    local result = ""
+
+    for i = 1, len do
+        local segment = floor((i - 1) / chars_per_segment) + 1
+        local t = ((i - 1) % chars_per_segment) / chars_per_segment
+        local current_color = E:InterpolateColor(colors[segment], colors[segment + 1], t)
+        result = result .. E:RGBToHex(current_color[1], current_color[2], current_color[3]) .. text:sub(i, i)
+    end
+
+    result = result .. "|r" -- Reset color at the end
+    return result
+end
+
 function E:Dump(o, devtools)
     if (devtools) then
         DevTools_Dump(o)

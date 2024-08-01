@@ -101,17 +101,12 @@ function E:OnInitialize()
 		end
 	end
 
-	self:RegisterEvent("PLAYER_ENTERING_WORLD")
-	self:RegisterEvent("PLAYER_LEVEL_UP")
-	self:RegisterBucketEvent("QUEST_LOG_UPDATE", 1, "GenerateQuestTable")
-	self:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "AutoAbandonQuests")
-	self:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "AutoExcludeQuests")
-	self:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "PruneQuestExclusionsFromAutomation")
-	self:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "RefreshGUI")
-	self:RegisterChatCommand("reckless", "ChatCommand")
-	self:RegisterChatCommand("rab", "ChatCommand")
+	E:RegisterEvent("PLAYER_ENTERING_WORLD")
+	E:RegisterEvent("PLAYER_LEVEL_UP")
+	E:RegisterChatCommand("reckless", "ChatCommand")
+	E:RegisterChatCommand("rab", "ChatCommand")
 
-	self.loadedtime = GetTime()
+	E.loadedtime = GetTime()
 end
 
 local LoadUI = CreateFrame("Frame")
@@ -119,7 +114,7 @@ LoadUI:RegisterEvent("ADDON_LOADED")
 LoadUI:RegisterEvent("PLAYER_LOGIN")
 LoadUI:SetScript(
 	"OnEvent",
-	function(Frame, event, addon)
+	function(_, event, addon)
 		if event == "ADDON_LOADED" and addon == "RecklessAbandon" then
 			E:Initialize()
 		end
@@ -165,7 +160,7 @@ end
 
 function E:PLAYER_ENTERING_WORLD()
 	E:PrintWelcomeMessage()
-	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	E:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
 
 function E:PLAYER_LEVEL_UP(_, arg2)

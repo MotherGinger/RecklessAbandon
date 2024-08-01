@@ -1,5 +1,13 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 
+E.wowpatch, E.wowbuild = GetBuildInfo()
+E.wowbuild = tonumber(E.wowbuild)
+E.isRetail = WOW_PROJECT_ID == (WOW_PROJECT_MAINLINE or 1)
+E.isClassic = WOW_PROJECT_ID == (WOW_PROJECT_CLASSIC or 2)
+E.isBC = WOW_PROJECT_ID == (WOW_PROJECT_BURNING_CRUSADE_CLASSIC or 5)
+E.isWrath = WOW_PROJECT_ID == (WOW_PROJECT_WRATH_CLASSIC or 11)
+E.isCata = WOW_PROJECT_ID == (WOW_PROJECT_CATACLYSM_CLASSIC or 14)
+
 ---@class Shim
 Shim = {}
 

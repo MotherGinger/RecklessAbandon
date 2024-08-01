@@ -1,5 +1,3 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Include file="Icons.lua" />
-	<Include file="Colors.lua" />
 	<Include file="Utils.lua" />
 </Ui>
