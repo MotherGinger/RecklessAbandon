@@ -1,15 +1,15 @@
 --- **AceLocale-3.0** manages localization in addons, allowing for multiple locale to be registered with fallback to the base locale for untranslated strings.
 -- @class file
 -- @name AceLocale-3.0
--- @release $Id$
-local MAJOR,MINOR = "AceLocale-3.0-Reckless", 1
+-- @release $Id: AceLocale-3.0.lua 1284 2022-09-25 09:15:30Z nevcairiel $
+local MAJOR,MINOR = "AceLocale-3.0-Reckless", 2
 
 local AceLocale, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceLocale then return end -- no upgrade needed
 
 -- Lua APIs
-local assert, tostring, error, type, pairs = assert, tostring, error, type, pairs
+local assert, tostring, error = assert, tostring, error
 local getmetatable, setmetatable, rawset, rawget = getmetatable, setmetatable, rawset, rawget
 
 local gameLocale = GetLocale()
@@ -25,8 +25,8 @@ AceLocale.appnames = AceLocale.appnames or {}  -- array of [localetableref]="App
 local readmeta = {
 	__index = function(self, key) -- requesting totally unknown entries: fire off a nonbreaking error and return key
 		AceLocale.MissingLinesReckless[key] = true
-		rawset(self, key, key)      -- only need to see the warning once, really
-		geterrorhandler()(MAJOR..": "..tostring(AceLocale.appnames[self])..": Missing entry for '"..tostring(key).."'")
+		rawset(self, key, key) -- only need to see the warning once, really
+		geterrorhandler()(MAJOR .. ": " .. tostring(AceLocale.appnames[self]) .. ": Missing entry for '" .. tostring(key) .. "'")
 		return key
 	end
 }
@@ -107,9 +107,11 @@ end
 -- local L = LibStub("AceLocale-3.0"):NewLocale("TestLocale", "deDE")
 -- if not L then return end
 -- L["string1"] = "Zeichenkette1"
+-- @return Locale Table to add localizations to, or nil if the current locale is not required.
 function AceLocale:NewLocale(application, locale, isDefault, silent)
+
 	-- GAME_LOCALE allows translators to test translations of addons without having that wow client installed
-	-- local activeGameLocale = GAME_LOCALE or gameLocale
+	local activeGameLocale = GAME_LOCALE or gameLocale
 
 	local app = AceLocale.apps[application]
 
@@ -125,6 +127,10 @@ function AceLocale:NewLocale(application, locale, isDefault, silent)
 		end
 		AceLocale.apps[application] = app
 		AceLocale.appnames[app] = application
+	end
+
+	if locale ~= activeGameLocale and not isDefault then
+		return -- nop, we don't need these translations
 	end
 
 	-- Reckless block
@@ -157,7 +163,7 @@ function AceLocale:GetLocale(application, locale, silent)
 	end
 
 	if not silent and not AceLocale.apps[application] then
-		error("Usage: GetLocale(application[,locale[, silent]]): 'application' - No locales registered for '"..tostring(application).."'", 2)
+		error("Usage: GetLocale(application[,locale[, silent]]): 'application' - No locales registered for '" .. tostring(application) .. "'", 2)
 	end
 
 	if locale ~= AceLocale.apps[application].defaultLocale then

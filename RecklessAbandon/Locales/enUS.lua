@@ -162,7 +162,7 @@ L["Unable to prune quests from the exclusion list from source '%s'"] = true
 
 L["About"] = true
 L["Testers"] = true
-L["Written by |T626001:0|t |cFF3FC7EB%s|r"] = true
+L["Written by %s%s%s%s %s"] = true
 L["Please report any bugs or request features on our issue board:"] = true
 
 L["|cFFFFFF00Abandoned quest %s|r"] = true
