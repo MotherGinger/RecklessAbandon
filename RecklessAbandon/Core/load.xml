@@ -33,7 +33,7 @@
 		</Scripts>
 	</Button>
 
-	<Script file="Compat.lua" />
+	<Include file="..\Environment\load.xml" />
 	<Script file="Core.lua" />
 	<Script file="Renderer.lua" />
 	<Script file="CommandLine.lua" />
