@@ -1,6 +1,6 @@
 local RecklessAbandon = select(2, ...)
 RecklessAbandon[2] = RecklessAbandon[1].Libs.ACL:GetLocale("RecklessAbandon", RecklessAbandon[1]:GetLocale()) -- Locale doesn't exist yet, make it exist.
-local E, L, V, P, G = unpack(RecklessAbandon) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(RecklessAbandon)                                                                 --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 
 -- Globals
 LOG_LEVEL_SYSTEM = 0
@@ -66,20 +66,20 @@ local groupButtonPool = CreateFramePool("Button", QuestMapFrame.QuestsFrame, "RE
 local MyScanningTooltip = CreateFrame("GameTooltip", "MyScanningTooltip", UIParent, "GameTooltipTemplate")
 local QuestTitleFromID =
 	setmetatable(
-	{},
-	{
-		__index = function(t, id)
-			MyScanningTooltip:SetOwner(UIParent, "ANCHOR_NONE")
-			MyScanningTooltip:SetHyperlink("quest:" .. id)
-			local title = MyScanningTooltipTextLeft1:GetText()
-			MyScanningTooltip:Hide()
-			if title and title ~= RETRIEVING_DATA then
-				t[id] = title
-				return title
+		{},
+		{
+			__index = function(t, id)
+				MyScanningTooltip:SetOwner(UIParent, "ANCHOR_NONE")
+				MyScanningTooltip:SetHyperlink("quest:" .. id)
+				local title = MyScanningTooltipTextLeft1:GetText()
+				MyScanningTooltip:Hide()
+				if title and title ~= RETRIEVING_DATA then
+					t[id] = title
+					return title
+				end
 			end
-		end
-	}
-)
+		}
+	)
 
 StaticPopupDialogs["RECKLESS_ABANDON_GROUP_CONFIRMATION"] = {
 	text = table.concat(
@@ -121,7 +121,8 @@ StaticPopupDialogs["RECKLESS_ABANDON_CONFIRMATION"] = {
 
 StaticPopupDialogs["RECKLESS_ABANDON_ALL_CONFIRMATION"] = {
 	text = table.concat(
-		{L["Are you sure you want to abandon all of the quests in your questlog?"], L["|cFFFF6B6BThis cannot be undone.|r"]},
+		{ L["Are you sure you want to abandon all of the quests in your questlog?"], L
+			["|cFFFF6B6BThis cannot be undone.|r"] },
 		"\n\n"
 	),
 	button1 = L["Yes"],
@@ -296,14 +297,7 @@ local function ShowAbandonButtons()
 
 		if E.db.general.zoneQuests.showAbandonButton then
 			for header in QuestScrollFrame.headerFramePool:EnumerateActive() do
-				local hasElvUI, _ = C_AddOns.IsAddOnLoaded("ElvUI")
-
-				-- * Adjust render position due to ElvUI moving the collapse button to the left
-				if hasElvUI then
-					RenderGroupAbandonButton(header.ButtonText, header.ButtonText:GetWidth() - 75, header.ButtonText:GetText())
-				else
-					RenderGroupAbandonButton(header.CollapseButton, -25, header.ButtonText:GetText())
-				end
+				RenderGroupAbandonButton(header.CollapseButton, -25, header.ButtonText:GetText())
 			end
 		end
 
@@ -332,7 +326,8 @@ local function onQuestLogEntryClick(self, button, down)
 	local excludeQuestBinding = E.db.general.individualQuests.excludeBinding
 	local binding = getKeybinding(button)
 	local isBound =
-		(isHeader and binding == groupAbandonQuestBinding) or binding == abandonQuestBinding or binding == excludeQuestBinding
+		(isHeader and binding == groupAbandonQuestBinding) or binding == abandonQuestBinding or
+		binding == excludeQuestBinding
 
 	-- * If the click matches a binding, disable default behaviors
 	-- * In retail this prevents things like the right click context menu or the full page quest description
@@ -424,21 +419,21 @@ function onAbandonButtonClick(self, button)
 			texture:SetVertexColor(1, 1, 1, 1)
 			self.tooltip =
 				format(
-				abandonTooltipFormat,
-				self.title,
-				L["Left Click: Abandon quest"],
-				L["Right Click: Exclude quest from group abandons"]
-			)
+					abandonTooltipFormat,
+					self.title,
+					L["Left Click: Abandon quest"],
+					L["Right Click: Exclude quest from group abandons"]
+				)
 		else
 			E:ExcludeQuest(self.questId, MANUAL)
 			texture:SetVertexColor(0.5, 0.5, 1, 0.7)
 			self.tooltip =
 				format(
-				abandonTooltipFormat,
-				self.title,
-				L["Left Click: Abandon quest"],
-				L["Right Click: Include quest in group abandons"]
-			)
+					abandonTooltipFormat,
+					self.title,
+					L["Left Click: Abandon quest"],
+					L["Right Click: Include quest in group abandons"]
+				)
 		end
 
 		self:SetNormalTexture(texture)
@@ -736,7 +731,7 @@ function E:AutoAbandonQuests()
 			local autoAbandonQuests = self.private.automationOptions.autoAbandonQuests
 			local ids = autoAbandonQuests.ids or "" -- These should never be nil, but lets guard against a corrupt config
 
-			local abandonQuestId = E:TableContainsValue({strsplit(",", ids)}, questId)
+			local abandonQuestId = E:TableContainsValue({ strsplit(",", ids) }, questId)
 			local gray = autoAbandonQuests.questType.gray and L["gray"] == color
 			local green = autoAbandonQuests.questType.green and L["green"] == color
 			local orange = autoAbandonQuests.questType.orange and L["orange"] == color
@@ -784,7 +779,7 @@ function E:PrintWelcomeMessage()
 		self:Critical(
 			format(
 				L[
-					"You have installed a version of this addon intended for |cFFFFFAB8%s|r, however you are currently playing |cFFFFFAB8%s|r. You may encounter serious issues with this setup. Please install the proper version from Github, CurseForge, Wago, or WoWInterface, and restart the game."
+				"You have installed a version of this addon intended for |cFFFFFAB8%s|r, however you are currently playing |cFFFFFAB8%s|r. You may encounter serious issues with this setup. Please install the proper version from Github, CurseForge, Wago, or WoWInterface, and restart the game."
 				],
 				E.wowVersionMatrix[E.validVersion],
 				E.wowVersionMatrix[WOW_PROJECT_ID]
@@ -796,7 +791,7 @@ function E:PrintWelcomeMessage()
 		self:System(
 			format(
 				L[
-					"You are currently running a pre-release version of %s. Please report any issues on github (|cFFB5FFEB%s|r) so they can be addressed quickly. Thank you for your interest in testing new features!"
+				"You are currently running a pre-release version of %s. Please report any issues on github (|cFFB5FFEB%s|r) so they can be addressed quickly. Thank you for your interest in testing new features!"
 				],
 				E.title,
 				E.github
@@ -817,7 +812,7 @@ function E:NormalizeSettings()
 	if E.private.exclusions.excludedQuests ~= nil then
 		for k, v in pairs(E.private.exclusions.excludedQuests) do
 			if (type(v) == "string") then
-				E.private.exclusions.excludedQuests[k] = {["title"] = v, ["source"] = MANUAL}
+				E.private.exclusions.excludedQuests[k] = { ["title"] = v, ["source"] = MANUAL }
 			end
 		end
 	end
@@ -825,8 +820,8 @@ function E:NormalizeSettings()
 	-- Rebuild automation options
 	if
 		E.private.automationOptions.autoAbandonQuests.questType == nil or
-			E:IsEmpty(E.private.automationOptions.autoAbandonQuests.questType)
-	 then
+		E:IsEmpty(E.private.automationOptions.autoAbandonQuests.questType)
+	then
 		E.private.automationOptions.autoAbandonQuests.questType = nil
 		E.private.automationOptions.autoAbandonQuests = {
 			["questType"] = E.private.automationOptions.autoAbandonQuests
