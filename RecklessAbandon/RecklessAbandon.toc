@@ -1,6 +1,6 @@
 ## Interface: 110007
 ## Author: Frauke Betz
-## Version: 3.0.0-beta.1
+## Version: 3.0.0-beta.2
 ## Title: |cFF80528CReckless Abandon|r
 ## Notes: A tool for quickly (and recklessly) abandoning quests
 ## Notes-esES: Una herramienta para abandonar misiones rápidamente (y sin escrúpulos)
@@ -16,6 +16,7 @@
 ## Category: Quests
 ## SavedVariables: RecklessAbandonDB, RecklessAbandonPrivateDB
 ## SavedVariablesPerCharacter: RecklessAbandonCharacterDB
+## AddonCompartmentFunc: RecklessAbandon_AddonCompartmentFunc
 
 Libraries\load.xml
 init.lua
