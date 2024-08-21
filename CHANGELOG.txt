@@ -6,10 +6,12 @@ This project adheres to Semantic Versioning.
   - Changed
     - Unified retail and classic codebases
     - Code cleanup
+    - Upgrade ACE libraries
   - Fixed
     - Keybinding for abandoning zone quests not binding properly
     - Automated abandons not working for dungeon quest types in classic
     - Profile issues in classic
+    - Lua error related to debugging
   
 - v2.0.2 - 2024-24-07
   - Fixed
