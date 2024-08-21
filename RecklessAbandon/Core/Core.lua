@@ -229,23 +229,23 @@ function E:Print(logLevel, ...)
 end
 
 function E:Verbose(...)
-	self:Print(LOG_LEVEL_VERBOSE, ...)
+	E:Print(LOG_LEVEL_VERBOSE, ...)
 end
 
 function E:Info(...)
-	self:Print(LOG_LEVEL_INFO, ...)
+	E:Print(LOG_LEVEL_INFO, ...)
 end
 
 function E:Warn(...)
-	self:Print(LOG_LEVEL_WARN, ...)
+	E:Print(LOG_LEVEL_WARN, ...)
 end
 
 function E:Error(...)
-	self:Print(LOG_LEVEL_ERROR, ...)
+	E:Print(LOG_LEVEL_ERROR, ...)
 end
 
 function E:System(...)
-	self:Print(LOG_LEVEL_SYSTEM, ...)
+	E:Print(LOG_LEVEL_SYSTEM, ...)
 end
 
 function E:Critical(...)
@@ -253,13 +253,13 @@ function E:Critical(...)
 end
 
 function E:Debug(...)
-	if self.db.debugging.debugLogging then
+	if E.db.debugging.debugLogging then
 		print(strjoin("", format(L["|cffffcc00%s Debug:|r"], E.title), " ", ...))
 	end
 end
 
 function E:UpdatePlayerLevel(level)
-	self:Debug(format("%s leveled up (%d -> %d)!", E.myname, E.mylevel, level))
+	E:Debug(format("%s leveled up (%d -> %d)!", E.myname, E.mylevel, level))
 	E.mylevel = level
 end
 
@@ -332,7 +332,7 @@ function E:AbandonAllQuests()
 		local questId = info.questID
 
 		if not info.isHeader and not info.isHidden then
-			self:AbandonQuest(questId)
+			E:AbandonQuest(questId)
 		end
 	end
 end
@@ -340,43 +340,43 @@ end
 function E:AbandonZoneQuests(key)
 	local group = E.questGroupsByName[key] or {}
 	for questId, _ in pairs(group.quests or {}) do
-		self:AbandonQuest(questId)
+		E:AbandonQuest(questId)
 	end
 
-	if self:IsEmpty(group.quests) then
+	if E:IsEmpty(group.quests) then
 		E.questGroupsByName[key] = nil
 	end
 end
 
 function E:AbandonQuests(questIds)
 	for _, questId in ipairs(questIds) do
-		self:AbandonQuest(questId)
+		E:AbandonQuest(questId)
 	end
 end
 
 function E:AbandonQuest(questId, exclusionBypass)
-	if exclusionBypass or not self.private.exclusions.excludedQuests[questId] then
+	if exclusionBypass or not E.private.exclusions.excludedQuests[questId] then
 		if Shim:CanAbandonQuest(questId) then
 			Shim:SetSelectedQuest(questId)
 			Shim:SetAbandonQuest()
 			Shim:AbandonQuest()
 
-			self:System(format(L["|cFFFFFF00Abandoned quest %s|r"], GetQuestLink(questId)))
+			E:System(format(L["|cFFFFFF00Abandoned quest %s|r"], GetQuestLink(questId)))
 
-			if E.private.exclusions.autoPrune and self:IsExcluded(questId) then
-				self:PruneQuestExclusion(questId)
+			if E.private.exclusions.autoPrune and E:IsExcluded(questId) then
+				E:PruneQuestExclusion(questId)
 			end
 		else
-			self:Warn(format(L["|cFFFFFF00You can't abandon %s|r"], GetQuestLink(questId)))
+			E:Warn(format(L["|cFFFFFF00You can't abandon %s|r"], GetQuestLink(questId)))
 		end
 	else
-		self:Verbose(format(L["Skipping %s since it is excluded from group abandons"], GetQuestLink(questId)))
+		E:Verbose(format(L["Skipping %s since it is excluded from group abandons"], GetQuestLink(questId)))
 	end
 end
 
 function E:ExcludeQuest(questId, source)
-	self:Verbose(format(L["Excluding quest %s from group abandons"], GetQuestLink(questId)))
-	self.private.exclusions.excludedQuests[tonumber(questId)] = {
+	E:Verbose(format(L["Excluding quest %s from group abandons"], GetQuestLink(questId)))
+	E.private.exclusions.excludedQuests[tonumber(questId)] = {
 		["title"] = QuestTitleFromID[questId],
 		["source"] = source or MANUAL
 	}
@@ -385,14 +385,14 @@ function E:ExcludeQuest(questId, source)
 end
 
 function E:IncludeQuest(questId)
-	self:Verbose(format(L["Including quest %s in group abandons"], GetQuestLink(questId)))
-	self.private.exclusions.excludedQuests[tonumber(questId)] = nil
+	E:Verbose(format(L["Including quest %s in group abandons"], GetQuestLink(questId)))
+	E.private.exclusions.excludedQuests[tonumber(questId)] = nil
 
 	E:RefreshGUI()
 end
 
 function E:IsExcluded(questId)
-	return self.private.exclusions.excludedQuests[tonumber(questId)] ~= nil
+	return E.private.exclusions.excludedQuests[tonumber(questId)] ~= nil
 end
 
 function E:CanQuestGroupAbandon(quests)
@@ -413,17 +413,17 @@ function E:PruneQuestExclusionsFromAutomation()
 			local source = meta.source
 			if orphaned and source == AUTOMATIC then
 				count = count + 1
-				self:PruneQuestExclusion(questId)
+				E:PruneQuestExclusion(questId)
 			end
 		end
 
-		self:Debug(format(L["Pruned %s automation |4orphan:orphans;!"], count))
+		E:Debug(format(L["Pruned %s automation |4orphan:orphans;!"], count))
 	end
 end
 
 function E:PruneQuestExclusion(questId)
 	local title = E.private.exclusions.excludedQuests[tonumber(questId)]["title"]
-	self:Verbose(format(L["Pruning '%s' from the exclusion list"], title))
+	E:Verbose(format(L["Pruning '%s' from the exclusion list"], title))
 	E.private.exclusions.excludedQuests[tonumber(questId)] = nil
 
 	E:RefreshGUI()
@@ -433,9 +433,9 @@ function E:ClearQuestExclusions()
 	for questId, _ in pairs(E.private.exclusions.excludedQuests) do
 		local orphaned = Shim:GetLogIndexForQuestID(questId) == nil
 		if orphaned then
-			self:PruneQuestExclusion(questId)
+			E:PruneQuestExclusion(questId)
 		else
-			self:IncludeQuest(questId)
+			E:IncludeQuest(questId)
 		end
 	end
 end
@@ -446,11 +446,11 @@ function E:PruneQuestExclusions()
 		local orphaned = Shim:GetLogIndexForQuestID(questId) == nil
 		if orphaned then
 			count = count + 1
-			self:PruneQuestExclusion(questId)
+			E:PruneQuestExclusion(questId)
 		end
 	end
 
-	self:Info(format(L["Pruned %s |4orphan:orphans;!"], count))
+	E:Info(format(L["Pruned %s |4orphan:orphans;!"], count))
 end
 
 function E:AutoAbandonQuests()
@@ -467,10 +467,10 @@ function E:AutoAbandonQuests()
 		local isWeekly = info.frequency == 2
 
 		if not info.isHeader then
-			local color = self:GetQuestColor(level)
+			local color = E:GetQuestColor(level)
 			local lowerTag = info.questTag and strlower(info.questTag) or nil
 
-			local autoAbandonQuests = self.private.automationOptions.autoAbandonQuests
+			local autoAbandonQuests = E.private.automationOptions.autoAbandonQuests
 			local ids = autoAbandonQuests.ids or "" -- These should never be nil, but lets guard against a corrupt config
 
 			local abandonQuestId = E:TableContainsValue({ strsplit(",", ids) }, questId)
@@ -512,7 +512,7 @@ function E:AutoAbandonQuests()
 			if E:TableContainsValue(eligibility, true) then
 				-- ! This triggers a second UNIT_QUEST_LOG_CHANGED event which reattempts to abandon excluded quests
 				-- ! This is a bit spammy and needs to be throttled somehow
-				if self:AbandonQuest(questId) then
+				if E:AbandonQuest(questId) then
 					count = count + 1
 				end
 			end
@@ -520,7 +520,7 @@ function E:AutoAbandonQuests()
 	end
 
 	if count > 0 then
-		self:Info(format("Automatically abandoned %s |4quest:quests;!", count))
+		E:Info(format("Automatically abandoned %s |4quest:quests;!", count))
 	end
 end
 
@@ -532,20 +532,20 @@ function E:AutoExcludeQuests()
 		local isComplete = Shim:IsComplete(questId)
 
 		if not info.isHeader then
-			if self.db.general.individualQuests.completeProtection and isComplete and not self:IsExcluded(questId) then
-				self:ExcludeQuest(questId, AUTOMATIC)
+			if E.db.general.individualQuests.completeProtection and isComplete and not E:IsExcluded(questId) then
+				E:ExcludeQuest(questId, AUTOMATIC)
 			end
 		end
 	end
 end
 
 function E:PrintWelcomeMessage()
-	if self.db.general.loginMessage then
-		self:System(format(L["You are running |cFFB5FFEBv%s|r. Type |cff888888/rab|r to configure settings."], E.version))
+	if E.db.general.loginMessage then
+		E:System(format(L["You are running |cFFB5FFEBv%s|r. Type |cff888888/rab|r to configure settings."], E.version))
 	end
 
 	if strfind(E.version, "alpha") or strfind(E.version, "beta") then
-		self:System(
+		E:System(
 			format(
 				L[
 				"You are currently running a pre-release version of %s. Please report any issues on github (|cFFB5FFEB%s|r) so they can be addressed quickly. Thank you for your interest in testing new features!"
@@ -563,6 +563,12 @@ function E:NormalizeSettings()
 	-- Set log level if not set
 	if E.db.general.logLevel == nil then
 		E.db.general.logLevel = LOG_LEVEL_VERBOSE
+	end
+
+	-- Set debugging if not set
+	-- https://github.com/MotherGinger/RecklessAbandon/issues/28
+	if E.db.debugging == nil then
+		E.db.debugging.debugLogging = false
 	end
 
 	-- Rebuild exclusion list

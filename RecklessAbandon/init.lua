@@ -39,6 +39,14 @@ Engine[5] = E.DF.global
 _G.RecklessAbandon = Engine
 
 do
+	function E:AddonCompartmentFunc()
+		E:ToggleOptionsUI()
+	end
+
+	_G.RecklessAbandon_AddonCompartmentFunc = E.AddonCompartmentFunc
+end
+
+do
 	local convert = { enGB = "enUS", esES = "esMX", zhTW = "zhCN", ptPT = "ptBR" }
 	local gameLocale = convert[E.locale] or E.locale or "enUS"
 
@@ -57,9 +65,9 @@ do
 
 		-- in this case: `major` is the lib table and `minor` is the minor version
 		if type(major) == "table" and type(minor) == "number" then
-			self.Libs[name], self.LibsMinor[name] = major, minor
+			E.Libs[name], E.LibsMinor[name] = major, minor
 		else -- in this case: `major` is the lib name and `minor` is the silent switch
-			self.Libs[name], self.LibsMinor[name] = _G.LibStub(major, minor)
+			E.Libs[name], E.LibsMinor[name] = _G.LibStub(major, minor)
 		end
 	end
 
