@@ -32,8 +32,7 @@
 			<OnUpdate>onButtonUpdate(self)</OnUpdate>
 		</Scripts>
 	</Button>
-
-	<Include file="..\Environment\load.xml" />
+	
 	<Script file="Core.lua" />
 	<Script file="Renderer.lua" />
 	<Script file="CommandLine.lua" />
