@@ -80,7 +80,6 @@ do
 	E:AddLib("AceConfigRegistry", "AceConfigRegistry-3.0")
 end
 
-
 ---@diagnostic disable-next-line: duplicate-set-field
 function E:OnInitialize()
 	if not RecklessAbandonCharacterDB then

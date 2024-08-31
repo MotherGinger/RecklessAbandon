@@ -44,7 +44,8 @@ local function GetKeybinding(button)
 end
 
 local function onQuestLogEntryClick(self, button, down)
-    local info = Shim:GetInfo(self.questLogIndex)
+    -- * Retail includes questLogIndex on the title object
+    local info = Shim:GetInfo(self.questLogIndex or self:GetID())
     local isHeader = info.isHeader
     local abandonQuestBinding = E.db.general.individualQuests.abandonBinding
     local excludeQuestBinding = E.db.general.individualQuests.excludeBinding
@@ -60,7 +61,8 @@ local function onQuestLogEntryClick(self, button, down)
 end
 
 local function onQuestLogEntryMouseDown(self, button)
-    local info = Shim:GetInfo(self.questLogIndex)
+    -- * Retail includes questLogIndex on the title object
+    local info = Shim:GetInfo(self.questLogIndex or self:GetID())
     local title = info.title
     local isHeader = info.isHeader
     local questId = info.questID
@@ -88,7 +90,7 @@ local function onQuestLogEntryMouseDown(self, button)
                 }
             end
         else
-            E:AbandonQuest(questId)
+            E:AbandonQuest(questId, true)
         end
         E:Debug(format(L["%s abandoned via keybinding (%s)"], title, binding))
     elseif binding == excludeQuestBinding then

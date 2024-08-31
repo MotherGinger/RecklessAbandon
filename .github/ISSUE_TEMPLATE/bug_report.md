@@ -7,6 +7,11 @@ assignees: MotherGinger
 
 ---
 
+**Client Details**
+What version of Reckless Abandon was this experienced with?
+
+What version of the game did this happen in (retail, classic, etc)?
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 

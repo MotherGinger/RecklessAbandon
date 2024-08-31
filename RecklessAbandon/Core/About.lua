@@ -52,14 +52,16 @@ E.Options.args.about = {
                     order = 1,
                     type = "description",
                     name = format(
-                        "%s%s%s %s",
+                        "%s%s%s%s %s",
                         E.classIcons.hunter,
                         E.classIcons.druid,
                         E.classIcons.evoker,
-                        E:FormatGradient("Cob", {
+                        E.classIcons.mage,
+                        E:FormatGradient("Cobbeleren", {
                             E.classColors.hunter.rgb,
                             E.classColors.druid.rgb,
-                            E.classColors.evoker.rgb
+                            E.classColors.evoker.rgb,
+                            E.classColors.mage.rgb
                         })
                     )
                 }
