@@ -7,6 +7,7 @@ This project adheres to Semantic Versioning.
     - Unified retail and classic codebases
     - Code cleanup
     - Upgrade ACE libraries
+    - Bump TOC for 1.15.4 (Classic Era)
   - Fixed
     - Keybinding for abandoning zone quests not binding properly
     - Automated abandons not working for dungeon quest types in classic
