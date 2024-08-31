@@ -3,6 +3,29 @@ local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateD
 local floor = math.floor
 local format = format
 
+---@param tbl table A table to check
+---@param depth number The check depth
+---@return boolean areSubkeysNil True if all subkeys are nil
+function E:AreSubkeysNil(tbl, depth)
+    -- Base case: If the table is not a table or depth is 0, return true
+    if type(tbl) ~= "table" or depth == 0 then
+        return tbl ~= nil
+    end
+
+    for _, value in pairs(tbl) do
+        if value == nil then
+            return false
+        elseif type(value) == "table" then
+            -- Recursively check the next level with a reduced depth
+            if not E:AreSubkeysNil(value, depth - 1) then
+                return false
+            end
+        end
+    end
+
+    return true
+end
+
 ---@param color string Hex color code
 ---@param str string The string to color
 ---@return string formattedString A colored string
@@ -33,15 +56,24 @@ end
 ---@param colors table The colors of the gradient
 ---@return string result The resulting formatted string
 function E:FormatGradient(text, colors)
+    -- Filter out nil values from the colors table
+    local filtered_colors = {}
+    for i = 1, #colors do
+        if colors[i] ~= nil then
+            table.insert(filtered_colors, colors[i])
+        end
+    end
+
+    -- Use filtered colors for the gradient
     local len = #text
-    local num_segments = #colors - 1
+    local num_segments = #filtered_colors - 1
     local chars_per_segment = len / num_segments
     local result = ""
 
     for i = 1, len do
         local segment = floor((i - 1) / chars_per_segment) + 1
         local t = ((i - 1) % chars_per_segment) / chars_per_segment
-        local current_color = E:InterpolateColor(colors[segment], colors[segment + 1], t)
+        local current_color = E:InterpolateColor(filtered_colors[segment], filtered_colors[segment + 1], t)
         result = result .. E:RGBToHex(current_color[1], current_color[2], current_color[3]) .. text:sub(i, i)
     end
 
@@ -150,6 +182,8 @@ function E:CopyTable(currentTable, defaultTable)
     return currentTable
 end
 
+---@param t table A table to check
+---@return boolean isEmpty Whether the table is empty
 function E:IsEmpty(t)
     for _, _ in pairs(t) do
         return false

@@ -12,6 +12,7 @@ This project adheres to Semantic Versioning.
     - Automated abandons not working for dungeon quest types in classic
     - Profile issues in classic
     - Lua error related to debugging
+    - Key bindings not abandoning excluded quests
   
 - v2.0.2 - 2024-24-07
   - Fixed
