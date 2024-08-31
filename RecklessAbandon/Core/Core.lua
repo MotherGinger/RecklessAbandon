@@ -566,7 +566,6 @@ function E:NormalizeSettings()
 	end
 
 	-- Set debugging if not set
-	-- https://github.com/MotherGinger/RecklessAbandon/issues/28
 	if E.db.debugging == nil then
 		E.db.debugging.debugLogging = false
 	end
@@ -648,9 +647,14 @@ function E:Initialize()
 	QuestFrame:HookScript(
 		"OnEvent",
 		function()
-			E:GenerateQuestTable()
-			E:ShowAbandonButtons()
-			E:RegisterHotkeys()
+			-- * Guard against a race condition between when settings are loaded and when an event is processed
+			-- * This only occurs in retail, likely due to some changes on addon load behavior
+			-- https://github.com/MotherGinger/RecklessAbandon/issues/28
+			if (E.isRetail and not E:AreSubkeysNil(E.db, 2)) or not E.isRetail then
+				E:GenerateQuestTable()
+				E:ShowAbandonButtons()
+				E:RegisterHotkeys()
+			end
 		end
 	)
 	QuestFrame:HookScript(
