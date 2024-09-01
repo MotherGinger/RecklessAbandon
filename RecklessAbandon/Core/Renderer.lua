@@ -204,13 +204,13 @@ function E:RetailRenderer()
 
     -- Guard against a bad cache (https://github.com/MotherGinger/RecklessAbandon/issues/25)
     if E.db ~= nil and E.db.general ~= nil then
-        if E.db.general.campaignQuests.showAbandonButton then
+        if E.db.general.campaignQuests ~= nil and E.db.general.campaignQuests.showAbandonButton then
             for header in QuestScrollFrame.campaignHeaderFramePool:EnumerateActive() do
                 E:RenderGroupAbandonButton(header.CollapseButton, -25, header.Text:GetText())
             end
         end
 
-        if E.db.general.covenantCallings.showAbandonButton then
+        if E.db.general.covenantCallings ~= nil and E.db.general.covenantCallings.showAbandonButton then
             for calling in QuestScrollFrame.covenantCallingsHeaderFramePool:EnumerateActive() do
                 local info = Shim:GetInfo(calling.questLogIndex)
                 if info then
@@ -227,13 +227,13 @@ function E:RetailRenderer()
             end
         end
 
-        if E.db.general.zoneQuests.showAbandonButton then
+        if E.db.general.zoneQuests ~= nil and E.db.general.zoneQuests.showAbandonButton then
             for header in QuestScrollFrame.headerFramePool:EnumerateActive() do
                 E:RenderGroupAbandonButton(header.CollapseButton, -25, header.ButtonText:GetText())
             end
         end
 
-        if E.db.general.individualQuests.showAbandonButton then
+        if E.db.general.individualQuests ~= nil and E.db.general.individualQuests.showAbandonButton then
             for quest in QuestScrollFrame.titleFramePool:EnumerateActive() do
                 local questId = quest.questID
                 local text = quest.Text:GetText()
