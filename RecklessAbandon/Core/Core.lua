@@ -253,7 +253,7 @@ function E:Critical(...)
 end
 
 function E:Debug(...)
-	if E.db.debugging.debugLogging then
+	if E.db.debugging ~= nil and E.db.debugging.debugLogging then
 		print(strjoin("", format(L["|cffffcc00%s Debug:|r"], E.title), " ", ...))
 	end
 end
@@ -647,14 +647,9 @@ function E:Initialize()
 	QuestFrame:HookScript(
 		"OnEvent",
 		function()
-			-- * Guard against a race condition between when settings are loaded and when an event is processed
-			-- * This only occurs in retail, likely due to some changes on addon load behavior
-			-- https://github.com/MotherGinger/RecklessAbandon/issues/28
-			if (E.isRetail and not E:AreSubkeysNil(E.db, 2)) or not E.isRetail then
-				E:GenerateQuestTable()
-				E:ShowAbandonButtons()
-				E:RegisterHotkeys()
-			end
+			E:GenerateQuestTable()
+			E:ShowAbandonButtons()
+			E:RegisterHotkeys()
 		end
 	)
 	QuestFrame:HookScript(
