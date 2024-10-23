@@ -1,7 +1,7 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 
 E.classIcons = {
-    death_knight = (not E.isClassic and not E.isBCC) and "|T135771:0|t" or "",
+    death_knight = (not E.isClassic and not E.isBC) and "|T135771:0|t" or "",
     demon_hunter = E.isRetail and "|T236415:0|t" or "",
     druid = "|T625999:0|t",
     evoker = E.isRetail and "|T4574311:0|t" or "",
