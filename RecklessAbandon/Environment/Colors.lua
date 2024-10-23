@@ -1,7 +1,7 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 
 E.classColors = {
-    death_knight = (not E.isClassic and not E.isBCC) and { hex = "cFFC41E3A", rgb = { 196, 30, 58 } } or {},
+    death_knight = (not E.isClassic and not E.isBC) and { hex = "cFFC41E3A", rgb = { 196, 30, 58 } } or {},
     demon_hunter = { hex = "cFFA330C9", rgb = { 163, 48, 201 } },
     druid = { hex = "cFFFF7C0A", rgb = { 255, 124, 10 } },
     evoker = E.isRetail and { hex = "cFF33937F", rgb = { 51, 147, 127 } } or {},
