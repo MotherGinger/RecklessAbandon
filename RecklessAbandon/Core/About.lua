@@ -18,19 +18,7 @@ E.Options.args.about = {
             order = 1,
             type = "description",
             fontSize = "medium",
-            name = format(
-                L["Written by %s%s%s%s %s"],
-                E.classIcons.paladin,
-                E.classIcons.mage,
-                E.classIcons.warrior,
-                E.classIcons.priest,
-                E:FormatGradient(E.author, {
-                    E.classColors.paladin.rgb,
-                    E.classColors.mage.rgb,
-                    E.classColors.warrior.rgb,
-                    E.classColors.priest.rgb
-                })
-            )
+            name = format(L["Written by %s %s"], E.classIcons.warrior, E:ColorFormat(E.classColors.warrior.hex, "Fraukë-Area52 (US)"))
         },
         space1 = {
             order = 2,
@@ -46,24 +34,12 @@ E.Options.args.about = {
                 rawrhax = {
                     order = 0,
                     type = "description",
-                    name = format("%s %s", E.classIcons.hunter, E:ColorFormat(E.classColors.hunter.hex, "Rawrsnax"))
+                    name = format("%s %s", E.classIcons.hunter, E:ColorFormat(E.classColors.hunter.hex, "Rawrsnax-Thrall (US)"))
                 },
                 cob = {
                     order = 1,
                     type = "description",
-                    name = format(
-                        "%s%s%s%s %s",
-                        E.classIcons.hunter,
-                        E.classIcons.druid,
-                        E.classIcons.evoker,
-                        E.classIcons.mage,
-                        E:FormatGradient("Cobbeleren", {
-                            E.classColors.hunter.rgb,
-                            E.classColors.druid.rgb,
-                            E.classColors.evoker.rgb,
-                            E.classColors.mage.rgb
-                        })
-                    )
+                    name = format("%s %s", E.classIcons.mage, E:ColorFormat(E.classColors.mage.hex, "Cobbeleren-Area52 (US)"))
                 }
             }
         },
