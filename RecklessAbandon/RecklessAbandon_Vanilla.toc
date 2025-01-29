@@ -1,4 +1,4 @@
-## Interface: 11504
+## Interface: 11506
 ## Author: Frauke Betz
 ## Version: 3.0.0-beta.4
 ## Title: |cFF80528CReckless Abandon|r
