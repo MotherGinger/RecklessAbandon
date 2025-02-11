@@ -660,7 +660,7 @@ function E:Initialize()
 	)
 
 	if E.isRetail then
-		QuestFrame.QuestsFrame.SearchBox:HookScript(
+		QuestScrollFrame.SearchBox:HookScript(
 			"OnTextChanged",
 			function()
 				-- * This is inefficient since these really only need to be adjusted when search results change
