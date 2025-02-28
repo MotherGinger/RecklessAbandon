@@ -4,6 +4,10 @@ This project adheres to Semantic Versioning.
 
 - Unreleased
 
+- v2.0.7 - 2025-27-02
+  - Fixed
+    - Avoid showing render buttons in quest details frame.
+
 - v2.0.6 - 2025-25-02
   - Changed
     - Update frame references for 11.1.0
@@ -257,7 +261,8 @@ This project adheres to Semantic Versioning.
     - Command line for abandoning all quests
     - Documentation
 
-[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v2.0.6...develop
+[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v2.0.7...develop
+[2.0.7]: https://github.com/MotherGinger/RecklessAbandon/compare/v2.0.6..v2.0.7
 [2.0.6]: https://github.com/MotherGinger/RecklessAbandon/compare/v2.0.5..v2.0.6
 [2.0.5]: https://github.com/MotherGinger/RecklessAbandon/compare/v2.0.4..v2.0.5
 [2.0.4]: https://github.com/MotherGinger/RecklessAbandon/compare/v2.0.3..v2.0.4
