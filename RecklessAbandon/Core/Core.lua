@@ -648,6 +648,10 @@ function E:Initialize()
 		"OnEvent",
 		function()
 			E:GenerateQuestTable()
+
+			-- * Added in Retail 11.1.0: Avoid showing render buttons in quest detail pane
+			if E.isRetail and QuestFrame.QuestsFrame.DetailsFrame:IsVisible() then return end
+
 			E:ShowAbandonButtons()
 			E:RegisterHotkeys()
 		end
@@ -675,6 +679,9 @@ function E:Initialize()
 			function()
 				E:RegisterHotkeys()
 
+				-- * Added in Retail 11.1.0: Avoid showing render buttons in quest detail pane
+				if QuestFrame.QuestsFrame.DetailsFrame:IsVisible() then return end
+
 				for button in E.questButtonPool:EnumerateActive() do
 					onButtonUpdate(button)
 				end
@@ -684,6 +691,15 @@ function E:Initialize()
 				end
 			end
 		)
+
+		-- * Added in Retail 11.1.0: Avoid showing render buttons in quest detail pane
+		QuestFrame.QuestsFrame.DetailsFrame:HookScript("OnShow", function()
+			E:HideAbandonButtons()
+		end)
+
+		QuestFrame.QuestsFrame.DetailsFrame:HookScript("OnHide", function()
+			E:ShowAbandonButtons()
+		end)
 	elseif E.isClassic then
 		QuestLogListScrollFrame:HookScript(
 			"OnVerticalScroll",
