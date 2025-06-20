@@ -9,13 +9,21 @@ This project adheres to Semantic Versioning.
     - Upgrade ACE libraries
     - Bump TOC for 1.15.7 (Classic Era)
     - Bump TOC for 4.4.2 (Cata Classic)
-    - Bump TOC for 11.1.5 (Retail)
+    - Bump TOC for 11.1.7 (Retail)
   - Fixed
     - Keybinding for abandoning zone quests not binding properly
     - Automated abandons not working for dungeon quest types in classic
     - Profile issues in classic
     - Lua error related to debugging
     - Key bindings not abandoning excluded quests
+
+- v2.0.9 - 2025-20-06
+  - Changed
+    - Bump TOC for 11.1.7
+
+- v2.0.8 - 2025-25-04
+  - Changed
+    - Bump TOC for 11.1.5
 
 - v2.0.7 - 2025-27-02
   - Fixed
@@ -274,7 +282,8 @@ This project adheres to Semantic Versioning.
     - Command line for abandoning all quests
     - Documentation
 
-[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v2.0.8...develop
+[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v2.0.9...develop
+[2.0.9]: https://github.com/MotherGinger/RecklessAbandon/compare/v2.0.8..v2.0.9
 [2.0.8]: https://github.com/MotherGinger/RecklessAbandon/compare/v2.0.7..v2.0.8
 [2.0.7]: https://github.com/MotherGinger/RecklessAbandon/compare/v2.0.6..v2.0.7
 [2.0.6]: https://github.com/MotherGinger/RecklessAbandon/compare/v2.0.5..v2.0.6
