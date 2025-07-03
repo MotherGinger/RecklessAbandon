@@ -7,7 +7,7 @@ E.classColors = {
     evoker = E.isRetail and { hex = "cFF33937F", rgb = { 51, 147, 127 } } or {},
     hunter = { hex = "cFFAAD372", rgb = { 170, 211, 114 } },
     mage = { hex = "cFF3FC7EB", rgb = { 63, 199, 235 } },
-    monk = E.isRetail and { hex = "cFF00FF98", rgb = { 0, 255, 152 } } or {},
+    monk = (E.isRetail or E.isMop) and { hex = "cFF00FF98", rgb = { 0, 255, 152 } } or {},
     paladin = { hex = "cFFF48CBA", rgb = { 244, 140, 186 } },
     priest = { hex = "cFFFFFFFF", rgb = { 255, 255, 255 } },
     rogue = { hex = "cFFFFF468", rgb = { 255, 244, 104 } },
