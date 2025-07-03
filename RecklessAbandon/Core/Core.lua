@@ -14,54 +14,40 @@ MANUAL = 0
 AUTOMATIC = 1
 
 --Lua functions
-local _G = _G
-local tonumber, pairs, ipairs, unpack, tostring = tonumber, pairs, ipairs, unpack, tostring
-local gsub, strjoin, twipe = gsub, strjoin, wipe
-local format, find = format, strfind
+local tonumber, pairs, ipairs = tonumber, pairs, ipairs
+local strjoin, twipe = strjoin, wipe
+local format = format
 local type, print = type, print
 
 --WoW API / Variables
 local CreateFrame = CreateFrame
 local GetQuestLink = GetQuestLink
-local IsInRaid = IsInRaid
-local SetCVar = SetCVar
-local UnitFactionGroup = UnitFactionGroup
 local UnitGUID = UnitGUID
 
 --Constants
+---@return nil
 E.noop = function()
 end
+
 E.title = format("|cFF80528C%s|r", "Reckless Abandon")
-E.version = C_AddOns.GetAddOnMetadata("RecklessAbandon", "Version")
-E.author = C_AddOns.GetAddOnMetadata("RecklessAbandon", "Author")
+E.version = Shim:GetAddOnMetadata("RecklessAbandon", "Version")
+E.author = Shim:GetAddOnMetadata("RecklessAbandon", "Author")
 E.github = "https://github.com/MotherGinger/RecklessAbandon/issues"
+E.myfaction, E.myLocalizedFaction = UnitFactionGroup("player")
 E.mylevel = UnitLevel("player")
+E.myLocalizedClass, E.myclass, E.myClassID = UnitClass("player")
+E.myLocalizedRace, E.myrace = UnitRace("player")
 E.myname = UnitName("player")
 E.myrealm = GetRealmName()
 E.mynameRealm = format("%s - %s", E.myname, E.myrealm) -- contains spaces/dashes in realm (for profile keys)
-E.wowpatch, E.wowbuild = GetBuildInfo()
-E.wowbuild = tonumber(E.wowbuild)
-E.isMacClient = IsMacClient()
-E.IsRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
-E.validVersion = WOW_PROJECT_MAINLINE
 E.screenwidth, E.screenheight = GetPhysicalScreenSize()
 E.resolution = format("%dx%d", E.screenwidth, E.screenheight)
-E.wowVersionMatrix = {
-	[WOW_PROJECT_MAINLINE] = "Retail"
-}
 E.logLevels = {
 	[LOG_LEVEL_ERROR] = L["Only show messages for errors"],
 	[LOG_LEVEL_WARN] = L["Only show messages for warnings and errors"],
 	[LOG_LEVEL_INFO] = L["Only show important messages"],
 	[LOG_LEVEL_VERBOSE] = L["Show all messages (default)"]
 }
-
-local abandonTooltipFormat = "|cFFFFFAB8%s|r\n\n|cFFFFF569%s|r\n|cFFB5FFEB%s|r"
-local groupAbandonTooltipFormat = "|cFFFFFAB8%s|r\n\n|cFFFFF569%s|r"
-local questGroupsByName = {}
--- TODO: We might want to create custom textures for each type
-local questButtonPool = CreateFramePool("Button", QuestMapFrame.QuestsFrame, "RECKLESS_ABANDON_BUTTON")
-local groupButtonPool = CreateFramePool("Button", QuestMapFrame.QuestsFrame, "RECKLESS_GROUP_ABANDON_BUTTON")
 
 local MyScanningTooltip = CreateFrame("GameTooltip", "MyScanningTooltip", UIParent, "GameTooltipTemplate")
 local QuestTitleFromID =
@@ -91,7 +77,7 @@ StaticPopupDialogs["RECKLESS_ABANDON_GROUP_CONFIRMATION"] = {
 	),
 	button1 = L["Yes"],
 	button2 = L["No"],
-	OnAccept = function(self, quests)
+	OnAccept = function(_, quests)
 		E:AbandonZoneQuests(quests)
 	end,
 	timeout = 0,
@@ -110,7 +96,7 @@ StaticPopupDialogs["RECKLESS_ABANDON_CONFIRMATION"] = {
 	),
 	button1 = L["Yes"],
 	button2 = L["No"],
-	OnAccept = function(self, data)
+	OnAccept = function(_, data)
 		E:AbandonQuest(data.questId, true)
 	end,
 	timeout = 0,
@@ -121,13 +107,12 @@ StaticPopupDialogs["RECKLESS_ABANDON_CONFIRMATION"] = {
 
 StaticPopupDialogs["RECKLESS_ABANDON_ALL_CONFIRMATION"] = {
 	text = table.concat(
-		{ L["Are you sure you want to abandon all of the quests in your questlog?"], L
-			["|cFFFF6B6BThis cannot be undone.|r"] },
+		{ L["Are you sure you want to abandon all of the quests in your questlog?"], L["|cFFFF6B6BThis cannot be undone.|r"] },
 		"\n\n"
 	),
 	button1 = L["Yes"],
 	button2 = L["No"],
-	OnAccept = function(self, data)
+	OnAccept = function()
 		E:AbandonAllQuests()
 	end,
 	timeout = 0,
@@ -147,7 +132,7 @@ StaticPopupDialogs["RECKLESS_QUALIFIER_ABANDON_CONFIRMATION"] = {
 	),
 	button1 = L["Yes"],
 	button2 = L["No"],
-	OnAccept = function(self, data)
+	OnAccept = function(_, data)
 		E:AbandonQuests(data.questIds)
 	end,
 	timeout = 0,
@@ -156,237 +141,6 @@ StaticPopupDialogs["RECKLESS_QUALIFIER_ABANDON_CONFIRMATION"] = {
 	preferredIndex = 3
 }
 
-local function getKey(value)
-	if value ~= nil then
-		return value:lower():gsub("[^a-z]", "")
-	end
-end
-
-local function getKeybinding(button)
-	if button == "LeftButton" then
-		button = "BUTTON1"
-	elseif button == "RightButton" then
-		button = "BUTTON2"
-	elseif button == "MiddleButton" then
-		button = "BUTTON3"
-	elseif button == "Button4" then
-		button = "BUTTON4"
-	elseif button == "Button5" then
-		button = "BUTTON5"
-	end
-
-	if IsShiftKeyDown() then
-		button = "SHIFT-" .. button
-	end
-
-	if IsControlKeyDown() then
-		button = "CTRL-" .. button
-	end
-
-	if IsAltKeyDown() then
-		button = "ALT-" .. button
-	end
-
-	return button
-end
-
-local function RenderAbandonButton(parent, offset, questId, excluded, title, tooltip)
-	title = title or parent:GetText()
-	tooltip =
-		tooltip or
-		format(
-			abandonTooltipFormat,
-			title,
-			L["Left Click: Abandon quest"],
-			(excluded and L["Right Click: Include quest in group abandons"] or
-				L["Right Click: Exclude quest from group abandons"])
-		)
-
-	local button = questButtonPool:Acquire()
-	local canAbandon = C_QuestLog.CanAbandonQuest(questId)
-
-	local ntex = button:GetNormalTexture()
-	local ptex = button:GetPushedTexture()
-	local htex = button:GetHighlightTexture()
-
-	ntex:SetTexCoord(0.25, 0.80, 0.20, 0.75)
-	ptex:SetTexCoord(0.25, 0.80, 0.20, 0.75)
-	htex:SetTexCoord(0.25, 0.80, 0.20, 0.75)
-
-	button.title = title
-	button.tooltip = tooltip
-	button.questId = questId
-
-	ntex:SetDesaturated(not canAbandon)
-
-	if canAbandon and excluded then
-		ntex:SetVertexColor(0.5, 0.5, 1, 0.7)
-	else
-		ntex:SetVertexColor(1, 1, 1, 1)
-	end
-
-	button:SetPoint("CENTER", parent, "CENTER", offset, 0)
-	button:SetEnabled(canAbandon)
-	button:SetNormalTexture(ntex)
-	button:SetPushedTexture(ptex)
-	button:SetHighlightTexture(htex)
-	button:Show()
-end
-
-local function RenderGroupAbandonButton(parent, offset, title, tooltip, key)
-	title = title or parent:GetText()
-	tooltip = tooltip or format(groupAbandonTooltipFormat, title, L["Left Click: Abandon all quests"], title)
-	key = key or getKey(title)
-
-	if questGroupsByName[key] then
-		local button = groupButtonPool:Acquire()
-		local hasQuests = not E:IsEmpty(questGroupsByName[key].quests)
-		local canAbandonAny = E:CanQuestGroupAbandon(questGroupsByName[key].quests)
-
-		local ntex = button:GetNormalTexture()
-		local ptex = button:GetPushedTexture()
-		local htex = button:GetHighlightTexture()
-
-		ntex:SetTexCoord(0.25, 0.80, 0.20, 0.75)
-		ptex:SetTexCoord(0.25, 0.80, 0.20, 0.75)
-		htex:SetTexCoord(0.25, 0.80, 0.20, 0.75)
-
-		button.title = title
-		button.tooltip = tooltip
-		button.key = key
-
-		ntex:SetDesaturated(not hasQuests or not canAbandonAny)
-
-		button:SetPoint("CENTER", parent, "CENTER", offset, 0)
-		button:SetEnabled(hasQuests and canAbandonAny)
-		button:SetNormalTexture(ntex)
-		button:SetPushedTexture(ptex)
-		button:SetHighlightTexture(htex)
-		button:Show()
-	end
-end
-
-local function ShowAbandonButtons()
-	questButtonPool:ReleaseAll()
-	groupButtonPool:ReleaseAll()
-
-	-- Guard against a bad cache (https://github.com/MotherGinger/RecklessAbandon/issues/25)
-	if E.db ~= nil and E.db.general ~= nil then
-		if E.db.general.campaignQuests.showAbandonButton then
-			for header in QuestScrollFrame.campaignHeaderFramePool:EnumerateActive() do
-				RenderGroupAbandonButton(header.CollapseButton, -25, header.Text:GetText())
-			end
-		end
-
-		if E.db.general.covenantCallings.showAbandonButton then
-			for calling in QuestScrollFrame.covenantCallingsHeaderFramePool:EnumerateActive() do
-				local info = C_QuestLog.GetInfo(calling.questLogIndex)
-				if info then
-					local title = info.title
-					local key = getKey(title)
-					RenderGroupAbandonButton(
-						calling.CollapseButton,
-						-25,
-						L["covenant callings"],
-						L["Left Click: Abandon all covenant calling quests"],
-						key
-					)
-				end
-			end
-		end
-
-		if E.db.general.zoneQuests.showAbandonButton then
-			for header in QuestScrollFrame.headerFramePool:EnumerateActive() do
-				RenderGroupAbandonButton(header.CollapseButton, -25, header.ButtonText:GetText())
-			end
-		end
-
-		if E.db.general.individualQuests.showAbandonButton then
-			for quest in QuestScrollFrame.titleFramePool:EnumerateActive() do
-				local questId = quest.questID
-				local text = quest.Text:GetText()
-				local excluded = E:IsExcluded(questId)
-
-				-- * This tag shows up in both the tooltip and the details pane, so lets hide it and collect more real estate for our button
-				-- TODO: This is a partial workaround since this will pop back in when hiding the details pane
-				quest.TagTexture:Hide()
-				RenderAbandonButton(quest.Checkbox, -25, questId, excluded, text)
-			end
-		end
-	end
-end
-
-local function HideAbandonButtons()
-	questButtonPool:ReleaseAll()
-	groupButtonPool:ReleaseAll()
-end
-
-local function onQuestLogEntryClick(self, button, down)
-	local abandonQuestBinding = E.db.general.individualQuests.abandonBinding
-	local excludeQuestBinding = E.db.general.individualQuests.excludeBinding
-	local binding = getKeybinding(button)
-	local isBound =
-		(isHeader and binding == groupAbandonQuestBinding) or binding == abandonQuestBinding or
-		binding == excludeQuestBinding
-
-	-- * If the click matches a binding, disable default behaviors
-	-- * In retail this prevents things like the right click context menu or the full page quest description
-	if self.origOnClick and not isBound then
-		self:origOnClick(button, down)
-	end
-end
-
-local function onQuestLogEntryMouseDown(self, button)
-	local info = C_QuestLog.GetInfo(self.questLogIndex)
-	local title = info.title
-	local isHeader = info.isHeader
-	local questId = info.questID
-	local abandonQuestBinding = E.db.general.individualQuests.abandonBinding
-	local excludeQuestBinding = E.db.general.individualQuests.excludeBinding
-	local groupAbandonQuestBinding = E.db.general.zoneQuests.abandonBinding
-	local binding = getKeybinding(button)
-
-	if isHeader and binding == groupAbandonQuestBinding then
-		if E.db.general.confirmGroup then
-			local dialog = StaticPopup_Show("RECKLESS_ABANDON_GROUP_CONFIRMATION", title)
-			if dialog then
-				dialog.data = getKey(title)
-			end
-		else
-			E:AbandonZoneQuests(getKey(title))
-		end
-		E:Debug(format(L["%s abandoned via keybinding (%s)"], title, binding))
-	elseif binding == abandonQuestBinding then
-		if E.db.general.confirmIndividual then
-			local dialog = StaticPopup_Show("RECKLESS_ABANDON_CONFIRMATION", title)
-			if dialog then
-				dialog.data = {
-					questId = questId
-				}
-			end
-		else
-			E:AbandonQuest(questId)
-		end
-		E:Debug(format(L["%s abandoned via keybinding (%s)"], title, binding))
-	elseif binding == excludeQuestBinding then
-		local excluded = E:IsExcluded(questId)
-
-		if excluded then
-			E:IncludeQuest(questId)
-			E:Debug(format(L["%s included via keybinding (%s)"], title, binding))
-		else
-			E:ExcludeQuest(questId, MANUAL)
-			E:Debug(format(L["%s excluded via keybinding (%s)"], title, binding))
-		end
-
-		ShowAbandonButtons()
-	end
-
-	if self.origOnMouseDown then
-		self:origOnMouseDown(button)
-	end
-end
-
 function onButtonEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 	GameTooltip:SetText(self.tooltip)
@@ -394,7 +148,7 @@ function onButtonEnter(self)
 	GameTooltip:Show()
 end
 
-function onButtonLeave(self)
+function onButtonLeave()
 	GameTooltip:Hide()
 end
 
@@ -419,7 +173,7 @@ function onAbandonButtonClick(self, button)
 			texture:SetVertexColor(1, 1, 1, 1)
 			self.tooltip =
 				format(
-					abandonTooltipFormat,
+					E.abandonTooltipFormat,
 					self.title,
 					L["Left Click: Abandon quest"],
 					L["Right Click: Exclude quest from group abandons"]
@@ -429,7 +183,7 @@ function onAbandonButtonClick(self, button)
 			texture:SetVertexColor(0.5, 0.5, 1, 0.7)
 			self.tooltip =
 				format(
-					abandonTooltipFormat,
+					E.abandonTooltipFormat,
 					self.title,
 					L["Left Click: Abandon quest"],
 					L["Right Click: Include quest in group abandons"]
@@ -457,9 +211,10 @@ function onButtonUpdate(self)
 	local buffer = 10
 	local bottom = self:GetBottom()
 	local top = self:GetTop()
+	local ScrollFrame = E.isRetail and QuestScrollFrame or QuestLogListScrollFrame
 
 	if bottom ~= nil and top ~= nil then
-		if bottom > QuestScrollFrame:GetBottom() - buffer and top < QuestScrollFrame:GetTop() + buffer then
+		if bottom > ScrollFrame:GetBottom() - buffer and top < ScrollFrame:GetTop() + buffer then
 			self:Show()
 		else
 			self:Hide()
@@ -474,23 +229,23 @@ function E:Print(logLevel, ...)
 end
 
 function E:Verbose(...)
-	self:Print(LOG_LEVEL_VERBOSE, ...)
+	E:Print(LOG_LEVEL_VERBOSE, ...)
 end
 
 function E:Info(...)
-	self:Print(LOG_LEVEL_INFO, ...)
+	E:Print(LOG_LEVEL_INFO, ...)
 end
 
 function E:Warn(...)
-	self:Print(LOG_LEVEL_WARN, ...)
+	E:Print(LOG_LEVEL_WARN, ...)
 end
 
 function E:Error(...)
-	self:Print(LOG_LEVEL_ERROR, ...)
+	E:Print(LOG_LEVEL_ERROR, ...)
 end
 
 function E:System(...)
-	self:Print(LOG_LEVEL_SYSTEM, ...)
+	E:Print(LOG_LEVEL_SYSTEM, ...)
 end
 
 function E:Critical(...)
@@ -498,18 +253,19 @@ function E:Critical(...)
 end
 
 function E:Debug(...)
-	if self.db.debugging.debugLogging then
+	if E.db.debugging ~= nil and E.db.debugging.debugLogging then
 		print(strjoin("", format(L["|cffffcc00%s Debug:|r"], E.title), " ", ...))
 	end
 end
 
 function E:UpdatePlayerLevel(level)
-	self:Debug(format("%s leveled up (%d -> %d)!", E.myname, E.mylevel, level))
+	E:Debug(format("%s leveled up (%d -> %d)!", E.myname, E.mylevel, level))
 	E.mylevel = level
 end
 
 function E:GetQuestColor(level)
 	local levelDiff = level - E.mylevel
+	local QuestRange = Shim:UnitQuestTrivialLevelRange("player")
 
 	if levelDiff >= 5 then
 		return L["red"]
@@ -517,7 +273,7 @@ function E:GetQuestColor(level)
 		return L["orange"]
 	elseif levelDiff >= -2 then
 		return L["yellow"]
-	elseif -levelDiff <= UnitQuestTrivialLevelRange("player") then
+	elseif -levelDiff <= QuestRange then
 		return L["green"]
 	else
 		return L["gray"]
@@ -526,8 +282,6 @@ end
 
 function E:GetAvailableQualifiers()
 	local qualifiers = {
-		[L["daily"]] = L["Matches all daily quests."],
-		[L["weekly"]] = L["Matches all weekly quests."],
 		[L["green"]] = L["Matches all green quests."],
 		[L["yellow"]] = L["Matches all yellow quests."],
 		[L["orange"]] = L["Matches all orange quests."],
@@ -536,8 +290,6 @@ function E:GetAvailableQualifiers()
 	}
 
 	local selections = {
-		["daily"] = DAILY,
-		["weekly"] = WEEKLY,
 		["green"] = L["Green"],
 		["yellow"] = L["Yellow"],
 		["orange"] = L["Orange"],
@@ -545,115 +297,107 @@ function E:GetAvailableQualifiers()
 		["gray"] = L["Gray"]
 	}
 
+	if not E.isClassic then
+		qualifiers[strlower(DAILY)] = L["Matches all daily quests."]
+		selections["daily"] = DAILY
+	end
+
+	if E.isRetail then
+		qualifiers[strlower(WEEKLY)] = L["Matches all weekly quests."]
+		selections["weekly"] = WEEKLY
+	else
+		qualifiers[strlower(FAILED)] = L["Matches all failed quests."]
+		qualifiers[strlower(LFG_TYPE_DUNGEON)] = L["Matches all dungeon quests."]
+		qualifiers[strlower(RAID)] = L["Matches all raid quests."]
+		qualifiers[strlower(GROUP)] = L["Matches all group quests."]
+		qualifiers[strlower(ELITE)] = L["Matches all elite quests."]
+		qualifiers[strlower(PLAYER_DIFFICULTY2)] = L["Matches all heroic quests."]
+		qualifiers[strlower(PVP)] = L["Matches all pvp quests."]
+
+		selections["failed"] = FAILED
+		selections["dungeon"] = LFG_TYPE_DUNGEON
+		selections["raid"] = RAID
+		selections["group"] = GROUP
+		selections["elite"] = ELITE
+		selections["heroic"] = PLAYER_DIFFICULTY2
+		selections["pvp"] = PVP
+	end
+
 	return qualifiers, selections
 end
 
-function E:GenerateQuestTable()
-	-- This generates a table of quests
-	-- {
-	-- 	[<zone_header_id>] = {
-	-- 		["quests"] = {
-	-- 			[<quest_id>] = "some-zone-header",
-	-- 		} ,
-	-- 		["title"] = "some-title",
-	-- 		["hidden"] = false,
-	-- 	},
-	-- }
-
-	local currentGroup
-
-	for i = 1, C_QuestLog.GetNumQuestLogEntries() do
-		local info = C_QuestLog.GetInfo(i)
-		if info.isHeader then -- ! caused an issue, info undefined
-			currentGroup = {
-				title = info.title,
-				hidden = true,
-				quests = {}
-			}
-			questGroupsByName[getKey(info.title)] = currentGroup
-		else
-			currentGroup.hidden = currentGroup.hidden and info.isHidden
-			currentGroup.quests[info.questID] = info.title
-		end
-	end
-
-	self:Debug(L["Quest Table: "] .. self:Dump(questGroupsByName))
-	self:Debug(L["Excluded Quests: "] .. self:Dump(self.private.exclusions.excludedQuests))
-end
-
 function E:AbandonAllQuests()
-	for i = 1, C_QuestLog.GetNumQuestLogEntries() do
-		local info = C_QuestLog.GetInfo(i)
+	for i = 1, Shim:GetNumQuestLogEntries() do
+		local info = Shim:GetInfo(i)
 		local questId = info.questID
 
 		if not info.isHeader and not info.isHidden then
-			self:AbandonQuest(questId)
+			E:AbandonQuest(questId)
 		end
 	end
 end
 
 function E:AbandonZoneQuests(key)
-	local group = questGroupsByName[key] or {}
+	local group = E.questGroupsByName[key] or {}
 	for questId, _ in pairs(group.quests or {}) do
-		self:AbandonQuest(questId)
+		E:AbandonQuest(questId)
 	end
 
-	if self:IsEmpty(group.quests) then
-		questGroupsByName[key] = nil
+	if E:IsEmpty(group.quests) then
+		E.questGroupsByName[key] = nil
 	end
 end
 
 function E:AbandonQuests(questIds)
 	for _, questId in ipairs(questIds) do
-		self:AbandonQuest(questId)
+		E:AbandonQuest(questId)
 	end
 end
 
 function E:AbandonQuest(questId, exclusionBypass)
-	if exclusionBypass or not self.private.exclusions.excludedQuests[questId] then
-		if C_QuestLog.CanAbandonQuest(questId) then
-			C_QuestLog.SetSelectedQuest(questId)
-			C_QuestLog.SetAbandonQuest()
-			C_QuestLog.AbandonQuest()
+	if exclusionBypass or not E.private.exclusions.excludedQuests[questId] then
+		if Shim:CanAbandonQuest(questId) then
+			Shim:SetSelectedQuest(questId)
+			Shim:SetAbandonQuest()
+			Shim:AbandonQuest()
 
-			self:System(format(L["|cFFFFFF00Abandoned quest %s|r"], GetQuestLink(questId)))
+			E:System(format(L["|cFFFFFF00Abandoned quest %s|r"], GetQuestLink(questId)))
 
-			if E.private.exclusions.autoPrune and self:IsExcluded(questId) then
-				self:PruneQuestExclusion(questId)
+			if E.private.exclusions.autoPrune and E:IsExcluded(questId) then
+				E:PruneQuestExclusion(questId)
 			end
 		else
-			self:Warn(format(L["|cFFFFFF00You can't abandon %s|r"], GetQuestLink(questId)))
+			E:Warn(format(L["|cFFFFFF00You can't abandon %s|r"], GetQuestLink(questId)))
 		end
 	else
-		self:Verbose(format(L["Skipping %s since it is excluded from group abandons"], GetQuestLink(questId)))
+		E:Verbose(format(L["Skipping %s since it is excluded from group abandons"], GetQuestLink(questId)))
 	end
 end
 
 function E:ExcludeQuest(questId, source)
-	local source = source or MANUAL
-	self:Verbose(format(L["Excluding quest %s from group abandons"], GetQuestLink(questId)))
-	self.private.exclusions.excludedQuests[tonumber(questId)] = {
+	E:Verbose(format(L["Excluding quest %s from group abandons"], GetQuestLink(questId)))
+	E.private.exclusions.excludedQuests[tonumber(questId)] = {
 		["title"] = QuestTitleFromID[questId],
-		["source"] = source
+		["source"] = source or MANUAL
 	}
 
 	E:RefreshGUI()
 end
 
 function E:IncludeQuest(questId)
-	self:Verbose(format(L["Including quest %s in group abandons"], GetQuestLink(questId)))
-	self.private.exclusions.excludedQuests[tonumber(questId)] = nil
+	E:Verbose(format(L["Including quest %s in group abandons"], GetQuestLink(questId)))
+	E.private.exclusions.excludedQuests[tonumber(questId)] = nil
 
 	E:RefreshGUI()
 end
 
 function E:IsExcluded(questId)
-	return self.private.exclusions.excludedQuests[tonumber(questId)] ~= nil
+	return E.private.exclusions.excludedQuests[tonumber(questId)] ~= nil
 end
 
 function E:CanQuestGroupAbandon(quests)
 	for questId, _ in pairs(quests) do
-		if C_QuestLog.CanAbandonQuest(questId) then
+		if Shim:CanAbandonQuest(questId) then
 			return true
 		end
 	end
@@ -665,21 +409,21 @@ function E:PruneQuestExclusionsFromAutomation()
 	if E.private.exclusions.autoPrune then
 		local count = 0
 		for questId, meta in pairs(E.private.exclusions.excludedQuests) do
-			local orphaned = C_QuestLog.GetLogIndexForQuestID(questId) == nil
+			local orphaned = Shim:GetLogIndexForQuestID(questId) == nil
 			local source = meta.source
 			if orphaned and source == AUTOMATIC then
 				count = count + 1
-				self:PruneQuestExclusion(questId)
+				E:PruneQuestExclusion(questId)
 			end
 		end
 
-		self:Debug(format(L["Pruned %s automation |4orphan:orphans;!"], count))
+		E:Debug(format(L["Pruned %s automation |4orphan:orphans;!"], count))
 	end
 end
 
 function E:PruneQuestExclusion(questId)
 	local title = E.private.exclusions.excludedQuests[tonumber(questId)]["title"]
-	self:Verbose(format(L["Pruning '%s' from the exclusion list"], title))
+	E:Verbose(format(L["Pruning '%s' from the exclusion list"], title))
 	E.private.exclusions.excludedQuests[tonumber(questId)] = nil
 
 	E:RefreshGUI()
@@ -687,11 +431,11 @@ end
 
 function E:ClearQuestExclusions()
 	for questId, _ in pairs(E.private.exclusions.excludedQuests) do
-		local orphaned = C_QuestLog.GetLogIndexForQuestID(questId) == nil
+		local orphaned = Shim:GetLogIndexForQuestID(questId) == nil
 		if orphaned then
-			self:PruneQuestExclusion(questId)
+			E:PruneQuestExclusion(questId)
 		else
-			self:IncludeQuest(questId)
+			E:IncludeQuest(questId)
 		end
 	end
 end
@@ -699,14 +443,14 @@ end
 function E:PruneQuestExclusions()
 	local count = 0
 	for questId, _ in pairs(E.private.exclusions.excludedQuests) do
-		local orphaned = C_QuestLog.GetLogIndexForQuestID(questId) == nil
+		local orphaned = Shim:GetLogIndexForQuestID(questId) == nil
 		if orphaned then
 			count = count + 1
-			self:PruneQuestExclusion(questId)
+			E:PruneQuestExclusion(questId)
 		end
 	end
 
-	self:Info(format(L["Pruned %s |4orphan:orphans;!"], count))
+	E:Info(format(L["Pruned %s |4orphan:orphans;!"], count))
 end
 
 function E:AutoAbandonQuests()
@@ -715,20 +459,18 @@ function E:AutoAbandonQuests()
 
 	local count = 0
 
-	for i = 1, C_QuestLog.GetNumQuestLogEntries() do
-		local info = C_QuestLog.GetInfo(i)
-		local title = info.title
+	for i = 1, Shim:GetNumQuestLogEntries() do
+		local info = Shim:GetInfo(i)
 		local questId = info.questID
 		local level = info.level
 		local isDaily = info.frequency == 1
 		local isWeekly = info.frequency == 2
-		local isComplete = C_QuestLog.IsComplete(questId)
 
 		if not info.isHeader then
-			local levelDiff = level - E.mylevel
-			local color = self:GetQuestColor(level)
+			local color = E:GetQuestColor(level)
+			local lowerTag = info.questTag and strlower(info.questTag) or nil
 
-			local autoAbandonQuests = self.private.automationOptions.autoAbandonQuests
+			local autoAbandonQuests = E.private.automationOptions.autoAbandonQuests
 			local ids = autoAbandonQuests.ids or "" -- These should never be nil, but lets guard against a corrupt config
 
 			local abandonQuestId = E:TableContainsValue({ strsplit(",", ids) }, questId)
@@ -736,14 +478,41 @@ function E:AutoAbandonQuests()
 			local green = autoAbandonQuests.questType.green and L["green"] == color
 			local orange = autoAbandonQuests.questType.orange and L["orange"] == color
 			local red = autoAbandonQuests.questType.red and L["red"] == color
-			local daily = autoAbandonQuests.questType.daily and isDaily
-			local weekly = autoAbandonQuests.questType.weekly and isWeekly
 			local yellow = autoAbandonQuests.questType.yellow and L["yellow"] == color
 
-			if abandonQuestId or gray or green or orange or red or daily or yellow or weekly then
+			local eligibility = { abandonQuestId, gray, green, orange, red, yellow }
+
+			if not E.isClassic then
+				local daily = autoAbandonQuests.questType.daily and isDaily
+				tinsert(eligibility, daily)
+			end
+
+			if E.isRetail then
+				local weekly = autoAbandonQuests.questType.weekly and isWeekly
+				tinsert(eligibility, weekly)
+			else
+				local dungeon = autoAbandonQuests.questType.dungeon and strlower(LFG_TYPE_DUNGEON) == lowerTag
+				local heroic = autoAbandonQuests.questType.heroic and strlower(PLAYER_DIFFICULTY2) == lowerTag
+				local raid = autoAbandonQuests.questType.raid and strlower(RAID) == lowerTag
+				local elite = autoAbandonQuests.questType.elite and strlower(ELITE) == lowerTag
+				local failed = autoAbandonQuests.questType.failed and info.isComplete == -1
+				local group = autoAbandonQuests.questType.group and strlower(GROUP) == lowerTag
+				local pvp = autoAbandonQuests.questType.pvp and strlower(PVP) == lowerTag
+
+				tinsert(eligibility, dungeon)
+				tinsert(eligibility, heroic)
+				tinsert(eligibility, raid)
+				tinsert(eligibility, elite)
+				tinsert(eligibility, failed)
+				tinsert(eligibility, group)
+				tinsert(eligibility, pvp)
+			end
+
+			-- Check if any eligibility condition was met
+			if E:TableContainsValue(eligibility, true) then
 				-- ! This triggers a second UNIT_QUEST_LOG_CHANGED event which reattempts to abandon excluded quests
 				-- ! This is a bit spammy and needs to be throttled somehow
-				if self:AbandonQuest(questId) then
+				if E:AbandonQuest(questId) then
 					count = count + 1
 				end
 			end
@@ -751,44 +520,32 @@ function E:AutoAbandonQuests()
 	end
 
 	if count > 0 then
-		self:Info(format("Automatically abandoned %s |4quest:quests;!", count))
+		E:Info(format("Automatically abandoned %s |4quest:quests;!", count))
 	end
 end
 
 -- TODO: Provide an auto exclude option under automation options, and perform similar evaluations as AutoAbandonQuests
 function E:AutoExcludeQuests()
-	for i = 1, C_QuestLog.GetNumQuestLogEntries() do
-		local info = C_QuestLog.GetInfo(i)
+	for i = 1, Shim:GetNumQuestLogEntries() do
+		local info = Shim:GetInfo(i)
 		local questId = info.questID
-		local isComplete = C_QuestLog.IsComplete(questId)
+		local isComplete = Shim:IsComplete(questId)
 
 		if not info.isHeader then
-			if self.db.general.individualQuests.completeProtection and isComplete and not self:IsExcluded(questId) then
-				self:ExcludeQuest(questId, AUTOMATIC)
+			if E.db.general.individualQuests.completeProtection and isComplete and not E:IsExcluded(questId) then
+				E:ExcludeQuest(questId, AUTOMATIC)
 			end
 		end
 	end
 end
 
 function E:PrintWelcomeMessage()
-	if self.db.general.loginMessage then
-		self:System(format(L["You are running |cFFB5FFEBv%s|r. Type |cff888888/rab|r to configure settings."], E.version))
-	end
-
-	if not WOW_PROJECT_ID == E.validVersion then
-		self:Critical(
-			format(
-				L[
-				"You have installed a version of this addon intended for |cFFFFFAB8%s|r, however you are currently playing |cFFFFFAB8%s|r. You may encounter serious issues with this setup. Please install the proper version from Github, CurseForge, Wago, or WoWInterface, and restart the game."
-				],
-				E.wowVersionMatrix[E.validVersion],
-				E.wowVersionMatrix[WOW_PROJECT_ID]
-			)
-		)
+	if E.db.general.loginMessage then
+		E:System(format(L["You are running |cFFB5FFEBv%s|r. Type |cff888888/rab|r to configure settings."], E.version))
 	end
 
 	if strfind(E.version, "alpha") or strfind(E.version, "beta") then
-		self:System(
+		E:System(
 			format(
 				L[
 				"You are currently running a pre-release version of %s. Please report any issues on github (|cFFB5FFEB%s|r) so they can be addressed quickly. Thank you for your interest in testing new features!"
@@ -806,6 +563,11 @@ function E:NormalizeSettings()
 	-- Set log level if not set
 	if E.db.general.logLevel == nil then
 		E.db.general.logLevel = LOG_LEVEL_VERBOSE
+	end
+
+	-- Set debugging if not set
+	if E.db.debugging == nil then
+		E.db.debugging.debugLogging = false
 	end
 
 	-- Rebuild exclusion list
@@ -837,26 +599,10 @@ function E:NormalizeSettings()
 end
 
 function E:RegisterHotkeys()
-	for quest in QuestScrollFrame.titleFramePool:EnumerateActive() do
-		if not quest.hasOnMouseDownScript then
-			quest.origOnClick = quest:GetScript("OnClick")
-			quest.origOnMouseDown = quest:GetScript("OnMouseDown")
-
-			quest:SetScript("OnClick", onQuestLogEntryClick)
-			quest:SetScript("OnMouseDown", onQuestLogEntryMouseDown)
-
-			quest.hasOnMouseDownScript = true
-		end
-	end
-
-	for header in QuestScrollFrame.headerFramePool:EnumerateActive() do
-		if not header.hasOnMouseDownScript then
-			header.origOnMouseDown = header:GetScript("OnMouseDown")
-
-			header:SetScript("OnMouseDown", onQuestLogEntryMouseDown)
-
-			header.hasOnMouseDownScript = true
-		end
+	if E.isRetail then
+		E:RegisterRetailHotkeys()
+	else
+		E:RegisterClassicHotkeys()
 	end
 end
 
@@ -873,6 +619,12 @@ function E:Initialize()
 	E.charSettings = E.Libs.AceDB:New("RecklessAbandonPrivateDB", E.privateVars)
 	E.charSettings.RegisterCallback(E, "OnProfileReset", "RefreshOptions")
 
+	E:RegisterBucketEvent("QUEST_LOG_UPDATE", 1, "GenerateQuestTable")
+	E:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "AutoAbandonQuests")
+	E:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "AutoExcludeQuests")
+	E:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "PruneQuestExclusionsFromAutomation")
+	E:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "RefreshGUI")
+
 	E.private = E.charSettings.profile
 	E.db = E.data.profile
 	E.global = E.data.global
@@ -882,58 +634,107 @@ function E:Initialize()
 
 	E:NormalizeSettings()
 
-	QuestMapFrame:HookScript(
+	local QuestFrame = E.isRetail and QuestMapFrame or QuestLogFrame
+
+	QuestFrame:HookScript(
 		"OnShow",
 		function()
 			E:GenerateQuestTable()
-			ShowAbandonButtons()
+			E:ShowAbandonButtons()
 			E:RegisterHotkeys()
 		end
 	)
-	QuestMapFrame:HookScript(
+	QuestFrame:HookScript(
 		"OnEvent",
 		function()
 			E:GenerateQuestTable()
 
 			-- * Added in Retail 11.1.0: Avoid showing render buttons in quest detail pane
-			if QuestMapFrame.QuestsFrame.DetailsFrame:IsVisible() then return end
+			if E.isRetail and QuestFrame.QuestsFrame.DetailsFrame:IsVisible() then return end
 
-			ShowAbandonButtons()
+			E:ShowAbandonButtons()
 			E:RegisterHotkeys()
 		end
 	)
-	QuestMapFrame:HookScript("OnHide", HideAbandonButtons)
-
-	-- * Added in Retail 11.1.0: Avoid showing render buttons in quest detail pane
-	QuestMapFrame.QuestsFrame.DetailsFrame:HookScript("OnShow", HideAbandonButtons)
-	QuestMapFrame.QuestsFrame.DetailsFrame:HookScript("OnHide", ShowAbandonButtons)
-
-	QuestScrollFrame.SearchBox:HookScript(
-		"OnTextChanged",
+	QuestFrame:HookScript(
+		"OnHide",
 		function()
-			-- * This is inefficient since these really only need to be adjusted when search results change
-			-- * However, there does not appear to be an exposed API to hook into to do this
-			ShowAbandonButtons()
+			E:HideAbandonButtons()
 		end
 	)
 
-	QuestScrollFrame:HookScript(
-		"OnVerticalScroll",
-		function()
-			E:RegisterHotkeys()
-
-			-- * Added in Retail 11.1.0: Avoid showing render buttons in quest detail pane
-			if QuestMapFrame.QuestsFrame.DetailsFrame:IsVisible() then return end
-
-			for button in questButtonPool:EnumerateActive() do
-				onButtonUpdate(button)
+	if E.isRetail then
+		QuestScrollFrame.SearchBox:HookScript(
+			"OnTextChanged",
+			function()
+				-- * This is inefficient since these really only need to be adjusted when search results change
+				-- * However, there does not appear to be an exposed API to hook into to do this
+				E:ShowAbandonButtons()
 			end
+		)
 
-			for button in groupButtonPool:EnumerateActive() do
-				onButtonUpdate(button)
+
+		QuestScrollFrame:HookScript(
+			"OnVerticalScroll",
+			function()
+				E:RegisterHotkeys()
+
+				-- * Added in Retail 11.1.0: Avoid showing render buttons in quest detail pane
+				if QuestFrame.QuestsFrame.DetailsFrame:IsVisible() then return end
+
+				for button in E.questButtonPool:EnumerateActive() do
+					onButtonUpdate(button)
+				end
+
+				for button in E.groupButtonPool:EnumerateActive() do
+					onButtonUpdate(button)
+				end
 			end
-		end
-	)
+		)
+
+		-- * Added in Retail 11.1.0: Avoid showing render buttons in quest detail pane
+		QuestFrame.QuestsFrame.DetailsFrame:HookScript("OnShow", function()
+			E:HideAbandonButtons()
+		end)
+
+		QuestFrame.QuestsFrame.DetailsFrame:HookScript("OnHide", function()
+			E:ShowAbandonButtons()
+		end)
+	elseif E.isClassic then
+		QuestLogListScrollFrame:HookScript(
+			"OnVerticalScroll",
+			function()
+				-- Render the next set of buttons. This is needed because the classic quest log only shows QUESTS_DISPLAYED titles at a time
+				E:ShowAbandonButtons()
+				E:RegisterHotkeys()
+
+				for button in E.questButtonPool:EnumerateActive() do
+					onButtonUpdate(button)
+				end
+
+				for button in E.groupButtonPool:EnumerateActive() do
+					onButtonUpdate(button)
+				end
+			end
+		)
+	else
+		QuestLogListScrollFrame.scrollBar:HookScript(
+			"OnValueChanged",
+			function()
+				-- Render the next set of buttons. This is needed because the classic quest log only shows QUESTS_DISPLAYED titles at a time
+				E:ShowAbandonButtons()
+				E:RegisterHotkeys()
+
+				for button in E.questButtonPool:EnumerateActive() do
+					onButtonUpdate(button)
+				end
+
+				for button in E.groupButtonPool:EnumerateActive() do
+					onButtonUpdate(button)
+				end
+			end
+		)
+	end
 
 	E.initialized = true
 end

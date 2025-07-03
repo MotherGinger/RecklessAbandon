@@ -1,6 +1,6 @@
-## Interface: 110107
-## Author: Arrila-Thrall (US)
-## Version: 2.0.9
+## Interface: 50500
+## Author: Frauke Betz
+## Version: 3.0.0
 ## Title: |cFF80528CReckless Abandon|r
 ## Notes: A tool for quickly (and recklessly) abandoning quests
 ## Notes-esES: Una herramienta para abandonar misiones rápidamente (y sin escrúpulos)
@@ -12,8 +12,6 @@
 ## Notes-ptBR: Uma ferramenta para abandonar missões rapidamente (e imprudentemente)
 ## Notes-zhCN: 一个快速（且鲁莽）放弃任务的工具
 ## Notes-zhTW: 一個快速（且魯莽）放棄任務的工具
-## IconTexture: 135818
-## Category: Quests
 ## SavedVariables: RecklessAbandonDB, RecklessAbandonPrivateDB
 ## SavedVariablesPerCharacter: RecklessAbandonCharacterDB
 
@@ -23,4 +21,5 @@ Widgets\load.xml
 Locales\load.xml
 Settings\load.xml
 Utils\load.xml
+Environment\load.xml
 Core\load.xml

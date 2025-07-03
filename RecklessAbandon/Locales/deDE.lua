@@ -10,9 +10,8 @@ L["Version"] = "Version"
 L["Configuration"] = "Konfiguration"
 L["Description"] = "Ein Werkzeug zum schnellen (und rücksichtslosen) Aufgeben von Quests"
 
-L["You have installed a version of this addon intended for |cFFFFFAB8%s|r, however, you are currently playing |cFFFFFAB8%s|r. You may encounter serious issues with this setup. Please install the proper version from Github, CurseForge, Wago, or WoWInterface and restart the game."] =
-    "Sie haben eine Version dieses Addons installiert, die für |cFFFFFAB8%s|r gedacht ist. Sie spielen jedoch derzeit |cFFFFFAB8%s|r. Sie könnten ernsthafte Probleme mit dieser Konfiguration haben. Bitte installieren Sie die entsprechende Version von Github, CurseForge, Wago oder WoWInterface und starten Sie das Spiel neu."
-L["You are currently running a pre-release version of %s. Please report any issues on github (|cFFB5FFEB%s|r) so they can be addressed quickly. Thank you for your interest in testing new features!"] = "Sie verwenden derzeit eine Vorabversion von %s. Bitte melden Sie etwaige Probleme auf GitHub (|cFFB5FFEB%s|r), damit diese schnell behoben werden können. Vielen Dank für Ihr Interesse am Testen neuer Funktionen!"
+L["You are currently running a pre-release version of %s. Please report any issues on github (|cFFB5FFEB%s|r) so they can be addressed quickly. Thank you for your interest in testing new features!"] =
+"Sie verwenden derzeit eine Vorabversion von %s. Bitte melden Sie etwaige Probleme auf GitHub (|cFFB5FFEB%s|r), damit diese schnell behoben werden können. Vielen Dank für Ihr Interesse am Testen neuer Funktionen!"
 
 L["Enable"] = "Aktivieren"
 L["Enable/Disable Reckless Abandon"] = "Aktiviere/Deaktiviere Rücksichtsloses Aufgeben"
@@ -119,9 +118,15 @@ L["This command abandons all quests that match a given qualifier and are not exc
 
 L["Available Qualifiers:"] = "Verfügbare Qualifikatoren:"
 
-L["daily"] = "täglich"
 L["Matches all daily quests."] = "Passt zu allen täglichen Quests."
-L["weekly"] = "wöchentlich"
+L["Matches all failed quests."] = "Entspricht allen gescheiterten Quests."
+L["Matches all dungeon quests."] = "Entspricht allen Dungeon-Quests."
+L["Matches all raid quests."] = "Entspricht allen Raid-Quests."
+L["Matches all group quests."] = "Entspricht allen Gruppen-Quests."
+L["Matches all heroic quests."] = "Entspricht allen heroischen Quests."
+L["Matches all elite quests."] = "Entspricht allen Elite-Quests."
+L["Matches all pvp quests."] = "Entspricht allen PvP-Quests."
+L["Matches all daily quests."] = "Entspricht allen täglichen Quests."
 L["Matches all weekly quests."] = "Passt zu allen wöchentlichen Quests."
 L["gray"] = "grau"
 L["Matches all gray quests."] = "Entspricht allen grauen Quests."
@@ -163,7 +168,7 @@ L["Unable to prune quests from the exclusion list from source '%s'"] = "Kann Que
 
 L["About"] = "Über"
 L["Testers"] = "Tester"
-L["Written by |T626001:0|t |cFF3FC7EB%s|r aka |T626003:0|t |cFFF48CBAAllyïa-Mankrik (US)|r"] = "Verfasst von |T626001:0|t |cFF3FC7EB%s|r alias |T626003:0|t |cFFF48CBAAllyïa-Mankrik (US)|r"
+L["Written by %s%s%s%s %s"] = "Verfasst von %s%s%s%s %s"
 L["Please report any bugs or request features on our issue board:"] = "Bitte melden Sie Fehler oder fordern Sie Funktionen auf unserem Problemboard an:"
 
 L["|cFFFFFF00Abandoned quest %s|r"] = "|cFFFFFF00Quest aufgegeben %s|r"

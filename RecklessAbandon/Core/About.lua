@@ -18,7 +18,7 @@ E.Options.args.about = {
             order = 1,
             type = "description",
             fontSize = "medium",
-            name = format(L["Written by |T626001:0|t |cFF3FC7EB%s|r"], E.author)
+            name = format(L["Written by %s %s"], E.classIcons.warrior, E:ColorFormat(E.classColors.warrior.hex, "Fraukë-Area52 (US)"))
         },
         space1 = {
             order = 2,
@@ -31,20 +31,15 @@ E.Options.args.about = {
             inline = true,
             name = format(L["Testers"]),
             args = {
-                arrila = {
+                rawrhax = {
                     order = 0,
                     type = "description",
-                    name = format("|T626001:0|t |cFF3FC7EB%s|r", E.author)
-                },
-                rawrhax = {
-                    order = 1,
-                    type = "description",
-                    name = "|T626000:0|t |cFFABD473Rawrsnax-Thrall (US)|r"
+                    name = format("%s %s", E.classIcons.hunter, E:ColorFormat(E.classColors.hunter.hex, "Rawrsnax-Thrall (US)"))
                 },
                 cob = {
-                    order = 2,
+                    order = 1,
                     type = "description",
-                    name = "|T626000:0|t |cFFABD473Cob-Thrall (US)|r"
+                    name = format("%s %s", E.classIcons.mage, E:ColorFormat(E.classColors.mage.hex, "Cobbeleren-Area52 (US)"))
                 }
             }
         },

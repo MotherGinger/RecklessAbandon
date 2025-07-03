@@ -1,8 +1,26 @@
 local E, L = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 
+local _G = _G
+
 ----------------------------------------------------------------
 ----------------------- Commands -------------------------------
 ----------------------------------------------------------------
+
+function E:CliDump(obj)
+    local val = _G[obj]
+
+    if val == nil then
+        E:Info(obj)
+
+        return
+    end
+
+    if type(val) == "table" then
+        E:Info(E:Dump(val))
+    else
+        E:Info(val)
+    end
+end
 
 function E:CliToggleDebugging()
     self.db.debugging.debugLogging = not self.db.debugging.debugLogging
@@ -15,8 +33,8 @@ function E:CliListAllQuests()
         self:Info(L["|cFFFF9C00<Zone Header>|r"])
         self:Info(L["    |cFFF2E699<Title>|r - |cFFB5FFEB<QuestID>|r"])
         self:Info("-------------------------------------------")
-        for i = 1, C_QuestLog.GetNumQuestLogEntries() do
-            local info = C_QuestLog.GetInfo(i)
+        for i = 1, Shim:GetNumQuestLogEntries() do
+            local info = Shim:GetInfo(i)
             -- * Some quest headers still exist in your quest log, but have no children and are not hidden
             -- * These are usually event quests that trigger when entering the zone
             -- * These will still be printed, but without any quests underneath them
@@ -46,11 +64,11 @@ end
 
 function E:CliAbandonQuestById(questId)
     if self.db.commands.generic.abandonByQuestId then
-        local index = C_QuestLog.GetLogIndexForQuestID(questId)
+        local index = Shim:GetLogIndexForQuestID(questId)
         if index ~= nil then
             if self.db.general.confirmIndividual then
-                local title = C_QuestLog.GetInfo(index).title
-                local dialog = StaticPopup_Show("RECKLESS_ABANDON_CONFIRMATION", title)
+                local info = Shim:GetInfo(index)
+                local dialog = StaticPopup_Show("RECKLESS_ABANDON_CONFIRMATION", info.title)
                 if dialog then
                     dialog.data = {
                         questId = questId
@@ -76,28 +94,20 @@ function E:CliAbandonByQualifier(qualifier)
     if self.db.commands.generic.abandonByQualifier then
         local questIds = {}
         local questTitles = {}
-        for i = 1, C_QuestLog.GetNumQuestLogEntries() do
-            local info = C_QuestLog.GetInfo(i)
+        for i = 1, Shim:GetNumQuestLogEntries() do
+            local info = Shim:GetInfo(i)
 
             if not info.isHeader and not info.isHidden then
-                local levelDiff = info.level - E.mylevel
-                local color
-                if levelDiff >= 5 then
-                    color = L["red"]
-                elseif levelDiff >= 3 then
-                    color = L["orange"]
-                elseif levelDiff >= -2 then
-                    color = L["yellow"]
-                elseif -levelDiff <= UnitQuestTrivialLevelRange("player") then
-                    color = L["green"]
-                else
-                    color = L["gray"]
-                end
+                local color = self:GetQuestColor(info.level)
+                local lowerTag = info.questTag and strlower(info.questTag) or nil
 
-                local isDaily = qualifier == L["daily"] and info.frequency == 1
-                local isWeekly = qualifier == L["weekly"] and info.frequency == 2
+                local isColor = qualifier == color
+                local isQualifier = qualifier == lowerTag
+                local isFailed = qualifier == strlower(FAILED) and info.isComplete == -1
+                local isDaily = qualifier == strlower(DAILY) and info.frequency == 1
+                local isWeekly = qualifier == strlower(WEEKLY) and info.frequency == 2
 
-                if (qualifier == color or isDaily or isWeekly) and qualifiers[qualifier] ~= nil then
+                if (isColor or isQualifier or isFailed or isDaily or isWeekly) and qualifiers[qualifier] ~= nil then
                     tinsert(questIds, info.questID)
                     tinsert(questTitles, info.title)
                 end
@@ -121,7 +131,7 @@ end
 
 function E:CliExcludeQuestById(questId)
     if self.db.commands.generic.excludeByQuestId then
-        local index = C_QuestLog.GetLogIndexForQuestID(questId)
+        local index = Shim:GetLogIndexForQuestID(questId)
         if index ~= nil then
             if not self:IsExcluded(questId) then
                 self:ExcludeQuest(questId)
@@ -138,7 +148,7 @@ end
 
 function E:CliIncludeQuestById(questId)
     if self.db.commands.generic.includeByQuestId then
-        local index = C_QuestLog.GetLogIndexForQuestID(questId)
+        local index = Shim:GetLogIndexForQuestID(questId)
         if index ~= nil then
             if self:IsExcluded(questId) then
                 self:IncludeQuest(questId)

@@ -10,7 +10,6 @@ L["Version"] = "版本"
 L["Configuration"] = "配置"
 L["Description"] = "一个快速（而且鲁莽）放弃任务的工具"
 
-L["You have installed a version of this addon intended for |cFFFFFAB8%s|r, however you are currently playing |cFFFFFAB8%s|r. You may encounter serious issues with this setup. Please install the proper version from Github, CurseForge, Wago, or WoWInterface, and restart the game."] = "你安装了适用于 |cFFFFFAB8%s|r 的插件版本，但你当前正在玩 |cFFFFFAB8%s|r。在这种设置下，你可能会遇到严重的问题。请从Github、CurseForge、Wago或WoWInterface安装正确版本，并重新启动游戏。"
 L["You are currently running a pre-release version of %s. Please report any issues on github (|cFFB5FFEB%s|r) so they can be addressed quickly. Thank you for your interest in testing new features!"] = "您当前正在运行 %s 的预发布版本。请在 GitHub (|cFFB5FFEB%s|r) 上报告任何问题，以便能够迅速解决。感谢您对测试新功能的兴趣！"
 
 L["Enable"] = "启用"
@@ -118,9 +117,14 @@ L["This command abandons all quests that match a given qualifier and are not exc
 
 L["Available Qualifiers:"] = "可用限定符："
 
-L["daily"] = "每日"
 L["Matches all daily quests."] = "匹配所有每日任务。"
-L["weekly"] = "每周"
+L["Matches all failed quests."] = "匹配所有失败的任务。"
+L["Matches all dungeon quests."] = "匹配所有地下城任务。"
+L["Matches all raid quests."] = "匹配所有团队副本任务。"
+L["Matches all group quests."] = "匹配所有组队任务。"
+L["Matches all heroic quests."] = "匹配所有英雄模式任务。"
+L["Matches all elite quests."] = "匹配所有精英任务。"
+L["Matches all pvp quests."] = "匹配所有PvP任务。"
 L["Matches all weekly quests."] = "匹配所有每周任务。"
 L["gray"] = "灰色"
 L["Matches all gray quests."] = "匹配所有灰色任务。"
@@ -162,7 +166,7 @@ L["Unable to prune quests from the exclusion list from source '%s'"] = "无法�
 
 L["About"] = "关于"
 L["Testers"] = "测试者"
-L["Written by |T626001:0|t |cFF3FC7EB%s|r aka |T626003:0|t |cFFF48CBAAllyïa-Mankrik (US)|r"] = "作者 |T626001:0|t |cFF3FC7EB%s|r，又名 |T626003:0|t |cFFF48CBAAllyïa-Mankrik (US)|r"
+L["Written by %s%s%s%s %s"] = "作者 %s%s%s%s %s"
 L["Please report any bugs or request features on our issue board:"] = "请在我们的问题板上报告任何错误或请求功能："
 
 L["|cFFFFFF00Abandoned quest %s|r"] = "|cFFFFFF00放弃了任务 %s|r"
