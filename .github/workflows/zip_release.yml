@@ -1,0 +1,25 @@
+name: Zip on Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  zip-and-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create versioned zip archive
+        run: |
+          ZIP_NAME="RecklessAbandon_${GITHUB_REF_NAME}.zip"
+          zip -r "$ZIP_NAME" RecklessAbandon
+          echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
+
+      - name: Upload zip to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ZIP_NAME }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
