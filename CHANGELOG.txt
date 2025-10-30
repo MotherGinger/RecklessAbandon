@@ -4,6 +4,11 @@ This project adheres to Semantic Versioning.
 
 - Unreleased
 
+- v3.0.4
+  - Changed
+    - Bump TOC for 5.5.2 (MoP Classic)
+    - Bump TOC for 1.15.8 (Classic Era)
+
 - v3.0.3
   - Changed
     - Bump TOC for 11.2.5 (Retail)
@@ -296,7 +301,8 @@ This project adheres to Semantic Versioning.
     - Command line for abandoning all quests
     - Documentation
 
-[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.3...develop
+[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.4...develop
+[3.0.4]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.3..v3.0.4
 [3.0.3]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.2..v3.0.3
 [3.0.2]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.1..v3.0.2
 [3.0.1]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.0..v3.0.1

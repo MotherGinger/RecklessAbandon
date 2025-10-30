@@ -1,6 +1,6 @@
-## Interface: 50501
+## Interface: 50502
 ## Author: Frauke Betz
-## Version: 3.0.3
+## Version: 3.0.4
 ## Title: |cFF80528CReckless Abandon|r
 ## Notes: A tool for quickly (and recklessly) abandoning quests
 ## Notes-esES: Una herramienta para abandonar misiones rápidamente (y sin escrúpulos)
