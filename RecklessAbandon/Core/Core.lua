@@ -718,6 +718,10 @@ function E:Initialize()
 		"OnShow",
 		function()
 			E:GenerateQuestTable()
+
+			-- * Added in Retail 11.1.0: Avoid showing render buttons in quest detail pane
+			if E.isRetail and QuestFrame.QuestsFrame.DetailsFrame:IsVisible() then return end
+
 			E:ShowAbandonButtons()
 			E:RegisterHotkeys()
 		end
