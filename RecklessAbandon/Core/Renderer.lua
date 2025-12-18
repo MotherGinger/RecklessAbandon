@@ -6,6 +6,12 @@ local QuestFrame = E.isRetail and QuestMapFrame.QuestsFrame or QuestLogFrame
 E.questButtonPool = CreateFramePool("Button", QuestFrame, "RECKLESS_ABANDON_BUTTON")
 E.groupButtonPool = CreateFramePool("Button", QuestFrame, "RECKLESS_GROUP_ABANDON_BUTTON")
 
+-- Button state cache for smart pool management
+E.buttonStateCache = {
+    activeQuestButtons = {}, -- questId -> button mapping
+    activeGroupButtons = {}  -- groupKey -> button mapping
+}
+
 E.abandonTooltipFormat = "|cFFFFFAB8%s|r\n\n|cFFFFF569%s|r\n|cFFB5FFEB%s|r"
 E.groupAbandonTooltipFormat = "|cFFFFFAB8%s|r\n\n|cFFFFF569%s|r"
 
@@ -45,7 +51,7 @@ end
 
 local function onQuestLogEntryClick(self, button, down)
     -- * Retail includes questLogIndex on the title object
-    local info = Shim:GetInfo(self.questLogIndex or self:GetID())
+    local info = E.Shim:GetInfo(self.questLogIndex or self:GetID())
     local isHeader = info.isHeader
     local abandonQuestBinding = E.db.general.individualQuests.abandonBinding
     local excludeQuestBinding = E.db.general.individualQuests.excludeBinding
@@ -62,7 +68,7 @@ end
 
 local function onQuestLogEntryMouseDown(self, button)
     -- * Retail includes questLogIndex on the title object
-    local info = Shim:GetInfo(self.questLogIndex or self:GetID())
+    local info = E.Shim:GetInfo(self.questLogIndex or self:GetID())
     local title = info.title
     local isHeader = info.isHeader
     local questId = info.questID
@@ -122,16 +128,18 @@ function E:RenderAbandonButton(parent, offset, questId, excluded, title, tooltip
             L["Right Click: Exclude quest from group abandons"])
     )
 
-    local button = E.questButtonPool:Acquire()
-    local canAbandon = Shim:CanAbandonQuest(questId)
+    -- Try to reuse existing button from cache, or acquire new one
+    local button = E.buttonStateCache.activeQuestButtons[questId]
+    if not button then
+        button = E.questButtonPool:Acquire()
+        E.buttonStateCache.activeQuestButtons[questId] = button
+    end
+
+    local canAbandon = E.Shim:CanAbandonQuest(questId)
+
+    E:SetupButtonTextures(button)
 
     local ntex = button:GetNormalTexture()
-    local ptex = button:GetPushedTexture()
-    local htex = button:GetHighlightTexture()
-
-    ntex:SetTexCoord(0.25, 0.80, 0.20, 0.75)
-    ptex:SetTexCoord(0.25, 0.80, 0.20, 0.75)
-    htex:SetTexCoord(0.25, 0.80, 0.20, 0.75)
 
     button.title = title
     button.tooltip = tooltip
@@ -147,9 +155,6 @@ function E:RenderAbandonButton(parent, offset, questId, excluded, title, tooltip
 
     button:SetPoint("CENTER", parent, "CENTER", offset, 0)
     button:SetEnabled(canAbandon)
-    button:SetNormalTexture(ntex)
-    button:SetPushedTexture(ptex)
-    button:SetHighlightTexture(htex)
     button:Show()
 end
 
@@ -159,17 +164,19 @@ function E:RenderGroupAbandonButton(parent, offset, title, tooltip, key)
     key = key or GetKey(title)
 
     if E.questGroupsByName[key] then
-        local button = E.groupButtonPool:Acquire()
+        -- Try to reuse existing button from cache, or acquire new one
+        local button = E.buttonStateCache.activeGroupButtons[key]
+        if not button then
+            button = E.groupButtonPool:Acquire()
+            E.buttonStateCache.activeGroupButtons[key] = button
+        end
+
         local hasQuests = not E:IsEmpty(E.questGroupsByName[key].quests)
         local canAbandonAny = E:CanQuestGroupAbandon(E.questGroupsByName[key].quests)
 
-        local ntex = button:GetNormalTexture()
-        local ptex = button:GetPushedTexture()
-        local htex = button:GetHighlightTexture()
+        E:SetupButtonTextures(button)
 
-        ntex:SetTexCoord(0.25, 0.80, 0.20, 0.75)
-        ptex:SetTexCoord(0.25, 0.80, 0.20, 0.75)
-        htex:SetTexCoord(0.25, 0.80, 0.20, 0.75)
+        local ntex = button:GetNormalTexture()
 
         button.title = title
         button.tooltip = tooltip
@@ -179,9 +186,6 @@ function E:RenderGroupAbandonButton(parent, offset, title, tooltip, key)
 
         button:SetPoint("CENTER", parent, "CENTER", offset, 0)
         button:SetEnabled(hasQuests and canAbandonAny)
-        button:SetNormalTexture(ntex)
-        button:SetPushedTexture(ptex)
-        button:SetHighlightTexture(htex)
         button:Show()
     end
 end
@@ -197,6 +201,28 @@ end
 function E:HideAbandonButtons()
     E.questButtonPool:ReleaseAll()
     E.groupButtonPool:ReleaseAll()
+    -- Clear cache when doing full release
+    E.buttonStateCache.activeQuestButtons = {}
+    E.buttonStateCache.activeGroupButtons = {}
+end
+
+-- Smart button management: only release buttons no longer needed
+function E:SmartReleaseButtons(neededQuestIds, neededGroupKeys)
+    -- Release quest buttons that are no longer needed
+    for questId, button in pairs(E.buttonStateCache.activeQuestButtons) do
+        if not neededQuestIds[questId] then
+            E.questButtonPool:Release(button)
+            E.buttonStateCache.activeQuestButtons[questId] = nil
+        end
+    end
+
+    -- Release group buttons that are no longer needed
+    for groupKey, button in pairs(E.buttonStateCache.activeGroupButtons) do
+        if not neededGroupKeys[groupKey] then
+            E.groupButtonPool:Release(button)
+            E.buttonStateCache.activeGroupButtons[groupKey] = nil
+        end
+    end
 end
 
 function E:RetailRenderer()
@@ -212,7 +238,7 @@ function E:RetailRenderer()
 
         if E.db.general.covenantCallings ~= nil and E.db.general.covenantCallings.showAbandonButton then
             for calling in QuestScrollFrame.covenantCallingsHeaderFramePool:EnumerateActive() do
-                local info = Shim:GetInfo(calling.questLogIndex)
+                local info = E.Shim:GetInfo(calling.questLogIndex)
                 if info then
                     local title = info.title
                     local key = GetKey(title)
@@ -253,16 +279,16 @@ function E:ClassicRenderer()
 
     -- Guard against a bad cache (https://github.com/MotherGinger/RecklessAbandon/issues/25)
     if E.db ~= nil and E.db.general ~= nil then
-        local numEntries = Shim:GetNumQuestLogEntries()
+        local numEntries = E.Shim:GetNumQuestLogEntries()
         for i = 1, QUESTS_DISPLAYED do
             local questIndex = floor(i + QuestLogListScrollFrame.offset)
             if questIndex <= numEntries then
-                local info = Shim:GetInfo(questIndex)
+                local info = E.Shim:GetInfo(questIndex)
 
                 local questLogTitle
                 if E.isClassic then
-                    -- * Vanilla needs to use getglobal to access the frame
-                    questLogTitle = getglobal("QuestLogTitle" .. i)
+                    -- * Vanilla needs to use _G to access the frame dynamically
+                    questLogTitle = _G["QuestLogTitle" .. i]
                 else
                     questLogTitle = QuestLogListScrollFrame.buttons[i]
                 end
@@ -294,24 +320,28 @@ function E:GenerateQuestTable()
 
     local currentGroup = { quests = {} }
 
-    for i = 1, Shim:GetNumQuestLogEntries() do
-        local info = Shim:GetInfo(i) -- TODO: Add a nil check for safety
-        if info.isHeader then
-            currentGroup = {
-                title = info.title,
-                hidden = true,
-                quests = {}
-            }
-
-            -- * In classic, collapsing a zone header "removes" the quests from the log since they aren't rendered
-            -- * If the header is collapsed, don't overwrite the last known quests under it to work around this
-            -- * This should always work as long as the headers are expanded at least once which tends to happen on initial load anyways
-            if E.isRetail or (not E.isRetail and not info.isCollapsed) then
-                E.questGroupsByName[GetKey(info.title)] = currentGroup
-            end
+    for i = 1, E.Shim:GetNumQuestLogEntries() do
+        local info = E.Shim:GetInfo(i)
+        if not info then
+            E:Error(format("Failed to get quest info for index %d", i))
         else
-            currentGroup.hidden = currentGroup.hidden and info.isHidden
-            currentGroup.quests[info.questID] = info.title
+            if info.isHeader then
+                currentGroup = {
+                    title = info.title,
+                    hidden = true,
+                    quests = {}
+                }
+
+                -- * In classic, collapsing a zone header "removes" the quests from the log since they aren't rendered
+                -- * If the header is collapsed, don't overwrite the last known quests under it to work around this
+                -- * This should always work as long as the headers are expanded at least once which tends to happen on initial load anyways
+                if E.isRetail or (not E.isRetail and not info.isCollapsed) then
+                    E.questGroupsByName[GetKey(info.title)] = currentGroup
+                end
+            else
+                currentGroup.hidden = currentGroup.hidden and info.isHidden
+                currentGroup.quests[info.questID] = info.title
+            end
         end
     end
 
@@ -347,8 +377,8 @@ function E:RegisterClassicHotkeys()
     for i = 1, GetNumQuestLogEntries() do
         local questLogTitle
         if E.isClassic then
-            -- * Vanilla needs to use getglobal to access the frame
-            questLogTitle = getglobal("QuestLogTitle" .. i)
+            -- * Vanilla needs to use _G to access the frame dynamically
+            questLogTitle = _G["QuestLogTitle" .. i]
         else
             questLogTitle = QuestLogListScrollFrame.buttons[i]
         end

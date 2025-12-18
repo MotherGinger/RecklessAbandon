@@ -58,6 +58,21 @@ function E:FormatGradient(text, colors)
     return result
 end
 
+--- Sets up button textures with consistent coordinates
+-- @param button Frame The button frame to configure
+-- @param texCoords table Optional texture coordinates {left, right, top, bottom}
+function E:SetupButtonTextures(button, texCoords)
+    texCoords = texCoords or {0.25, 0.80, 0.20, 0.75}
+
+    local ntex = button:GetNormalTexture()
+    local ptex = button:GetPushedTexture()
+    local htex = button:GetHighlightTexture()
+
+    if ntex then ntex:SetTexCoord(texCoords[1], texCoords[2], texCoords[3], texCoords[4]) end
+    if ptex then ptex:SetTexCoord(texCoords[1], texCoords[2], texCoords[3], texCoords[4]) end
+    if htex then htex:SetTexCoord(texCoords[1], texCoords[2], texCoords[3], texCoords[4]) end
+end
+
 function E:Dump(o, devtools)
     if (devtools) then
         DevTools_Dump(o)

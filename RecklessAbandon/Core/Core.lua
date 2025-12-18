@@ -30,8 +30,8 @@ E.noop = function()
 end
 
 E.title = format("|cFF80528C%s|r", "Reckless Abandon")
-E.version = Shim:GetAddOnMetadata("RecklessAbandon", "Version")
-E.author = Shim:GetAddOnMetadata("RecklessAbandon", "Author")
+E.version = E.Shim:GetAddOnMetadata("RecklessAbandon", "Version")
+E.author = E.Shim:GetAddOnMetadata("RecklessAbandon", "Author")
 E.github = "https://github.com/MotherGinger/RecklessAbandon/issues"
 E.myfaction, E.myLocalizedFaction = UnitFactionGroup("player")
 E.mylevel = UnitLevel("player")
@@ -265,7 +265,7 @@ end
 
 function E:GetQuestColor(level)
 	local levelDiff = level - E.mylevel
-	local QuestRange = Shim:UnitQuestTrivialLevelRange("player")
+	local QuestRange = E.Shim:UnitQuestTrivialLevelRange("player")
 
 	if levelDiff >= 5 then
 		return L["red"]
@@ -327,8 +327,8 @@ function E:GetAvailableQualifiers()
 end
 
 function E:AbandonAllQuests()
-	for i = 1, Shim:GetNumQuestLogEntries() do
-		local info = Shim:GetInfo(i)
+	for i = 1, E.Shim:GetNumQuestLogEntries() do
+		local info = E.Shim:GetInfo(i)
 		local questId = info.questID
 
 		if not info.isHeader and not info.isHidden then
@@ -356,10 +356,10 @@ end
 
 function E:AbandonQuest(questId, exclusionBypass)
 	if exclusionBypass or not E.private.exclusions.excludedQuests[questId] then
-		if Shim:CanAbandonQuest(questId) then
-			Shim:SetSelectedQuest(questId)
-			Shim:SetAbandonQuest()
-			Shim:AbandonQuest()
+		if E.Shim:CanAbandonQuest(questId) then
+			E.Shim:SetSelectedQuest(questId)
+			E.Shim:SetAbandonQuest()
+			E.Shim:AbandonQuest()
 
 			E:System(format(L["|cFFFFFF00Abandoned quest %s|r"], GetQuestLink(questId)))
 
@@ -397,7 +397,7 @@ end
 
 function E:CanQuestGroupAbandon(quests)
 	for questId, _ in pairs(quests) do
-		if Shim:CanAbandonQuest(questId) then
+		if E.Shim:CanAbandonQuest(questId) then
 			return true
 		end
 	end
@@ -409,7 +409,7 @@ function E:PruneQuestExclusionsFromAutomation()
 	if E.private.exclusions.autoPrune then
 		local count = 0
 		for questId, meta in pairs(E.private.exclusions.excludedQuests) do
-			local orphaned = Shim:GetLogIndexForQuestID(questId) == nil
+			local orphaned = E.Shim:GetLogIndexForQuestID(questId) == nil
 			local source = meta.source
 			if orphaned and source == AUTOMATIC then
 				count = count + 1
@@ -431,7 +431,7 @@ end
 
 function E:ClearQuestExclusions()
 	for questId, _ in pairs(E.private.exclusions.excludedQuests) do
-		local orphaned = Shim:GetLogIndexForQuestID(questId) == nil
+		local orphaned = E.Shim:GetLogIndexForQuestID(questId) == nil
 		if orphaned then
 			E:PruneQuestExclusion(questId)
 		else
@@ -443,7 +443,7 @@ end
 function E:PruneQuestExclusions()
 	local count = 0
 	for questId, _ in pairs(E.private.exclusions.excludedQuests) do
-		local orphaned = Shim:GetLogIndexForQuestID(questId) == nil
+		local orphaned = E.Shim:GetLogIndexForQuestID(questId) == nil
 		if orphaned then
 			count = count + 1
 			E:PruneQuestExclusion(questId)
@@ -453,68 +453,113 @@ function E:PruneQuestExclusions()
 	E:Info(format(L["Pruned %s |4orphan:orphans;!"], count))
 end
 
+-- Pre-parse the exclusion CSV into a lookup table for O(1) access
+function E:UpdateParsedExclusions()
+	local ids = self.private.automationOptions.autoAbandonQuests.ids
+	self.parsedExclusions = {}
+
+	if ids and ids ~= "" then
+		for questId in string.gmatch(ids, "([^,]+)") do
+			local numId = tonumber(questId)
+			if numId then
+				self.parsedExclusions[numId] = true
+			end
+		end
+	end
+end
+
+-- Cache color map to avoid repeated localization lookups
+function E:InitializeColorMap()
+	self.COLOR_MAP = {
+		gray = strlower(L["gray"]),
+		green = strlower(L["green"]),
+		yellow = strlower(L["yellow"]),
+		orange = strlower(L["orange"]),
+		red = strlower(L["red"])
+	}
+end
+
+-- Cache tag constants to avoid repeated strlower() calls
+function E:InitializeTagCache()
+	if not E.isRetail then
+		self.TAG_CACHE = {
+			dungeon = strlower(LFG_TYPE_DUNGEON or "Dungeon"),
+			heroic = strlower(PLAYER_DIFFICULTY2 or "Heroic"),
+			raid = strlower(RAID or "Raid"),
+			elite = strlower(ELITE or "Elite"),
+			group = strlower(GROUP or "Group"),
+			pvp = strlower(PVP or "PvP")
+		}
+	end
+end
+
 function E:AutoAbandonQuests()
 	-- * This will abandon all quests of types that have been elected for automatic abandons
-	-- * This is O(n)
+	-- * Now optimized with pre-parsed exclusions and cached lookups
 
 	local count = 0
 
-	for i = 1, Shim:GetNumQuestLogEntries() do
-		local info = Shim:GetInfo(i)
-		local questId = info.questID
-		local level = info.level
-		local isDaily = info.frequency == 1
-		local isWeekly = info.frequency == 2
+	for i = 1, E.Shim:GetNumQuestLogEntries() do
+		local info = E.Shim:GetInfo(i)
+		if not info then
+			E:Error(format("Failed to get quest info for index %d in AutoAbandonQuests", i))
+		elseif not info.isHeader then
+			local questId = info.questID
+			local level = info.level
+			local isDaily = info.frequency == 1
+			local isWeekly = info.frequency == 2
 
-		if not info.isHeader then
-			local color = E:GetQuestColor(level)
+			local color = strlower(E:GetQuestColor(level))
 			local lowerTag = info.questTag and strlower(info.questTag) or nil
 
 			local autoAbandonQuests = E.private.automationOptions.autoAbandonQuests
-			local ids = autoAbandonQuests.ids or "" -- These should never be nil, but lets guard against a corrupt config
+			local eligible = false
 
-			local abandonQuestId = E:TableContainsValue({ strsplit(",", ids) }, questId)
-			local gray = autoAbandonQuests.questType.gray and L["gray"] == color
-			local green = autoAbandonQuests.questType.green and L["green"] == color
-			local orange = autoAbandonQuests.questType.orange and L["orange"] == color
-			local red = autoAbandonQuests.questType.red and L["red"] == color
-			local yellow = autoAbandonQuests.questType.yellow and L["yellow"] == color
-
-			local eligibility = { abandonQuestId, gray, green, orange, red, yellow }
-
-			if not E.isClassic then
-				local daily = autoAbandonQuests.questType.daily and isDaily
-				tinsert(eligibility, daily)
+			-- Check quest ID match using pre-parsed lookup table (O(1) instead of O(n))
+			if self.parsedExclusions and self.parsedExclusions[questId] then
+				eligible = true
 			end
 
-			if E.isRetail then
-				local weekly = autoAbandonQuests.questType.weekly and isWeekly
-				tinsert(eligibility, weekly)
-			else
-				local dungeon = autoAbandonQuests.questType.dungeon and strlower(LFG_TYPE_DUNGEON) == lowerTag
-				local heroic = autoAbandonQuests.questType.heroic and strlower(PLAYER_DIFFICULTY2) == lowerTag
-				local raid = autoAbandonQuests.questType.raid and strlower(RAID) == lowerTag
-				local elite = autoAbandonQuests.questType.elite and strlower(ELITE) == lowerTag
-				local failed = autoAbandonQuests.questType.failed and info.isComplete == -1
-				local group = autoAbandonQuests.questType.group and strlower(GROUP) == lowerTag
-				local pvp = autoAbandonQuests.questType.pvp and strlower(PVP) == lowerTag
-
-				tinsert(eligibility, dungeon)
-				tinsert(eligibility, heroic)
-				tinsert(eligibility, raid)
-				tinsert(eligibility, elite)
-				tinsert(eligibility, failed)
-				tinsert(eligibility, group)
-				tinsert(eligibility, pvp)
-			end
-
-			-- Check if any eligibility condition was met
-			if E:TableContainsValue(eligibility, true) then
-				-- ! This triggers a second UNIT_QUEST_LOG_CHANGED event which reattempts to abandon excluded quests
-				-- ! This is a bit spammy and needs to be throttled somehow
-				if E:AbandonQuest(questId) then
-					count = count + 1
+			-- Check color using cached color map
+			if not eligible and self.COLOR_MAP then
+				if (autoAbandonQuests.questType.gray and self.COLOR_MAP.gray == color) or
+				   (autoAbandonQuests.questType.green and self.COLOR_MAP.green == color) or
+				   (autoAbandonQuests.questType.yellow and self.COLOR_MAP.yellow == color) or
+				   (autoAbandonQuests.questType.orange and self.COLOR_MAP.orange == color) or
+				   (autoAbandonQuests.questType.red and self.COLOR_MAP.red == color) then
+					eligible = true
 				end
+			end
+
+			-- Check frequency-based types
+			if not eligible and not E.isClassic and autoAbandonQuests.questType.daily and isDaily then
+				eligible = true
+			end
+
+			if not eligible and E.isRetail and autoAbandonQuests.questType.weekly and isWeekly then
+				eligible = true
+			end
+
+			-- Check tag-based types using cached tag constants
+			if not eligible and not E.isRetail and lowerTag and self.TAG_CACHE then
+				if (autoAbandonQuests.questType.dungeon and self.TAG_CACHE.dungeon == lowerTag) or
+				   (autoAbandonQuests.questType.heroic and self.TAG_CACHE.heroic == lowerTag) or
+				   (autoAbandonQuests.questType.raid and self.TAG_CACHE.raid == lowerTag) or
+				   (autoAbandonQuests.questType.elite and self.TAG_CACHE.elite == lowerTag) or
+				   (autoAbandonQuests.questType.group and self.TAG_CACHE.group == lowerTag) or
+				   (autoAbandonQuests.questType.pvp and self.TAG_CACHE.pvp == lowerTag) then
+					eligible = true
+				end
+			end
+
+			-- Check failed quests (non-Retail only)
+			if not eligible and not E.isRetail and autoAbandonQuests.questType.failed and info.isComplete == -1 then
+				eligible = true
+			end
+
+			-- Abandon if eligible
+			if eligible and E:AbandonQuest(questId) then
+				count = count + 1
 			end
 		end
 	end
@@ -524,19 +569,52 @@ function E:AutoAbandonQuests()
 	end
 end
 
--- TODO: Provide an auto exclude option under automation options, and perform similar evaluations as AutoAbandonQuests
 function E:AutoExcludeQuests()
-	for i = 1, Shim:GetNumQuestLogEntries() do
-		local info = Shim:GetInfo(i)
-		local questId = info.questID
-		local isComplete = Shim:IsComplete(questId)
+	for i = 1, E.Shim:GetNumQuestLogEntries() do
+		local info = E.Shim:GetInfo(i)
+		if not info then
+			E:Error(format("Failed to get quest info for index %d in AutoExcludeQuests", i))
+		else
+			local questId = info.questID
+			local isComplete = E.Shim:IsComplete(questId)
 
-		if not info.isHeader then
-			if E.db.general.individualQuests.completeProtection and isComplete and not E:IsExcluded(questId) then
-				E:ExcludeQuest(questId, AUTOMATIC)
+			if not info.isHeader then
+				if E.db.general.individualQuests.completeProtection and isComplete and not E:IsExcluded(questId) then
+					E:ExcludeQuest(questId, AUTOMATIC)
+				end
 			end
 		end
 	end
+end
+
+-- Consolidated event handler for UNIT_QUEST_LOG_CHANGED
+function E:OnQuestLogChanged()
+	-- Auto-abandon if enabled
+	if self.private.automationOptions.autoAbandonQuests then
+		local hasAnyEnabled = false
+		for _, enabled in pairs(self.private.automationOptions.autoAbandonQuests.questType) do
+			if enabled then
+				hasAnyEnabled = true
+				break
+			end
+		end
+		if hasAnyEnabled or (self.private.automationOptions.autoAbandonQuests.ids and self.private.automationOptions.autoAbandonQuests.ids ~= "") then
+			self:AutoAbandonQuests()
+		end
+	end
+
+	-- Auto-exclude (has its own internal check for completeProtection)
+	self:AutoExcludeQuests()
+
+	-- Prune exclusions every 5 seconds instead of every event
+	local currentTime = GetTime()
+	if (currentTime - self.lastPruneTime) > 5 then
+		self:PruneQuestExclusionsFromAutomation()
+		self.lastPruneTime = currentTime
+	end
+
+	-- Always refresh GUI
+	self:RefreshGUI()
 end
 
 function E:PrintWelcomeMessage()
@@ -620,10 +698,10 @@ function E:Initialize()
 	E.charSettings.RegisterCallback(E, "OnProfileReset", "RefreshOptions")
 
 	E:RegisterBucketEvent("QUEST_LOG_UPDATE", 1, "GenerateQuestTable")
-	E:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "AutoAbandonQuests")
-	E:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "AutoExcludeQuests")
-	E:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "PruneQuestExclusionsFromAutomation")
-	E:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "RefreshGUI")
+	E:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "OnQuestLogChanged")
+
+	-- Initialize prune throttle timer
+	E.lastPruneTime = 0
 
 	E.private = E.charSettings.profile
 	E.db = E.data.profile
@@ -664,12 +742,22 @@ function E:Initialize()
 	)
 
 	if E.isRetail then
+		-- Initialize debounce timer
+		E.searchDebounceTimer = nil
+
 		QuestScrollFrame.SearchBox:HookScript(
 			"OnTextChanged",
 			function()
-				-- * This is inefficient since these really only need to be adjusted when search results change
-				-- * However, there does not appear to be an exposed API to hook into to do this
-				E:ShowAbandonButtons()
+				-- Cancel existing timer if present
+				if E.searchDebounceTimer then
+					E.searchDebounceTimer:Cancel()
+				end
+
+				-- Create new timer with 0.3s delay to reduce unnecessary renders
+				E.searchDebounceTimer = C_Timer.NewTimer(0.3, function()
+					E:ShowAbandonButtons()
+					E.searchDebounceTimer = nil
+				end)
 			end
 		)
 

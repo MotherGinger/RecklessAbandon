@@ -167,6 +167,12 @@ end
 
 function E:PLAYER_ENTERING_WORLD()
 	E:PrintWelcomeMessage()
+
+	-- Initialize caches for AutoAbandonQuests optimization
+	E:UpdateParsedExclusions()
+	E:InitializeColorMap()
+	E:InitializeTagCache()
+
 	E:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
 

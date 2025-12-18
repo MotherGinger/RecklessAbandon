@@ -10,17 +10,17 @@ E.isCata = WOW_PROJECT_ID == (WOW_PROJECT_CATACLYSM_CLASSIC or 14)
 E.isMop = WOW_PROJECT_ID == (WOW_PROJECT_MISTS_CLASSIC or 19)
 
 ---@class Shim
-Shim = {}
+E.Shim = {}
 
 ---@param unit string A unitid
 ---@return number levelRange The difference the unit's current level and the level at which quests are trivial
-function Shim:UnitQuestTrivialLevelRange(unit)
+function E.Shim:UnitQuestTrivialLevelRange(unit)
     return E.isRetail and UnitQuestTrivialLevelRange(unit) or GetQuestGreenRange(unit)
 end
 
 ---@param questId number The quest id to check
 ---@return boolean canAbandon If the quest can be abandoned
-function Shim:CanAbandonQuest(questId)
+function E.Shim:CanAbandonQuest(questId)
     if E.isRetail then
         return C_QuestLog.CanAbandonQuest(questId)
     else
@@ -30,7 +30,7 @@ end
 
 ---@param questIndex number The quest log index
 ---@return Info? info The quest information
-function Shim:GetInfo(questIndex)
+function E.Shim:GetInfo(questIndex)
     ---@class Info
     ---@field title string The quest title
     ---@field questLogIndex number The quest log index
@@ -78,7 +78,7 @@ end
 
 ---@return number numEntries Number of entries in the quest log, including collapsible zone headers
 ---@return number numQuests Number of actual quests in the quest log, not counting zone headers
-function Shim:GetNumQuestLogEntries()
+function E.Shim:GetNumQuestLogEntries()
     if E.isRetail then
         return C_QuestLog.GetNumQuestLogEntries()
     else
@@ -88,7 +88,7 @@ end
 
 ---@param questId number The quest ID
 ---@return boolean isComplete Whether the quest is both in the quest log and is complete
-function Shim:IsComplete(questId)
+function E.Shim:IsComplete(questId)
     if E.isRetail then
         return C_QuestLog.IsComplete(questId)
     else
@@ -102,7 +102,7 @@ end
 ---@param name number|string The name or index of the addon, case insensitive
 ---@param variable string The variable name, case insensitive
 ---@return string? value The value of the vvariable
-function Shim:GetAddOnMetadata(name, variable)
+function E.Shim:GetAddOnMetadata(name, variable)
     if E.isRetail then
         return C_AddOns.GetAddOnMetadata(name, variable)
     else
@@ -111,7 +111,7 @@ function Shim:GetAddOnMetadata(name, variable)
 end
 
 ---@param questId number The quest ID
-function Shim:SetSelectedQuest(questId)
+function E.Shim:SetSelectedQuest(questId)
     if E.isRetail then
         C_QuestLog.SetSelectedQuest(questId)
     else
@@ -120,7 +120,7 @@ function Shim:SetSelectedQuest(questId)
     end
 end
 
-function Shim:SetAbandonQuest()
+function E.Shim:SetAbandonQuest()
     if E.isRetail then
         C_QuestLog.SetAbandonQuest()
     else
@@ -128,7 +128,7 @@ function Shim:SetAbandonQuest()
     end
 end
 
-function Shim:AbandonQuest()
+function E.Shim:AbandonQuest()
     if E.isRetail then
         C_QuestLog.AbandonQuest()
     else
@@ -138,7 +138,7 @@ end
 
 ---@param questId number The quest ID
 ---@return number? questLogIndex The quest log index
-function Shim:GetLogIndexForQuestID(questId)
+function E.Shim:GetLogIndexForQuestID(questId)
     if E.isRetail then
         return C_QuestLog.GetLogIndexForQuestID(questId)
     else

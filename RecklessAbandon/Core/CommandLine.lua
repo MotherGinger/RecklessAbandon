@@ -33,8 +33,8 @@ function E:CliListAllQuests()
         self:Info(L["|cFFFF9C00<Zone Header>|r"])
         self:Info(L["    |cFFF2E699<Title>|r - |cFFB5FFEB<QuestID>|r"])
         self:Info("-------------------------------------------")
-        for i = 1, Shim:GetNumQuestLogEntries() do
-            local info = Shim:GetInfo(i)
+        for i = 1, E.Shim:GetNumQuestLogEntries() do
+            local info = E.Shim:GetInfo(i)
             -- * Some quest headers still exist in your quest log, but have no children and are not hidden
             -- * These are usually event quests that trigger when entering the zone
             -- * These will still be printed, but without any quests underneath them
@@ -64,10 +64,10 @@ end
 
 function E:CliAbandonQuestById(questId)
     if self.db.commands.generic.abandonByQuestId then
-        local index = Shim:GetLogIndexForQuestID(questId)
+        local index = E.Shim:GetLogIndexForQuestID(questId)
         if index ~= nil then
             if self.db.general.confirmIndividual then
-                local info = Shim:GetInfo(index)
+                local info = E.Shim:GetInfo(index)
                 local dialog = StaticPopup_Show("RECKLESS_ABANDON_CONFIRMATION", info.title)
                 if dialog then
                     dialog.data = {
@@ -94,8 +94,8 @@ function E:CliAbandonByQualifier(qualifier)
     if self.db.commands.generic.abandonByQualifier then
         local questIds = {}
         local questTitles = {}
-        for i = 1, Shim:GetNumQuestLogEntries() do
-            local info = Shim:GetInfo(i)
+        for i = 1, E.Shim:GetNumQuestLogEntries() do
+            local info = E.Shim:GetInfo(i)
 
             if not info.isHeader and not info.isHidden then
                 local color = self:GetQuestColor(info.level)
@@ -131,7 +131,7 @@ end
 
 function E:CliExcludeQuestById(questId)
     if self.db.commands.generic.excludeByQuestId then
-        local index = Shim:GetLogIndexForQuestID(questId)
+        local index = E.Shim:GetLogIndexForQuestID(questId)
         if index ~= nil then
             if not self:IsExcluded(questId) then
                 self:ExcludeQuest(questId)
@@ -148,7 +148,7 @@ end
 
 function E:CliIncludeQuestById(questId)
     if self.db.commands.generic.includeByQuestId then
-        local index = Shim:GetLogIndexForQuestID(questId)
+        local index = E.Shim:GetLogIndexForQuestID(questId)
         if index ~= nil then
             if self:IsExcluded(questId) then
                 self:IncludeQuest(questId)

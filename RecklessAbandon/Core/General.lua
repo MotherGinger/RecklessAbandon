@@ -353,6 +353,8 @@ E.Options.args.general = {
                                 local ids = value:gsub("[^%d,]+", ""):gsub(",+", ","):gsub("^,+", ""):gsub(",*$", "")
                                 E:Debug(L["Auto Abandon: "], E:Dump({ strsplit(",", ids) }))
                                 E.private.automationOptions.autoAbandonQuests.ids = ids
+                                -- Update the parsed exclusions cache
+                                E:UpdateParsedExclusions()
                             end
                         }
                     }
@@ -391,7 +393,7 @@ E.Options.args.general = {
                         for questId, meta in pairs(E.private.exclusions.excludedQuests) do
                             local title = meta.title
                             local source = meta.source == MANUAL and L["Manual"] or L["Automation"]
-                            local orphaned = Shim:GetLogIndexForQuestID(questId) == nil
+                            local orphaned = E.Shim:GetLogIndexForQuestID(questId) == nil
 
                             -- * Excluded quests are stored with the localized version of the title at time of exclusion
                             -- * This cannot be updated when language changes since the title can only be fetched for quests still in your log
