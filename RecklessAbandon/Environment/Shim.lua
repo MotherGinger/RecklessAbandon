@@ -89,7 +89,7 @@ end
 ---@param questId number The quest ID
 ---@return boolean isComplete Whether the quest is both in the quest log and is complete
 function E.Shim:IsComplete(questId)
-    if E.isRetail or E.isBC then
+    if E.isRetail then
         return C_QuestLog.IsComplete(questId)
     else
         local questLogIndex = GetQuestLogIndexByID(questId)

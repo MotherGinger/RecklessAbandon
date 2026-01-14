@@ -4,6 +4,10 @@ This project adheres to Semantic Versioning.
 
 - Unreleased
 
+- 3.0.8
+  - Fixed
+    - Lua error in BC anniversary when completing a quest
+
 - v3.0.7
   - Fixed
     - Fix a bug where the group abandon button tooltip does not match the zone header after closing the quest details panel
@@ -316,7 +320,8 @@ This project adheres to Semantic Versioning.
     - Command line for abandoning all quests
     - Documentation
 
-[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.7...develop
+[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.8...develop
+[3.0.8]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.7..v3.0.8
 [3.0.7]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.6..v3.0.7
 [3.0.6]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.5..v3.0.6
 [3.0.5]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.4..v3.0.5
