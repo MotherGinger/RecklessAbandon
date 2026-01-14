@@ -4,6 +4,13 @@ This project adheres to Semantic Versioning.
 
 - Unreleased
 
+- v3.0.7
+  - Fixed
+    - Fix a bug where the group abandon button tooltip does not match the zone header after closing the quest details panel
+    - Fix a bug where abandon buttons show up on the quest details panel
+  - Changed
+    - Add anniversary edition support (TBC)
+
 - v3.0.6
   - Changed
     - Bump TOC for 5.5.3 (MoP Classic)
@@ -309,7 +316,8 @@ This project adheres to Semantic Versioning.
     - Command line for abandoning all quests
     - Documentation
 
-[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.6...develop
+[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.7...develop
+[3.0.7]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.6..v3.0.7
 [3.0.6]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.5..v3.0.6
 [3.0.5]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.4..v3.0.5
 [3.0.4]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.3..v3.0.4

@@ -286,7 +286,7 @@ function E:ClassicRenderer()
                 local info = E.Shim:GetInfo(questIndex)
 
                 local questLogTitle
-                if E.isClassic then
+                if E.isClassic or E.isBC then
                     -- * Vanilla needs to use _G to access the frame dynamically
                     questLogTitle = _G["QuestLogTitle" .. i]
                 else
@@ -376,7 +376,7 @@ end
 function E:RegisterClassicHotkeys()
     for i = 1, GetNumQuestLogEntries() do
         local questLogTitle
-        if E.isClassic then
+        if E.isClassic or E.isBC then
             -- * Vanilla needs to use _G to access the frame dynamically
             questLogTitle = _G["QuestLogTitle" .. i]
         else

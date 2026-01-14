@@ -69,6 +69,7 @@
     "GameTooltip",
     "GetActiveTalentGroup",
     "GetAtlasInfo",
+    "GetAddOnMetadata",
     "GetClassAtlas",
     "GetCursorPosition",
     "GetNumTalents",

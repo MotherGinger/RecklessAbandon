@@ -790,9 +790,14 @@ function E:Initialize()
 		end)
 
 		QuestFrame.QuestsFrame.DetailsFrame:HookScript("OnHide", function()
-			E:ShowAbandonButtons()
+			-- Delay rendering to allow WoW's quest frames to finish reordering after details pane closes
+			C_Timer.After(0.1, function()
+				E:GenerateQuestTable()
+				E:ShowAbandonButtons()
+				E:RegisterHotkeys()
+			end)
 		end)
-	elseif E.isClassic then
+	elseif E.isClassic or E.isBC then
 		QuestLogListScrollFrame:HookScript(
 			"OnVerticalScroll",
 			function()

@@ -89,7 +89,7 @@ end
 ---@param questId number The quest ID
 ---@return boolean isComplete Whether the quest is both in the quest log and is complete
 function E.Shim:IsComplete(questId)
-    if E.isRetail then
+    if E.isRetail or E.isBC then
         return C_QuestLog.IsComplete(questId)
     else
         local questLogIndex = GetQuestLogIndexByID(questId)
@@ -103,7 +103,7 @@ end
 ---@param variable string The variable name, case insensitive
 ---@return string? value The value of the vvariable
 function E.Shim:GetAddOnMetadata(name, variable)
-    if E.isRetail then
+    if E.isRetail or E.isBC then
         return C_AddOns.GetAddOnMetadata(name, variable)
     else
         return GetAddOnMetadata(name, variable)
