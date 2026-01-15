@@ -21,7 +21,6 @@ local type, print = type, print
 
 --WoW API / Variables
 local CreateFrame = CreateFrame
-local GetQuestLink = GetQuestLink
 local UnitGUID = UnitGUID
 
 --Constants
@@ -361,21 +360,21 @@ function E:AbandonQuest(questId, exclusionBypass)
 			E.Shim:SetAbandonQuest()
 			E.Shim:AbandonQuest()
 
-			E:System(format(L["|cFFFFFF00Abandoned quest %s|r"], GetQuestLink(questId)))
+			E:System(format(L["|cFFFFFF00Abandoned quest %s|r"], E.Shim:GetQuestLink(questId)))
 
 			if E.private.exclusions.autoPrune and E:IsExcluded(questId) then
 				E:PruneQuestExclusion(questId)
 			end
 		else
-			E:Warn(format(L["|cFFFFFF00You can't abandon %s|r"], GetQuestLink(questId)))
+			E:Warn(format(L["|cFFFFFF00You can't abandon %s|r"], E.Shim:GetQuestLink(questId)))
 		end
 	else
-		E:Verbose(format(L["Skipping %s since it is excluded from group abandons"], GetQuestLink(questId)))
+		E:Verbose(format(L["Skipping %s since it is excluded from group abandons"], E.Shim:GetQuestLink(questId)))
 	end
 end
 
 function E:ExcludeQuest(questId, source)
-	E:Verbose(format(L["Excluding quest %s from group abandons"], GetQuestLink(questId)))
+	E:Verbose(format(L["Excluding quest %s from group abandons"], E.Shim:GetQuestLink(questId)))
 	E.private.exclusions.excludedQuests[tonumber(questId)] = {
 		["title"] = QuestTitleFromID[questId],
 		["source"] = source or MANUAL
@@ -385,7 +384,7 @@ function E:ExcludeQuest(questId, source)
 end
 
 function E:IncludeQuest(questId)
-	E:Verbose(format(L["Including quest %s in group abandons"], GetQuestLink(questId)))
+	E:Verbose(format(L["Including quest %s in group abandons"], E.Shim:GetQuestLink(questId)))
 	E.private.exclusions.excludedQuests[tonumber(questId)] = nil
 
 	E:RefreshGUI()

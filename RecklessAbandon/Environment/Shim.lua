@@ -144,7 +144,41 @@ function E.Shim:GetLogIndexForQuestID(questId)
     else
         local idx = GetQuestLogIndexByID(questId)
 
-        -- Normalize
-        return idx == 0 and nil or idx
+        -- Normalize: Classic returns 0 for "not found", Retail returns nil
+        if idx == 0 then
+            return nil
+        end
+
+        return idx
     end
+end
+
+---@param questId number The quest ID
+---@return string? link The quest link, or nil if the quest is not in the quest log
+function E.Shim:GetQuestLink(questId)
+    if not (E.isClassic or E.isBC or E.isWrath) then
+        return GetQuestLink(questId)
+    end
+
+    -- Classic, BC, and Wrath use quest log index instead of questId
+    local questLogIndex = GetQuestLogIndexByID(questId)
+    if not questLogIndex or questLogIndex == 0 then
+        return nil
+    end
+
+    -- Try using GetQuestLink first
+    local questLink = GetQuestLink(questLogIndex)
+    if questLink then
+        return questLink
+    end
+
+    -- Fallback: Manually construct the link (BC might not support GetQuestLink)
+    local title, level = GetQuestLogTitle(questLogIndex)
+    if not title then
+        return nil
+    end
+
+    -- Quest link format: |cffRRGGBB|Hquest:questID:level|h[title]|h|r
+    local playerLevel = UnitLevel("player")
+    return format("|cffffff00|Hquest:%d:%d|h[%s]|h|r", questId, playerLevel, title)
 end
