@@ -4,6 +4,10 @@ This project adheres to Semantic Versioning.
 
 - Unreleased
 
+- 3.0.10
+  - Changed
+    - Bump TOC for 12.0.0 (Retail)
+
 - 3.0.9
   - Fixed
     - Exclusion orphans not showing as red in the exclusion list. This made them unprunable (All versions)
@@ -325,7 +329,8 @@ This project adheres to Semantic Versioning.
     - Command line for abandoning all quests
     - Documentation
 
-[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.9...develop
+[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.10...develop
+[3.0.10]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.9..v3.0.10
 [3.0.9]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.8..v3.0.9
 [3.0.8]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.7..v3.0.8
 [3.0.7]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.6..v3.0.7
