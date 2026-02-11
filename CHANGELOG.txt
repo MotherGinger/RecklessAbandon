@@ -4,16 +4,20 @@ This project adheres to Semantic Versioning.
 
 - Unreleased
 
-- 3.0.10
+- v3.0.11
+  - Changed
+    - Bump TOC for 12.0.1 (Retail)
+
+- v3.0.10
   - Changed
     - Bump TOC for 12.0.0 (Retail)
 
-- 3.0.9
+- v3.0.9
   - Fixed
     - Exclusion orphans not showing as red in the exclusion list. This made them unprunable (All versions)
     - Lua errors when trying to print quest links (TBC)
 
-- 3.0.8
+- v3.0.8
   - Fixed
     - Lua error in BC anniversary when completing a quest
 
@@ -329,7 +333,8 @@ This project adheres to Semantic Versioning.
     - Command line for abandoning all quests
     - Documentation
 
-[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.10...develop
+[unreleased]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.11...develop
+[3.0.11]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.10..v3.0.11
 [3.0.10]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.9..v3.0.10
 [3.0.9]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.8..v3.0.9
 [3.0.8]: https://github.com/MotherGinger/RecklessAbandon/compare/v3.0.7..v3.0.8
