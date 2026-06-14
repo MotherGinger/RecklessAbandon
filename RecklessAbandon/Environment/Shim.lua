@@ -103,7 +103,7 @@ end
 ---@param variable string The variable name, case insensitive
 ---@return string? value The value of the vvariable
 function E.Shim:GetAddOnMetadata(name, variable)
-    if E.isRetail or E.isBC then
+    if E.isRetail or E.isBC or E.isMop then
         return C_AddOns.GetAddOnMetadata(name, variable)
     else
         return GetAddOnMetadata(name, variable)
