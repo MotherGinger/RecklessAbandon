@@ -2,7 +2,7 @@
 -- @class file
 -- @name AceLocale-3.0
 -- @release $Id: AceLocale-3.0.lua 1284 2022-09-25 09:15:30Z nevcairiel $
-local MAJOR,MINOR = "AceLocale-3.0-Reckless", 2
+local MAJOR,MINOR = "AceLocale-3.0-Reckless", 3
 
 local AceLocale, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
