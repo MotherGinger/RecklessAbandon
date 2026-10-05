@@ -210,7 +210,7 @@ function onButtonUpdate(self)
 	local buffer = 10
 	local bottom = self:GetBottom()
 	local top = self:GetTop()
-	local ScrollFrame = E.isRetail and QuestScrollFrame or QuestLogListScrollFrame
+	local ScrollFrame = E.hasQuestMapFrame and QuestScrollFrame or QuestLogListScrollFrame
 
 	if bottom ~= nil and top ~= nil then
 		if bottom > ScrollFrame:GetBottom() - buffer and top < ScrollFrame:GetTop() + buffer then
@@ -676,7 +676,7 @@ function E:NormalizeSettings()
 end
 
 function E:RegisterHotkeys()
-	if E.isRetail then
+	if E.hasQuestMapFrame then
 		E:RegisterRetailHotkeys()
 	else
 		E:RegisterClassicHotkeys()
@@ -711,7 +711,9 @@ function E:Initialize()
 
 	E:NormalizeSettings()
 
-	local QuestFrame = E.isRetail and QuestMapFrame or QuestLogFrame
+	local QuestFrame = E.hasQuestMapFrame and QuestMapFrame or QuestLogFrame
+	-- * Added in Retail 11.1.0: Render buttons are hidden while the quest details pane is open
+	local DetailsFrame = E.hasQuestMapFrame and QuestFrame.QuestsFrame and QuestFrame.QuestsFrame.DetailsFrame
 
 	QuestFrame:HookScript(
 		"OnShow",
@@ -719,7 +721,7 @@ function E:Initialize()
 			E:GenerateQuestTable()
 
 			-- * Added in Retail 11.1.0: Avoid showing render buttons in quest detail pane
-			if E.isRetail and QuestFrame.QuestsFrame.DetailsFrame:IsVisible() then return end
+			if DetailsFrame and DetailsFrame:IsVisible() then return end
 
 			E:ShowAbandonButtons()
 			E:RegisterHotkeys()
@@ -731,7 +733,7 @@ function E:Initialize()
 			E:GenerateQuestTable()
 
 			-- * Added in Retail 11.1.0: Avoid showing render buttons in quest detail pane
-			if E.isRetail and QuestFrame.QuestsFrame.DetailsFrame:IsVisible() then return end
+			if DetailsFrame and DetailsFrame:IsVisible() then return end
 
 			E:ShowAbandonButtons()
 			E:RegisterHotkeys()
@@ -744,26 +746,27 @@ function E:Initialize()
 		end
 	)
 
-	if E.isRetail then
+	if E.hasQuestMapFrame then
 		-- Initialize debounce timer
 		E.searchDebounceTimer = nil
 
-		QuestScrollFrame.SearchBox:HookScript(
-			"OnTextChanged",
-			function()
-				-- Cancel existing timer if present
-				if E.searchDebounceTimer then
-					E.searchDebounceTimer:Cancel()
+		if QuestScrollFrame.SearchBox then
+			QuestScrollFrame.SearchBox:HookScript(
+				"OnTextChanged",
+				function()
+					-- Cancel existing timer if present
+					if E.searchDebounceTimer then
+						E.searchDebounceTimer:Cancel()
+					end
+
+					-- Create new timer with 0.3s delay to reduce unnecessary renders
+					E.searchDebounceTimer = C_Timer.NewTimer(0.3, function()
+						E:ShowAbandonButtons()
+						E.searchDebounceTimer = nil
+					end)
 				end
-
-				-- Create new timer with 0.3s delay to reduce unnecessary renders
-				E.searchDebounceTimer = C_Timer.NewTimer(0.3, function()
-					E:ShowAbandonButtons()
-					E.searchDebounceTimer = nil
-				end)
-			end
-		)
-
+			)
+		end
 
 		QuestScrollFrame:HookScript(
 			"OnVerticalScroll",
@@ -771,7 +774,7 @@ function E:Initialize()
 				E:RegisterHotkeys()
 
 				-- * Added in Retail 11.1.0: Avoid showing render buttons in quest detail pane
-				if QuestFrame.QuestsFrame.DetailsFrame:IsVisible() then return end
+				if DetailsFrame and DetailsFrame:IsVisible() then return end
 
 				for button in E.questButtonPool:EnumerateActive() do
 					onButtonUpdate(button)
@@ -784,18 +787,20 @@ function E:Initialize()
 		)
 
 		-- * Added in Retail 11.1.0: Avoid showing render buttons in quest detail pane
-		QuestFrame.QuestsFrame.DetailsFrame:HookScript("OnShow", function()
-			E:HideAbandonButtons()
-		end)
-
-		QuestFrame.QuestsFrame.DetailsFrame:HookScript("OnHide", function()
-			-- Delay rendering to allow WoW's quest frames to finish reordering after details pane closes
-			C_Timer.After(0.1, function()
-				E:GenerateQuestTable()
-				E:ShowAbandonButtons()
-				E:RegisterHotkeys()
+		if DetailsFrame then
+			DetailsFrame:HookScript("OnShow", function()
+				E:HideAbandonButtons()
 			end)
-		end)
+
+			DetailsFrame:HookScript("OnHide", function()
+				-- Delay rendering to allow WoW's quest frames to finish reordering after details pane closes
+				C_Timer.After(0.1, function()
+					E:GenerateQuestTable()
+					E:ShowAbandonButtons()
+					E:RegisterHotkeys()
+				end)
+			end)
+		end
 	elseif E.isClassic or E.isBC then
 		QuestLogListScrollFrame:HookScript(
 			"OnVerticalScroll",

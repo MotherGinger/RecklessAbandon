@@ -1,6 +1,7 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 
-E.wowpatch, E.wowbuild = GetBuildInfo()
+local _, interfaceVersion
+E.wowpatch, E.wowbuild, _, interfaceVersion = GetBuildInfo()
 E.wowbuild = tonumber(E.wowbuild)
 E.isRetail = WOW_PROJECT_ID == (WOW_PROJECT_MAINLINE or 1)
 E.isClassic = WOW_PROJECT_ID == (WOW_PROJECT_CLASSIC or 2)
@@ -9,19 +10,33 @@ E.isWrath = WOW_PROJECT_ID == (WOW_PROJECT_WRATH_CLASSIC or 11)
 E.isCata = WOW_PROJECT_ID == (WOW_PROJECT_CATACLYSM_CLASSIC or 14)
 E.isMop = WOW_PROJECT_ID == (WOW_PROJECT_MISTS_CLASSIC or 19)
 
+-- Camelot is a vanilla (1.x) client with its own WOW_PROJECT_ID, so it follows the Classic code paths
+E.isCamelot = not E.isClassic and interfaceVersion >= 10000 and interfaceVersion < 20000
+E.isClassic = E.isClassic or E.isCamelot
+
+-- Retail and Camelot removed the legacy quest log globals in favor of C_QuestLog
+E.hasQuestLogAPI = E.isRetail or GetNumQuestLogEntries == nil
+
+-- Retail and Camelot use the QuestMapFrame quest log instead of the legacy QuestLogFrame
+E.hasQuestMapFrame = E.isRetail or QuestLogFrame == nil
+
 ---@class Shim
 E.Shim = {}
 
 ---@param unit string A unitid
 ---@return number levelRange The difference the unit's current level and the level at which quests are trivial
 function E.Shim:UnitQuestTrivialLevelRange(unit)
-    return E.isRetail and UnitQuestTrivialLevelRange(unit) or GetQuestGreenRange(unit)
+    if E.isRetail or not GetQuestGreenRange then
+        return UnitQuestTrivialLevelRange(unit)
+    else
+        return GetQuestGreenRange(unit)
+    end
 end
 
 ---@param questId number The quest id to check
 ---@return boolean canAbandon If the quest can be abandoned
 function E.Shim:CanAbandonQuest(questId)
-    if E.isRetail then
+    if E.hasQuestLogAPI then
         return C_QuestLog.CanAbandonQuest(questId)
     else
         return CanAbandonQuest(questId)
@@ -44,7 +59,7 @@ function E.Shim:GetInfo(questIndex)
     ---@field isComplete number Indicates if a quest is completed (1) or failed (-1) (Classic)
     local Info = {}
 
-    if E.isRetail then
+    if E.hasQuestLogAPI then
         local info = C_QuestLog.GetInfo(questIndex)
 
         Info.title = info.title
@@ -79,7 +94,7 @@ end
 ---@return number numEntries Number of entries in the quest log, including collapsible zone headers
 ---@return number numQuests Number of actual quests in the quest log, not counting zone headers
 function E.Shim:GetNumQuestLogEntries()
-    if E.isRetail then
+    if E.hasQuestLogAPI then
         return C_QuestLog.GetNumQuestLogEntries()
     else
         return GetNumQuestLogEntries()
@@ -89,7 +104,7 @@ end
 ---@param questId number The quest ID
 ---@return boolean isComplete Whether the quest is both in the quest log and is complete
 function E.Shim:IsComplete(questId)
-    if E.isRetail then
+    if E.hasQuestLogAPI then
         return C_QuestLog.IsComplete(questId)
     else
         local questLogIndex = GetQuestLogIndexByID(questId)
@@ -103,7 +118,7 @@ end
 ---@param variable string The variable name, case insensitive
 ---@return string? value The value of the vvariable
 function E.Shim:GetAddOnMetadata(name, variable)
-    if E.isRetail or E.isBC or E.isMop or E.isClassic then
+    if C_AddOns and C_AddOns.GetAddOnMetadata then
         return C_AddOns.GetAddOnMetadata(name, variable)
     else
         return GetAddOnMetadata(name, variable)
@@ -112,7 +127,7 @@ end
 
 ---@param questId number The quest ID
 function E.Shim:SetSelectedQuest(questId)
-    if E.isRetail then
+    if E.hasQuestLogAPI then
         C_QuestLog.SetSelectedQuest(questId)
     else
         local logIndex = GetQuestLogIndexByID(questId)
@@ -121,7 +136,7 @@ function E.Shim:SetSelectedQuest(questId)
 end
 
 function E.Shim:SetAbandonQuest()
-    if E.isRetail then
+    if E.hasQuestLogAPI then
         C_QuestLog.SetAbandonQuest()
     else
         SetAbandonQuest()
@@ -129,7 +144,7 @@ function E.Shim:SetAbandonQuest()
 end
 
 function E.Shim:AbandonQuest()
-    if E.isRetail then
+    if E.hasQuestLogAPI then
         C_QuestLog.AbandonQuest()
     else
         AbandonQuest()
@@ -139,7 +154,7 @@ end
 ---@param questId number The quest ID
 ---@return number? questLogIndex The quest log index
 function E.Shim:GetLogIndexForQuestID(questId)
-    if E.isRetail then
+    if E.hasQuestLogAPI then
         return C_QuestLog.GetLogIndexForQuestID(questId)
     else
         local idx = GetQuestLogIndexByID(questId)
@@ -156,6 +171,22 @@ end
 ---@param questId number The quest ID
 ---@return string? link The quest link, or nil if the quest is not in the quest log
 function E.Shim:GetQuestLink(questId)
+    if E.hasQuestLogAPI then
+        local questLink = GetQuestLink and GetQuestLink(questId)
+        if questLink then
+            return questLink
+        end
+
+        -- Fallback: Manually construct the link in case GetQuestLink is unavailable
+        local questLogIndex = C_QuestLog.GetLogIndexForQuestID(questId)
+        local info = questLogIndex and C_QuestLog.GetInfo(questLogIndex)
+        if not info then
+            return nil
+        end
+
+        return format("|cffffff00|Hquest:%d:%d|h[%s]|h|r", questId, UnitLevel("player"), info.title)
+    end
+
     if not (E.isClassic or E.isBC or E.isWrath) then
         return GetQuestLink(questId)
     end
