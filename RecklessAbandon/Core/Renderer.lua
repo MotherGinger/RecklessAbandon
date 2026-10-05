@@ -2,7 +2,7 @@ local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateD
 
 E.questGroupsByName = {}
 
-local QuestFrame = E.isRetail and QuestMapFrame.QuestsFrame or QuestLogFrame
+local QuestFrame = E.hasQuestMapFrame and QuestMapFrame.QuestsFrame or QuestLogFrame
 E.questButtonPool = CreateFramePool("Button", QuestFrame, "RECKLESS_ABANDON_BUTTON")
 E.groupButtonPool = CreateFramePool("Button", QuestFrame, "RECKLESS_GROUP_ABANDON_BUTTON")
 
@@ -191,7 +191,7 @@ function E:RenderGroupAbandonButton(parent, offset, title, tooltip, key)
 end
 
 function E:ShowAbandonButtons()
-    if E.isRetail then
+    if E.hasQuestMapFrame then
         E:RetailRenderer()
     else
         E:ClassicRenderer()
@@ -230,13 +230,13 @@ function E:RetailRenderer()
 
     -- Guard against a bad cache (https://github.com/MotherGinger/RecklessAbandon/issues/25)
     if E.db ~= nil and E.db.general ~= nil then
-        if E.db.general.campaignQuests ~= nil and E.db.general.campaignQuests.showAbandonButton then
+        if E.db.general.campaignQuests ~= nil and E.db.general.campaignQuests.showAbandonButton and QuestScrollFrame.campaignHeaderFramePool then
             for header in QuestScrollFrame.campaignHeaderFramePool:EnumerateActive() do
                 E:RenderGroupAbandonButton(header.CollapseButton, -25, header.Text:GetText())
             end
         end
 
-        if E.db.general.covenantCallings ~= nil and E.db.general.covenantCallings.showAbandonButton then
+        if E.db.general.covenantCallings ~= nil and E.db.general.covenantCallings.showAbandonButton and QuestScrollFrame.covenantCallingsHeaderFramePool then
             for calling in QuestScrollFrame.covenantCallingsHeaderFramePool:EnumerateActive() do
                 local info = E.Shim:GetInfo(calling.questLogIndex)
                 if info then
@@ -267,7 +267,9 @@ function E:RetailRenderer()
 
                 -- * This tag shows up in both the tooltip and the details pane, so lets hide it and collect more real estate for our button
                 -- TODO: This is a partial workaround since this will pop back in when hiding the details pane
-                quest.TagTexture:Hide()
+                if quest.TagTexture then
+                    quest.TagTexture:Hide()
+                end
                 E:RenderAbandonButton(quest.Checkbox, -25, questId, excluded, text)
             end
         end
@@ -335,7 +337,7 @@ function E:GenerateQuestTable()
                 -- * In classic, collapsing a zone header "removes" the quests from the log since they aren't rendered
                 -- * If the header is collapsed, don't overwrite the last known quests under it to work around this
                 -- * This should always work as long as the headers are expanded at least once which tends to happen on initial load anyways
-                if E.isRetail or (not E.isRetail and not info.isCollapsed) then
+                if E.hasQuestLogAPI or not info.isCollapsed then
                     E.questGroupsByName[GetKey(info.title)] = currentGroup
                 end
             else
@@ -374,7 +376,7 @@ function E:RegisterRetailHotkeys()
 end
 
 function E:RegisterClassicHotkeys()
-    for i = 1, GetNumQuestLogEntries() do
+    for i = 1, E.Shim:GetNumQuestLogEntries() do
         local questLogTitle
         if E.isClassic or E.isBC then
             -- * Vanilla needs to use _G to access the frame dynamically

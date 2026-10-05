@@ -136,7 +136,7 @@ function E:CliExcludeQuestById(questId)
             if not self:IsExcluded(questId) then
                 self:ExcludeQuest(questId)
             else
-                self:Warn(format(L["%s is already excluded from group abandons!"], GetQuestLink(questId)))
+                self:Warn(format(L["%s is already excluded from group abandons!"], E.Shim:GetQuestLink(questId)))
             end
         else
             self:Error(format(L["Unable to exclude quest, '%s' is not recognized. Either the quest is not in your quest log, or you may have entered the wrong id."], questId))
@@ -153,7 +153,7 @@ function E:CliIncludeQuestById(questId)
             if self:IsExcluded(questId) then
                 self:IncludeQuest(questId)
             else
-                self:Warn(format(L["%s is already included in group abandons!"], GetQuestLink(questId)))
+                self:Warn(format(L["%s is already included in group abandons!"], E.Shim:GetQuestLink(questId)))
             end
         else
             self:Error(format(L["Unable to include quest, '%s' is not recognized. Either the quest is not in your quest log, or you may have entered the wrong id."], questId))
