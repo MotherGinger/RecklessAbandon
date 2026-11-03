@@ -326,51 +326,125 @@ function E:GetAvailableQualifiers()
 end
 
 function E:AbandonAllQuests()
+	-- * Collect the ids first: abandoning changes the quest log, so walking it by index while abandoning can skip entries
+	local questIds = {}
 	for i = 1, E.Shim:GetNumQuestLogEntries() do
 		local info = E.Shim:GetInfo(i)
-		local questId = info.questID
 
-		if not info.isHeader and not info.isHidden then
-			E:AbandonQuest(questId)
+		if info and not info.isHeader and not info.isHidden then
+			tinsert(questIds, info.questID)
 		end
 	end
+
+	E:AbandonQuests(questIds)
 end
 
 function E:AbandonZoneQuests(key)
+	-- * Rebuild first so we act on the quest log as it is now, not as it was at the last update
+	E:GenerateQuestTable()
+
 	local group = E.questGroupsByName[key] or {}
+	local questIds = {}
 	for questId, _ in pairs(group.quests or {}) do
-		E:AbandonQuest(questId)
+		tinsert(questIds, questId)
 	end
+
+	E:AbandonQuests(questIds)
 
 	if E:IsEmpty(group.quests) then
 		E.questGroupsByName[key] = nil
 	end
 end
 
-function E:AbandonQuests(questIds)
-	for _, questId in ipairs(questIds) do
-		E:AbandonQuest(questId)
+-- * Bulk abandons are spaced out and then checked. When many abandons are sent in a single frame,
+-- * the server can drop the tail of the list, so instead of assuming every call worked we wait,
+-- * look at the quest log, and retry whatever is still there with a wider gap.
+local ABANDON_GAP = 0.05    -- seconds between abandons in the first round (multiplied by the round number)
+local ABANDON_ROUNDS = 4    -- rounds before reporting a quest as failed
+local ABANDON_SETTLE = 0.75 -- seconds to wait after the last abandon before checking the quest log
+
+-- * Quests queued or being abandoned. Stops automation from queueing the same quest again while a sweep is running.
+E.pendingAbandons = {}
+
+function E:IsOnQuest(questId)
+	if C_QuestLog and C_QuestLog.IsOnQuest then
+		return C_QuestLog.IsOnQuest(questId) == true
 	end
+
+	return E.Shim:GetLogIndexForQuestID(questId) ~= nil
 end
 
-function E:AbandonQuest(questId, exclusionBypass)
-	if exclusionBypass or not E.private.exclusions.excludedQuests[questId] then
-		if E.Shim:CanAbandonQuest(questId) then
-			E.Shim:SetSelectedQuest(questId)
-			E.Shim:SetAbandonQuest()
-			E.Shim:AbandonQuest()
+function E:RunAbandonSweep(batch, round)
+	local gap = ABANDON_GAP * round
 
-			E:System(format(L["|cFFFFFF00Abandoned quest %s|r"], E.Shim:GetQuestLink(questId)))
-
-			if E.private.exclusions.autoPrune and E:IsExcluded(questId) then
-				E:PruneQuestExclusion(questId)
+	for i, entry in ipairs(batch) do
+		E:ScheduleTimer(function()
+			-- * Checked when the abandon fires, not when it was scheduled: the quest may have been turned in meanwhile
+			if E:IsOnQuest(entry.questId) then
+				E.Shim:SetSelectedQuest(entry.questId)
+				E.Shim:SetAbandonQuest()
+				E.Shim:AbandonQuest()
 			end
-		else
-			E:Warn(format(L["|cFFFFFF00You can't abandon %s|r"], E.Shim:GetQuestLink(questId)))
-		end
-	else
-		E:Verbose(format(L["Skipping %s since it is excluded from group abandons"], E.Shim:GetQuestLink(questId)))
+		end, (i - 1) * gap)
 	end
+
+	E:ScheduleTimer(function()
+		local remaining = {}
+
+		for _, entry in ipairs(batch) do
+			if E:IsOnQuest(entry.questId) then
+				tinsert(remaining, entry)
+			else
+				E.pendingAbandons[entry.questId] = nil
+				E:System(format(L["|cFFFFFF00Abandoned quest %s|r"], entry.link))
+
+				if E.private.exclusions.autoPrune and E:IsExcluded(entry.questId) then
+					E:PruneQuestExclusion(entry.questId)
+				end
+			end
+		end
+
+		if #remaining > 0 and round < ABANDON_ROUNDS then
+			E:Debug(format("Retrying %d abandon(s), round %d", #remaining, round + 1))
+			E:RunAbandonSweep(remaining, round + 1)
+			return
+		end
+
+		for _, entry in ipairs(remaining) do
+			E.pendingAbandons[entry.questId] = nil
+			E:Warn(format(L["|cFFFFFF00Failed to abandon %s|r"], entry.link))
+		end
+	end, (#batch - 1) * gap + ABANDON_SETTLE)
+end
+
+-- * Queues quests for abandoning. Returns how many were queued.
+function E:AbandonQuests(questIds, exclusionBypass)
+	local batch = {}
+
+	for _, questId in ipairs(questIds) do
+		if E.pendingAbandons[questId] then
+			-- * Already queued
+		elseif not exclusionBypass and E.private.exclusions.excludedQuests[questId] then
+			E:Verbose(format(L["Skipping %s since it is excluded from group abandons"], E.Shim:GetQuestLink(questId)))
+		elseif not E.Shim:CanAbandonQuest(questId) then
+			E:Warn(format(L["|cFFFFFF00You can't abandon %s|r"], E.Shim:GetQuestLink(questId)))
+		else
+			E.pendingAbandons[questId] = true
+			-- * Build the link now: once the quest leaves the log it can no longer be looked up
+			tinsert(batch, { questId = questId, link = E.Shim:GetQuestLink(questId) or tostring(questId) })
+		end
+	end
+
+	if #batch > 0 then
+		E:RunAbandonSweep(batch, 1)
+	end
+
+	return #batch
+end
+
+-- * Returns true if the quest was queued for abandoning
+function E:AbandonQuest(questId, exclusionBypass)
+	return E:AbandonQuests({ questId }, exclusionBypass) > 0
 end
 
 function E:ExcludeQuest(questId, source)
@@ -496,13 +570,13 @@ function E:AutoAbandonQuests()
 	-- * This will abandon all quests of types that have been elected for automatic abandons
 	-- * Now optimized with pre-parsed exclusions and cached lookups
 
-	local count = 0
+	local eligibleIds = {}
 
 	for i = 1, E.Shim:GetNumQuestLogEntries() do
 		local info = E.Shim:GetInfo(i)
 		if not info then
 			E:Error(format("Failed to get quest info for index %d in AutoAbandonQuests", i))
-		elseif not info.isHeader then
+		elseif not info.isHeader and not E.pendingAbandons[info.questID] then
 			local questId = info.questID
 			local level = info.level
 			local isDaily = info.frequency == 1
@@ -556,12 +630,14 @@ function E:AutoAbandonQuests()
 				eligible = true
 			end
 
-			-- Abandon if eligible
-			if eligible and E:AbandonQuest(questId) then
-				count = count + 1
+			if eligible then
+				tinsert(eligibleIds, questId)
 			end
 		end
 	end
+
+	-- * Collected first, then abandoned together so the abandons are spaced out and checked
+	local count = E:AbandonQuests(eligibleIds)
 
 	if count > 0 then
 		E:Info(format("Automatically abandoned %s |4quest:quests;!", count))
