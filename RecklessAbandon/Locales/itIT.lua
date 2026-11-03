@@ -171,6 +171,7 @@ L["Please report any bugs or request features on our issue board:"] = "Segnala e
 
 L["|cFFFFFF00Abandoned quest %s|r"] = "|cFFFFFF00Missione abbandonata %s|r"
 L["|cFFFFFF00You can't abandon %s|r"] = "|cFFFFFF00Non puoi abbandonare %s|r"
+L["|cFFFFFF00Failed to abandon %s|r"] = "|cFFFFFF00Impossibile abbandonare %s|r"
 
 L["Skipping %s since it is excluded from group abandons"] = "Ignorando %s poiché è escluso dagli abbandoni di gruppo"
 L["Excluding quest %s from group abandons"] = "Esclusione missione %s dagli abbandoni di gruppo"

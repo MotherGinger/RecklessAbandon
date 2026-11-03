@@ -15,9 +15,14 @@ E.buttonStateCache = {
 E.abandonTooltipFormat = "|cFFFFFAB8%s|r\n\n|cFFFFF569%s|r\n|cFFB5FFEB%s|r"
 E.groupAbandonTooltipFormat = "|cFFFFFAB8%s|r\n\n|cFFFFF569%s|r"
 
+-- * Normalizes a header title so the frame text and the quest log title match.
+-- * Removes color codes, spaces, digits and ASCII punctuation, but keeps every non-ASCII byte.
+-- * Stripping everything outside a-z gave every Russian/Chinese header the same empty key,
+-- * so one header's group abandon could take another header's quests.
 local function GetKey(value)
     if value ~= nil then
-        return value:lower():gsub("[^a-z]", "")
+        local key = value:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""):lower():gsub("[%s%p%d]", "")
+        return key
     end
 end
 

@@ -167,6 +167,7 @@ L["Please report any bugs or request features on our issue board:"] = true
 
 L["|cFFFFFF00Abandoned quest %s|r"] = true
 L["|cFFFFFF00You can't abandon %s|r"] = true
+L["|cFFFFFF00Failed to abandon %s|r"] = true
 
 L["Skipping %s since it is excluded from group abandons"] = true
 L["Excluding quest %s from group abandons"] = true

@@ -171,6 +171,7 @@ L["Please report any bugs or request features on our issue board:"] = "Пожа�
 
 L["|cFFFFFF00Abandoned quest %s|r"] = "|cFFFFFF00Отказ от задания %s|r"
 L["|cFFFFFF00You can't abandon %s|r"] = "|cFFFFFF00Вы не можете отказаться от квеста %s|r"
+L["|cFFFFFF00Failed to abandon %s|r"] = "|cFFFFFF00Не удалось отказаться от задания %s|r"
 
 L["Skipping %s since it is excluded from group abandons"] = "Пропуск %s, так как он исключен из групповых отказов"
 L["Excluding quest %s from group abandons"] = "Исключение задания %s из групповых отказов"
