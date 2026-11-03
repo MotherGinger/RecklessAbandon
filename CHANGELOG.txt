@@ -5,6 +5,9 @@ This project adheres to Semantic Versioning.
 - Unreleased
 
 - v3.1.0
+  - Fixed
+    - Localized group abandons will no longer fail on non-english symbols
+    - Groups abandons will no longer send in one frame
   - Changed
     - Added TOC for 1.60.1 (Forever)
     - Update ACE Libraries
