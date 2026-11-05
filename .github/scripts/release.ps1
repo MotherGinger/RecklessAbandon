@@ -4,8 +4,8 @@ Cuts a release: files the Unreleased changelog entries under the new version,
 updates the TOC versions, commits "Bump to v<version>", and tags it.
 
 .DESCRIPTION
-Run by the Release workflow (.github/workflows/release.yml), which then builds
-the zip, pushes, and creates the GitHub release. Running it locally only makes
+Run by the Prepare release workflow (.github/workflows/prepare-release.yml), which
+opens the release pull request. Running it locally only makes
 the commit and tag, which is handy for checking the result; nothing is pushed.
 
 .EXAMPLE

@@ -1,7 +1,7 @@
-name: Release
+name: Prepare release
 
-# Bumps the version, tags it, and publishes the GitHub release.
-# Wago and CurseForge are published separately with their own workflows.
+# Opens a "Release v<version>" pull request with the changelog and TOC version bump.
+# Merging it runs publish-github.yml, which tags the release and publishes it on GitHub.
 on:
   workflow_dispatch:
     inputs:
@@ -10,18 +10,19 @@ on:
         required: true
         type: string
       dry_run:
-        description: Dry run (build and show everything, push nothing)
+        description: Dry run (build and show everything, open no pull request)
         type: boolean
         default: true
 
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
-  group: release
+  group: prepare-release
 
 jobs:
-  release:
+  prepare:
     runs-on: ubuntu-latest
     steps:
       - name: Require main for real releases
@@ -29,34 +30,22 @@ jobs:
         env:
           REF: ${{ github.ref_name }}
         run: |
-          echo "::error::Releases must run on main, not '$REF'."
+          echo "::error::Releases must be prepared from main, not '$REF'."
           exit 1
-
-      - name: Check deploy key
-        if: ${{ !inputs.dry_run }}
-        env:
-          RELEASE_DEPLOY_KEY: ${{ secrets.RELEASE_DEPLOY_KEY }}
-        run: |
-          if [[ -z $RELEASE_DEPLOY_KEY ]]; then
-            echo "::error::The RELEASE_DEPLOY_KEY repository secret is not set."
-            exit 1
-          fi
 
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # the release script and notes look back through tags
-          # main requires pull requests; the deploy key is on the ruleset's bypass list so the
-          # bump commit can be pushed directly. Dry runs don't push, so they fall back to the token.
-          ssh-key: ${{ !inputs.dry_run && secrets.RELEASE_DEPLOY_KEY || '' }}
 
-      - name: Bump version, commit, and tag
+      - name: Bump version and commit
         shell: pwsh
         env:
           VERSION: ${{ inputs.version }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Also tags locally so the dry run zip gets the right name; the tag itself is never pushed here
           ./.github/scripts/release.ps1 $env:VERSION
           "TAG=$(git describe --tags --exact-match HEAD)" >> $env:GITHUB_ENV
 
@@ -83,16 +72,21 @@ jobs:
             .release/*.zip
             .release-notes.md
 
-      - name: Push commit and tag
-        if: ${{ !inputs.dry_run }}
-        # Atomic: if main moved since checkout, nothing is pushed
-        run: git push --atomic origin HEAD:main "refs/tags/$TAG"
-
-      - name: Create GitHub release
+      - name: Open the release pull request
         if: ${{ !inputs.dry_run }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          flags=()
-          [[ ${TAG,,} == *alpha* || ${TAG,,} == *beta* ]] && flags+=(--prerelease)
-          gh release create "$TAG" .release/*.zip --verify-tag --title "$TAG" --notes-file .release-notes.md "${flags[@]}"
+          branch="release/$TAG"
+          if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
+            echo "::error::Branch $branch already exists. Merge or delete it first."
+            exit 1
+          fi
+          git push origin "HEAD:refs/heads/$branch"
+          {
+            echo "Merging this tags \`$TAG\` and publishes the GitHub release with these notes."
+            echo "Wago and CurseForge are published afterwards with their own workflows."
+            echo
+            cat .release-notes.md
+          } > .pr-body.md
+          gh pr create --base main --head "$branch" --title "Release $TAG" --body-file .pr-body.md

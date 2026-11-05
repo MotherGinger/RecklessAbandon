@@ -45,11 +45,14 @@ Note player-facing changes in `CHANGELOG.txt` under `- Unreleased`, grouped as `
 
 ## Releasing (maintainers)
 
-All three workflows are started by hand from the Actions tab and default to a dry run, which builds everything and attaches the zip and release notes to the run without pushing or uploading anything.
+The manual workflows are started from the Actions tab and default to a dry run, which builds everything and attaches the zip and release notes to the run without pushing or uploading anything.
 
-1. **Release** (version, e.g. `3.2.0` or `3.2.0-beta.1`, run on `main`): moves the Unreleased entries under the new version (betas leave them in place), updates `## Version:` in every TOC, commits `Bump to v<version>`, tags it, and publishes the GitHub release. Pushes with the `RELEASE_DEPLOY_KEY` secret, a deploy key with write access that the `main` ruleset lets bypass the pull request rule.
-2. **Publish to Wago** (tag, e.g. `v3.2.0`): uploads that release to Wago for every game version in the TOC files. Needs the `WAGO_API_TOKEN` secret.
-3. **Publish to CurseForge** (tag): the same for CurseForge. Needs the `CF_API_TOKEN` secret and `## X-Curse-Project-ID:` in the TOC files.
+1. **Prepare release** (manual; version, e.g. `3.2.0` or `3.2.0-beta.1`; run on `main`): moves the Unreleased entries under the new version (betas leave them in place), updates `## Version:` in every TOC, and opens a `Release v<version>` pull request from `release/v<version>`.
+2. **Merge the pull request.** Publish GitHub release runs on its own: it tags the merged commit, builds the zip, publishes the GitHub release, and deletes the release branch.
+3. **Publish to Wago** (manual; tag, e.g. `v3.2.0`): uploads that release to Wago for every game version in the TOC files. Needs the `WAGO_API_TOKEN` secret.
+4. **Publish to CurseForge** (manual; tag): the same for CurseForge. Needs the `CF_API_TOKEN` secret and `## X-Curse-Project-ID:` in the TOC files.
+
+Opening the pull request needs Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests".
 
 The repository rulesets are kept in `.github/rulesets/` and imported under Settings → Rules → Rulesets → New ruleset → Import a ruleset.
 
