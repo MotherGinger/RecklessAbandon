@@ -106,7 +106,7 @@ StaticPopupDialogs["RECKLESS_ABANDON_CONFIRMATION"] = {
 
 StaticPopupDialogs["RECKLESS_ABANDON_ALL_CONFIRMATION"] = {
 	text = table.concat(
-		{ L["Are you sure you want to abandon all of the quests in your questlog?"], L["|cFFFF6B6BThis cannot be undone.|r"] },
+		{ L["Are you sure you want to abandon all of the quests in your quest log?"], L["|cFFFF6B6BThis cannot be undone.|r"] },
 		"\n\n"
 	),
 	button1 = L["Yes"],
@@ -258,7 +258,7 @@ function E:Debug(...)
 end
 
 function E:UpdatePlayerLevel(level)
-	E:Debug(format("%s leveled up (%d -> %d)!", E.myname, E.mylevel, level))
+	E:Debug(format(L["%s leveled up (%d -> %d)!"], E.myname, E.mylevel, level))
 	E.mylevel = level
 
 	-- * Quest colors depend on the player's level, so color rules may now match
@@ -653,7 +653,7 @@ function E:AutoAbandonQuests()
 
 	if count > 0 then
 		-- * Each quest already gets its own "Abandoned quest" notice, so the summary is detail only
-		E:Verbose(format("Automatically abandoned %s |4quest:quests;!", count))
+		E:Verbose(format(L["Automatically abandoned %s |4quest:quests;!"], count))
 	end
 end
 

@@ -162,7 +162,7 @@ E.Options.args.general = {
                                     return table.concat(
                                         {
                                             format(L["Are you sure you want to bind %s?"], key),
-                                            L["|cFFFF6B6BCaution: This can cause you to accidently abandon a quest when trying to select a quest in your quest log.|r"]
+                                            L["|cFFFF6B6BCaution: This can cause you to accidentally abandon a quest when trying to select a quest in your quest log.|r"]
                                         },
                                         "\n\n"
                                     )
@@ -170,7 +170,7 @@ E.Options.args.general = {
                                     return table.concat(
                                         {
                                             format(L["Are you sure you want to bind %s?"], key),
-                                            L["|cFFFF6B6BCaution: This can cause you to accidently abandon a quest when trying to track a quest in your quest log.|r"]
+                                            L["|cFFFF6B6BCaution: This can cause you to accidentally abandon a quest when trying to track a quest in your quest log.|r"]
                                         },
                                         "\n\n"
                                     )
@@ -200,7 +200,7 @@ E.Options.args.general = {
                                     return table.concat(
                                         {
                                             format(L["Are you sure you want to bind %s?"], key),
-                                            L["|cFFFF6B6BCaution: This can cause you to accidently toggle exclusion of a quest from group abandons when trying to select a quest in your quest log.|r"]
+                                            L["|cFFFF6B6BCaution: This can cause you to accidentally toggle exclusion of a quest from group abandons when trying to select a quest in your quest log.|r"]
                                         },
                                         "\n\n"
                                     )
@@ -208,7 +208,7 @@ E.Options.args.general = {
                                     return table.concat(
                                         {
                                             format(L["Are you sure you want to bind %s?"], key),
-                                            L["|cFFFF6B6BCaution: This can cause you to accidently toggle exclusion of a quest from group abandons when trying to track a quest in your quest log.|r"]
+                                            L["|cFFFF6B6BCaution: This can cause you to accidentally toggle exclusion of a quest from group abandons when trying to track a quest in your quest log.|r"]
                                         },
                                         "\n\n"
                                     )
@@ -259,7 +259,7 @@ E.Options.args.general = {
                                     return table.concat(
                                         {
                                             format(L["Are you sure you want to bind %s?"], key),
-                                            L["|cFFFF6B6BCaution: This can cause you to accidently abandon all quests in a zone when trying to expand a zone header in your quest log.|r"]
+                                            L["|cFFFF6B6BCaution: This can cause you to accidentally abandon all quests in a zone when trying to expand a zone header in your quest log.|r"]
                                         },
                                         "\n\n"
                                     )
@@ -287,7 +287,7 @@ E.Options.args.general = {
                     type = "description",
                     name = table.concat(
                         {
-                            L["These options will act upon your quest log automatically. This can save you time, however, care should be taken when using them."],
+                            L["These options will act upon your quest log automatically. This can save you time; however, care should be taken when using them."],
                             L["|cFF00D1FFNote:|r Each character has their own automation options."]
                         },
                         "\n\n"
@@ -309,7 +309,7 @@ E.Options.args.general = {
                             desc = table.concat(
                                 {
                                     L["Automatically abandon quests of the given type if they are included in group abandons."],
-                                    L["|cFFFF6B6BCaution:|r These quests will be abandoned for you, confirmation settings will be ignored."]
+                                    L["|cFFFF6B6BCaution:|r These quests will be abandoned for you; confirmation settings will be ignored."]
                                 },
                                 "\n\n"
                             ),
@@ -338,7 +338,7 @@ E.Options.args.general = {
                             name = L["Quest IDs"],
                             desc = table.concat(
                                 {
-                                    L["Enter quest ids separated by a comma. These quests will be abandoned automatically if they are included in group abandons."],
+                                    L["Enter quest IDs separated by a comma. These quests will be abandoned automatically if they are included in group abandons."],
                                     "e.g. 4563,7562,2345"
                                 },
                                 "\n\n"
@@ -421,7 +421,7 @@ E.Options.args.general = {
                     desc = table.concat(
                         {
                             L["Automatically prune quests from the exclusion list when they are abandoned, or when they are no longer in your quest log and were excluded via automation."],
-                            L["|cFF00D1FFNote:|r This does not retroactively prune quests that have already been abandoned, but are still in the exclusion list."],
+                            L["|cFF00D1FFNote:|r This does not retroactively prune quests that have already been abandoned but are still in the exclusion list."],
                             L["Use the 'Prune Exclusion List' button below to do this manually."]
                         },
                         "\n\n"
@@ -502,7 +502,7 @@ E.Options.args.general = {
                         abandonAll = {
                             order = 1,
                             name = L["Enable |cff888888/reckless abandon all|r"],
-                            desc = L["|cFFFFF569Warning:|r This command abandons all quests in your quest log that are not excluded from group abandons, use it wisely."],
+                            desc = L["|cFFFFF569Warning:|r This command abandons all quests in your quest log that are not excluded from group abandons; use it wisely."],
                             descStyle = "inline",
                             width = "full",
                             type = "toggle",
@@ -586,7 +586,7 @@ E.Options.args.general = {
                 debugLogging = {
                     order = 1,
                     name = L["Enable Debugging"],
-                    desc = L["Print debugging statements when this is enabled.\n\n|cFF00D1FFNote:|r You can also toggle this quickly via |cff888888/reckless debug|r"],
+                    desc = L["Print debugging statements when this is enabled."] .. "\n\n" .. L["|cFF00D1FFNote:|r You can also toggle this quickly via |cff888888/reckless debug|r"],
                     type = "toggle",
                     get = function(info)
                         return E.db.debugging[info[#info]]
