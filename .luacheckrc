@@ -70,6 +70,7 @@ globals = {
     "QUESTS_DISPLAYED",
     "UnitQuestTrivialLevelRange",
     "WOW_PROJECT_WRATH_CLASSIC",
+    "WOW_PROJECT_CAMELOT",
 
     -- WeakAuras
     "WeakAuras_DropDownMenu",

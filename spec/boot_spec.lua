@@ -34,6 +34,34 @@ describe("booting", function()
                 assert.are.same(EXPECTED[flavor], actual)
             end)
         end
+
+        -- Forever's project ID has changed during the beta, so either signal alone is enough.
+        local function forever(adjust)
+            local E = Loader.Boot("forever", { before = adjust })
+            local actual = {}
+            for key in pairs(EXPECTED.forever) do actual[key] = E[key] end
+            assert.are.same(EXPECTED.forever, actual)
+        end
+
+        it("on Forever builds that report the Retail project ID", function()
+            -- Builds up to at least 69913 reported WOW_PROJECT_MAINLINE and had no WOW_PROJECT_CAMELOT.
+            forever(function()
+                _G.WOW_PROJECT_ID, _G.WOW_PROJECT_CAMELOT = 1, nil
+            end)
+        end)
+
+        it("on Forever builds whose interface number leaves the 1.x range", function()
+            forever(function()
+                _G.GetBuildInfo = function() return "2.0.0", "80000", "Jan 1 2027", 20000 end
+            end)
+        end)
+
+        it("on Forever builds without the WOW_PROJECT_CAMELOT constant", function()
+            forever(function()
+                _G.WOW_PROJECT_CAMELOT = nil
+                _G.GetBuildInfo = function() return "2.0.0", "80000", "Jan 1 2027", 20000 end
+            end)
+        end)
     end)
 
     describe("welcome message", function()

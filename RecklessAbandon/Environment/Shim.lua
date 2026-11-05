@@ -3,16 +3,20 @@ local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateD
 local _, interfaceVersion
 E.wowpatch, E.wowbuild, _, interfaceVersion = GetBuildInfo()
 E.wowbuild = tonumber(E.wowbuild)
-E.isRetail = WOW_PROJECT_ID == (WOW_PROJECT_MAINLINE or 1)
-E.isClassic = WOW_PROJECT_ID == (WOW_PROJECT_CLASSIC or 2)
-E.isBC = WOW_PROJECT_ID == (WOW_PROJECT_BURNING_CRUSADE_CLASSIC or 5)
-E.isWrath = WOW_PROJECT_ID == (WOW_PROJECT_WRATH_CLASSIC or 11)
-E.isCata = WOW_PROJECT_ID == (WOW_PROJECT_CATACLYSM_CLASSIC or 14)
-E.isMop = WOW_PROJECT_ID == (WOW_PROJECT_MISTS_CLASSIC or 19)
 
--- Camelot is a vanilla (1.x) client with its own WOW_PROJECT_ID, so it follows the Classic code paths
-E.isCamelot = not E.isClassic and interfaceVersion >= 10000 and interfaceVersion < 20000
-E.isClassic = E.isClassic or E.isCamelot
+-- Camelot (WoW Forever) is a vanilla (1.x) client, so it follows the Classic code paths. Its project ID
+-- has changed during the beta (WOW_PROJECT_MAINLINE up to at least build 69913, WOW_PROJECT_CAMELOT = 18
+-- since 70245), so either signal is enough: that ID (the constant only exists on Forever, hence the
+-- literal), or an interface number of 1.60 and up (16000 to 19999, which no other client uses).
+E.isCamelot = WOW_PROJECT_ID == (WOW_PROJECT_CAMELOT or 18)
+    or (interfaceVersion >= 16000 and interfaceVersion < 20000)
+
+E.isRetail = not E.isCamelot and WOW_PROJECT_ID == (WOW_PROJECT_MAINLINE or 1)
+E.isClassic = E.isCamelot or WOW_PROJECT_ID == (WOW_PROJECT_CLASSIC or 2)
+E.isBC = not E.isCamelot and WOW_PROJECT_ID == (WOW_PROJECT_BURNING_CRUSADE_CLASSIC or 5)
+E.isWrath = not E.isCamelot and WOW_PROJECT_ID == (WOW_PROJECT_WRATH_CLASSIC or 11)
+E.isCata = not E.isCamelot and WOW_PROJECT_ID == (WOW_PROJECT_CATACLYSM_CLASSIC or 14)
+E.isMop = not E.isCamelot and WOW_PROJECT_ID == (WOW_PROJECT_MISTS_CLASSIC or 19)
 
 -- Retail and Camelot removed the legacy quest log globals in favor of C_QuestLog
 E.hasQuestLogAPI = E.isRetail or GetNumQuestLogEntries == nil
