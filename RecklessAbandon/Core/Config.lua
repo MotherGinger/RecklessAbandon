@@ -15,7 +15,7 @@ E:AddLib("AceDBOptions", "AceDBOptions-3.0")
 
 function E:ToggleOptionsUI(msg)
 	if InCombatLockdown() then
-		self:Warn(ERR_NOT_IN_COMBAT)
+		self:System(ERR_NOT_IN_COMBAT)
 		self.ShowOptionsUI = true
 		return
 	end

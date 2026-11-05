@@ -24,10 +24,9 @@ L["Are you sure you want to abandon |cFFF2E699%s|r?"] = "Êtes-vous sûr de voul
 L["Are you sure you want to abandon all of the quests in your quest log?"] = "Êtes-vous sûr de vouloir abandonner toutes les quêtes de votre journal de quêtes ?"
 L["Are you sure you want to abandon the following %s quests?"] = "Êtes-vous sûr de vouloir abandonner les %s quêtes suivantes ?"
 
-L["Only show messages for errors"] = "Afficher uniquement les messages d'erreur"
-L["Only show messages for warnings and errors"] = "Afficher uniquement les messages d'avertissement et d'erreur"
-L["Only show important messages"] = "Afficher uniquement les messages importants"
-L["Show all messages (default)"] = "Afficher tous les messages (par défaut)"
+L["Only show problems"] = "Afficher uniquement les problèmes"
+L["Only show important messages (default)"] = "Afficher uniquement les messages importants (par défaut)"
+L["Show all messages"] = "Afficher tous les messages"
 
 L["Left Click: Abandon quest"] = "Clic gauche : Abandonner la quête"
 L["Right Click: Exclude quest from group abandons"] = "Clic droit : Exclure la quête des abandons de groupe"

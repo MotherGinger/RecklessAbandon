@@ -323,6 +323,8 @@ E.Options.args.general = {
                             end,
                             set = function(_, value)
                                 E.private.automationOptions.autoAbandonQuests.questType[value] = not E.private.automationOptions.autoAbandonQuests.questType[value]
+                                -- * Apply the rule to quests already in the log
+                                E:OnQuestLogChanged()
                             end
                         },
                         space4 = {
@@ -355,6 +357,8 @@ E.Options.args.general = {
                                 E.private.automationOptions.autoAbandonQuests.ids = ids
                                 -- Update the parsed exclusions cache
                                 E:UpdateParsedExclusions()
+                                -- * Apply the new ids to quests already in the log
+                                E:OnQuestLogChanged()
                             end
                         }
                     }

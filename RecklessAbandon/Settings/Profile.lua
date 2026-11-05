@@ -2,7 +2,7 @@ local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateD
 
 P.general = {
     loginMessage = true,
-    logLevel = 4,
+    logLevel = 3, -- LOG_LEVEL_INFO
     confirmIndividual = false,
     confirmGroup = true,
     individualQuests = {

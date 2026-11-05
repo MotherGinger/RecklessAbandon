@@ -70,6 +70,16 @@ function E.Shim:GetInfo(questIndex)
         Info.isHidden = info.isHidden
         Info.questLogIndex = info.questLogIndex
         Info.frequency = info.frequency
+
+        -- Camelot uses C_QuestLog but still relies on the Classic tag/failed qualifiers,
+        -- which C_QuestLog.GetInfo does not provide
+        if not E.isRetail and not info.isHeader and info.questID then
+            Info.questTag = E.Shim:GetQuestTagName(info.questID)
+
+            if C_QuestLog.IsFailed and C_QuestLog.IsFailed(info.questID) then
+                Info.isComplete = -1
+            end
+        end
     else
         local title, level, questTag, isHeader, isCollapsed, isComplete, isDaily, questID,
         _, _, _, _, _, _, _, isHidden = GetQuestLogTitle(questIndex)
@@ -89,6 +99,46 @@ function E.Shim:GetInfo(questIndex)
     end
 
     return Info
+end
+
+local QuestTag = Enum and Enum.QuestTag or {}
+
+-- Map tag IDs to the same localized labels GetQuestLogTitle returns on Classic,
+-- so they match the tag cache regardless of how the client names the tag
+local TAG_LABELS = {
+    [QuestTag.Group or 1] = GROUP,
+    [QuestTag.PvP or 41] = PVP,
+    [QuestTag.Raid or 62] = RAID,
+    [QuestTag.Dungeon or 81] = LFG_TYPE_DUNGEON,
+    [QuestTag.Heroic or 85] = PLAYER_DIFFICULTY2
+}
+
+---@param questId number The quest ID
+---@return string? tagName The quest type label (e.g. "PvP", "Dungeon", "Elite"), or nil if untagged
+function E.Shim:GetQuestTagName(questId)
+    if not (C_QuestLog and C_QuestLog.GetQuestTagInfo) then
+        return nil
+    end
+
+    local tagInfo = C_QuestLog.GetQuestTagInfo(questId)
+    if not tagInfo then
+        return nil
+    end
+
+    local label = tagInfo.tagID and TAG_LABELS[tagInfo.tagID]
+    if label then
+        return label
+    end
+
+    if tagInfo.tagName and tagInfo.tagName ~= "" then
+        return tagInfo.tagName
+    end
+
+    if tagInfo.isElite then
+        return ELITE
+    end
+
+    return nil
 end
 
 ---@return number numEntries Number of entries in the quest log, including collapsible zone headers

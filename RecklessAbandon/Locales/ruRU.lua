@@ -24,10 +24,9 @@ L["Are you sure you want to abandon |cFFF2E699%s|r?"] = "Вы уверены, ч
 L["Are you sure you want to abandon all of the quests in your questlog?"] = "Вы уверены, что хотите отказаться от всех заданий в вашем журнале заданий?"
 L["Are you sure you want to abandon the following %s quests?"] = "Вы уверены, что хотите отказаться от следующих %s заданий?"
 
-L["Only show messages for errors"] = "Показывать только сообщения об ошибках"
-L["Only show messages for warnings and errors"] = "Показывать только предупреждения и ошибки"
-L["Only show important messages"] = "Показывать только важные сообщения"
-L["Show all messages (default)"] = "Показывать все сообщения (по умолчанию)"
+L["Only show problems"] = "Показывать только проблемы"
+L["Only show important messages (default)"] = "Показывать только важные сообщения (по умолчанию)"
+L["Show all messages"] = "Показывать все сообщения"
 
 L["Left Click: Abandon quest"] = "Левый клик: Отказаться от задания"
 L["Right Click: Exclude quest from group abandons"] = "Правый клик: Исключить задание из группового отказа"

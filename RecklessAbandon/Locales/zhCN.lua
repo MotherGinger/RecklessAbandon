@@ -24,10 +24,9 @@ L["Are you sure you want to abandon |cFFF2E699%s|r?"] = "你确定要放弃 |cFF
 L["Are you sure you want to abandon all of the quests in your questlog?"] = "你确定要放弃你任务日志中的所有任务吗？"
 L["Are you sure you want to abandon the following %s quests?"] = "你确定要放弃以下%s个任务吗？"
 
-L["Only show messages for errors"] = "仅显示错误信息"
-L["Only show messages for warnings and errors"] = "仅显示警告和错误信息"
-L["Only show important messages"] = "仅显示重要信息"
-L["Show all messages (default)"] = "显示所有信息（默认）"
+L["Only show problems"] = "仅显示问题"
+L["Only show important messages (default)"] = "仅显示重要信息（默认）"
+L["Show all messages"] = "显示所有信息"
 
 L["Left Click: Abandon quest"] = "左键点击：放弃任务"
 L["Right Click: Exclude quest from group abandons"] = "右键点击：从组放弃中排除任务"
