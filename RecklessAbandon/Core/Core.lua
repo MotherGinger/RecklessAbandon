@@ -41,11 +41,11 @@ E.myrealm = GetRealmName()
 E.mynameRealm = format("%s - %s", E.myname, E.myrealm) -- contains spaces/dashes in realm (for profile keys)
 E.screenwidth, E.screenheight = GetPhysicalScreenSize()
 E.resolution = format("%dx%d", E.screenwidth, E.screenheight)
+-- * Selectable messaging rates. System messages (abandon notices, command replies) and errors always show.
 E.logLevels = {
-	[LOG_LEVEL_ERROR] = L["Only show messages for errors"],
-	[LOG_LEVEL_WARN] = L["Only show messages for warnings and errors"],
-	[LOG_LEVEL_INFO] = L["Only show important messages"],
-	[LOG_LEVEL_VERBOSE] = L["Show all messages (default)"]
+	[LOG_LEVEL_WARN] = L["Only show problems"],
+	[LOG_LEVEL_INFO] = L["Only show important messages (default)"],
+	[LOG_LEVEL_VERBOSE] = L["Show all messages"]
 }
 
 local MyScanningTooltip = CreateFrame("GameTooltip", "MyScanningTooltip", UIParent, "GameTooltipTemplate")
@@ -106,7 +106,7 @@ StaticPopupDialogs["RECKLESS_ABANDON_CONFIRMATION"] = {
 
 StaticPopupDialogs["RECKLESS_ABANDON_ALL_CONFIRMATION"] = {
 	text = table.concat(
-		{ L["Are you sure you want to abandon all of the quests in your questlog?"], L["|cFFFF6B6BThis cannot be undone.|r"] },
+		{ L["Are you sure you want to abandon all of the quests in your quest log?"], L["|cFFFF6B6BThis cannot be undone.|r"] },
 		"\n\n"
 	),
 	button1 = L["Yes"],
@@ -258,8 +258,11 @@ function E:Debug(...)
 end
 
 function E:UpdatePlayerLevel(level)
-	E:Debug(format("%s leveled up (%d -> %d)!", E.myname, E.mylevel, level))
+	E:Debug(format(L["%s leveled up (%d -> %d)!"], E.myname, E.mylevel, level))
 	E.mylevel = level
+
+	-- * Quest colors depend on the player's level, so color rules may now match
+	E:OnQuestLogChanged()
 end
 
 function E:GetQuestColor(level)
@@ -366,6 +369,9 @@ local ABANDON_SETTLE = 0.75 -- seconds to wait after the last abandon before che
 -- * Quests queued or being abandoned. Stops automation from queueing the same quest again while a sweep is running.
 E.pendingAbandons = {}
 
+-- * Quests that could not be abandoned after every retry. Automation leaves these alone for the rest of the session.
+E.failedAbandons = {}
+
 function E:IsOnQuest(questId)
 	if C_QuestLog and C_QuestLog.IsOnQuest then
 		return C_QuestLog.IsOnQuest(questId) == true
@@ -412,6 +418,7 @@ function E:RunAbandonSweep(batch, round)
 
 		for _, entry in ipairs(remaining) do
 			E.pendingAbandons[entry.questId] = nil
+			E.failedAbandons[entry.questId] = true
 			E:Warn(format(L["|cFFFFFF00Failed to abandon %s|r"], entry.link))
 		end
 	end, (#batch - 1) * gap + ABANDON_SETTLE)
@@ -575,8 +582,13 @@ function E:AutoAbandonQuests()
 	for i = 1, E.Shim:GetNumQuestLogEntries() do
 		local info = E.Shim:GetInfo(i)
 		if not info then
-			E:Error(format("Failed to get quest info for index %d in AutoAbandonQuests", i))
-		elseif not info.isHeader and not E.pendingAbandons[info.questID] then
+			E:Debug(format("Failed to get quest info for index %d in AutoAbandonQuests", i))
+		elseif not info.isHeader and info.questID
+			and not E.pendingAbandons[info.questID]
+			and not E.failedAbandons[info.questID]
+			-- * Skip quests AbandonQuests would reject, so frequent automation runs don't repeat its messages
+			and not E:IsExcluded(info.questID)
+			and E.Shim:CanAbandonQuest(info.questID) then
 			local questId = info.questID
 			local level = info.level
 			local isDaily = info.frequency == 1
@@ -640,7 +652,8 @@ function E:AutoAbandonQuests()
 	local count = E:AbandonQuests(eligibleIds)
 
 	if count > 0 then
-		E:Info(format("Automatically abandoned %s |4quest:quests;!", count))
+		-- * Each quest already gets its own "Abandoned quest" notice, so the summary is detail only
+		E:Verbose(format(L["Automatically abandoned %s |4quest:quests;!"], count))
 	end
 end
 
@@ -648,7 +661,7 @@ function E:AutoExcludeQuests()
 	for i = 1, E.Shim:GetNumQuestLogEntries() do
 		local info = E.Shim:GetInfo(i)
 		if not info then
-			E:Error(format("Failed to get quest info for index %d in AutoExcludeQuests", i))
+			E:Debug(format("Failed to get quest info for index %d in AutoExcludeQuests", i))
 		else
 			local questId = info.questID
 			local isComplete = E.Shim:IsComplete(questId)
@@ -712,17 +725,57 @@ function E:PrintWelcomeMessage()
 	end
 end
 
+-- * Moves the true/false switches in `source` to `target`, keeping any `target` already has.
+local function MoveSwitches(source, target)
+	local moved = {}
+	for key, value in pairs(source) do
+		if type(value) == "boolean" then moved[key] = value end
+	end
+	for key, value in pairs(moved) do
+		source[key] = nil
+		if rawget(target, key) == nil then target[key] = value end
+	end
+end
+
+-- * A table of switches should hold only name = true/false. An earlier version of NormalizeSettings
+-- * nested the whole settings table inside it on every new character (AceDB's "*" defaults made it
+-- * look empty). Lifts the nested switches back up and returns the other values it found by name.
+local function FlattenSwitches(switches)
+	local nested, strings = {}, {}
+	for key, value in pairs(switches) do
+		if type(value) ~= "boolean" then nested[key] = value end
+	end
+	for key, value in pairs(nested) do
+		switches[key] = nil
+		if type(value) == "table" then
+			for innerKey, innerValue in pairs(FlattenSwitches(value)) do strings[innerKey] = innerValue end
+			MoveSwitches(value, switches)
+		else
+			strings[key] = value
+		end
+	end
+	return strings
+end
+
 function E:NormalizeSettings()
 	-- * Verify default settings and guard against corrupted tables
 
 	-- Set log level if not set
 	if E.db.general.logLevel == nil then
+		E.db.general.logLevel = P.general.logLevel
+	end
+
+	-- * The "errors only" level was removed. Move it (and any out of range value) to the nearest remaining level.
+	-- * Profiles still on the old default ("show all") have nothing saved, so they pick up the new default on their own.
+	if E.db.general.logLevel < LOG_LEVEL_WARN then
+		E.db.general.logLevel = LOG_LEVEL_WARN
+	elseif E.db.general.logLevel > LOG_LEVEL_VERBOSE then
 		E.db.general.logLevel = LOG_LEVEL_VERBOSE
 	end
 
 	-- Set debugging if not set
 	if E.db.debugging == nil then
-		E.db.debugging.debugLogging = false
+		E.db.debugging = { debugLogging = false }
 	end
 
 	-- Rebuild exclusion list
@@ -734,23 +787,24 @@ function E:NormalizeSettings()
 		end
 	end
 
-	-- Rebuild automation options
-	if
-		E.private.automationOptions.autoAbandonQuests.questType == nil or
-		E:IsEmpty(E.private.automationOptions.autoAbandonQuests.questType)
-	then
-		E.private.automationOptions.autoAbandonQuests.questType = nil
-		E.private.automationOptions.autoAbandonQuests = {
-			["questType"] = E.private.automationOptions.autoAbandonQuests
-		}
+	-- * Automation: before v1.6.0 the quest types were switches straight under autoAbandonQuests
+	-- * (and under private.general in the v1.6.0 betas). They now live in autoAbandonQuests.questType.
+	local automation = E.private.automationOptions.autoAbandonQuests
+	local betaGeneral = E.private.general
+	if type(betaGeneral) == "table" and type(betaGeneral.autoAbandonQuests) == "table" then
+		MoveSwitches(betaGeneral.autoAbandonQuests, automation.questType)
+		betaGeneral.autoAbandonQuests = nil
+	end
+	MoveSwitches(automation, automation.questType)
+	local strings = FlattenSwitches(automation.questType)
+	-- * The quest ID list an earlier version of this function moved into questType
+	if type(strings.ids) == "string" and (automation.ids == nil or automation.ids == "") then
+		automation.ids = strings.ids
 	end
 
-	-- Rebuild command settings
-	if E.db.commands.generic == nil or E:IsEmpty(E.db.commands.generic) then
-		E.db.commands = {
-			["generic"] = E.db.commands
-		}
-	end
+	-- * Commands: before v1.6.0 the command switches were straight under commands. They now live in commands.generic.
+	MoveSwitches(E.db.commands, E.db.commands.generic)
+	FlattenSwitches(E.db.commands.generic)
 end
 
 -- AceDB strips values that match defaults when it saves (including whole
@@ -790,7 +844,9 @@ function E:Initialize()
 	E.charSettings.RegisterCallback(E, "OnProfileReset", "RefreshOptions")
 
 	E:RegisterBucketEvent("QUEST_LOG_UPDATE", 1, "GenerateQuestTable")
-	E:RegisterBucketEvent("UNIT_QUEST_LOG_CHANGED", 0.5, "OnQuestLogChanged")
+	-- * UNIT_QUEST_LOG_CHANGED can fire before a newly accepted quest's details (tag, level) are available,
+	-- * so also listen for QUEST_LOG_UPDATE, which follows once the quest log data is ready
+	E:RegisterBucketEvent({ "UNIT_QUEST_LOG_CHANGED", "QUEST_LOG_UPDATE" }, 0.5, "OnQuestLogChanged")
 
 	-- Initialize prune throttle timer
 	E.lastPruneTime = 0

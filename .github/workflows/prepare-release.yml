@@ -1,0 +1,92 @@
+name: Prepare release
+
+# Opens a "Release v<version>" pull request with the changelog and TOC version bump.
+# Merging it runs publish-github.yml, which tags the release and publishes it on GitHub.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release, e.g. 3.2.0 or 3.2.0-beta.1
+        required: true
+        type: string
+      dry_run:
+        description: Dry run (build and show everything, open no pull request)
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: prepare-release
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require main for real releases
+        if: ${{ !inputs.dry_run && github.ref_name != 'main' }}
+        env:
+          REF: ${{ github.ref_name }}
+        run: |
+          echo "::error::Releases must be prepared from main, not '$REF'."
+          exit 1
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the release script and notes look back through tags
+
+      - name: Bump version and commit
+        shell: pwsh
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Also tags locally so the dry run zip gets the right name; the tag itself is never pushed here
+          ./.github/scripts/release.ps1 $env:VERSION
+          "TAG=$(git describe --tags --exact-match HEAD)" >> $env:GITHUB_ENV
+
+      - name: Show the release commit
+        run: git show --format='%s' HEAD
+
+      - name: Build release notes from CHANGELOG.txt
+        run: |
+          bash .github/scripts/release-notes.sh "$TAG" > .release-notes.md
+          cat .release-notes.md
+
+      - name: Build the zip
+        uses: BigWigsMods/packager@v2
+        with:
+          args: -d -n "{package-name}_{project-version}"
+
+      - name: Keep the dry run output
+        if: inputs.dry_run
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-dry-run
+          include-hidden-files: true
+          path: |
+            .release/*.zip
+            .release-notes.md
+
+      - name: Open the release pull request
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          branch="release/$TAG"
+          if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
+            echo "::error::Branch $branch already exists. Merge or delete it first."
+            exit 1
+          fi
+          git push origin "HEAD:refs/heads/$branch"
+          {
+            echo "Merging this tags \`$TAG\` and publishes the GitHub release with these notes."
+            echo "Wago and CurseForge are published afterwards with their own workflows."
+            echo
+            cat .release-notes.md
+          } > .pr-body.md
+          gh pr create --base main --head "$branch" --title "Release $TAG" --body-file .pr-body.md

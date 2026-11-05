@@ -8,8 +8,6 @@ L["Description"] = "A tool for quickly (and recklessly) abandoning quests"
 
 L["You are currently running a pre-release version of %s. Please report any issues on github (|cFFB5FFEB%s|r) so they can be addressed quickly. Thank you for your interest in testing new features!"] = true
 
-L["Enable"] = true
-L["Enable/Disable Reckless Abandon"] = true
 
 L["Yes"] = true
 L["No"] = true
@@ -17,13 +15,12 @@ L["No"] = true
 L["|cFFFF6B6BThis cannot be undone.|r"] = true
 L["Are you sure you want to abandon all quests in |cFFF2E699%s|r?"] = true
 L["Are you sure you want to abandon |cFFF2E699%s|r?"] = true
-L["Are you sure you want to abandon all of the quests in your questlog?"] = true
+L["Are you sure you want to abandon all of the quests in your quest log?"] = true
 L["Are you sure you want to abandon the following %s quests?"] = true
 
-L["Only show messages for errors"] = true
-L["Only show messages for warnings and errors"] = true
-L["Only show important messages"] = true
-L["Show all messages (default)"] = true
+L["Only show problems"] = true
+L["Only show important messages (default)"] = true
+L["Show all messages"] = true
 
 L["Left Click: Abandon quest"] = true
 L["Right Click: Exclude quest from group abandons"] = true
@@ -64,11 +61,11 @@ L["Show a group abandon button for zone quests."] = true
 L["Abandon Quests"] = true
 L["Use this keybinding on a zone header in your quest log to abandon all quests for that zone that are included in group abandons."] = true
 L["Are you sure you want to bind %s?"] = true
-L["|cFFFF6B6BCaution: This can cause you to accidently abandon a quest when trying to select a quest in your quest log.|r"] = true
-L["|cFFFF6B6BCaution: This can cause you to accidently abandon a quest when trying to track a quest in your quest log.|r"] = true
-L["|cFFFF6B6BCaution: This can cause you to accidently toggle exclusion of a quest from group abandons when trying to select a quest in your quest log.|r"] = true
-L["|cFFFF6B6BCaution: This can cause you to accidently toggle exclusion of a quest from group abandons when trying to track a quest in your quest log.|r"] = true
-L["|cFFFF6B6BCaution: This can cause you to accidently abandon all quests in a zone when trying to expand a zone header in your quest log.|r"] = true
+L["|cFFFF6B6BCaution: This can cause you to accidentally abandon a quest when trying to select a quest in your quest log.|r"] = true
+L["|cFFFF6B6BCaution: This can cause you to accidentally abandon a quest when trying to track a quest in your quest log.|r"] = true
+L["|cFFFF6B6BCaution: This can cause you to accidentally toggle exclusion of a quest from group abandons when trying to select a quest in your quest log.|r"] = true
+L["|cFFFF6B6BCaution: This can cause you to accidentally toggle exclusion of a quest from group abandons when trying to track a quest in your quest log.|r"] = true
+L["|cFFFF6B6BCaution: This can cause you to accidentally abandon all quests in a zone when trying to expand a zone header in your quest log.|r"] = true
 L["Show a group abandon button for campaign quests."] = true
 L["Show a group abandon button for covenant callings."] = true
 L["|cFF00D1FFNote:|r Blizzard currently does not allow covenant callings to be abandoned. This button will be disabled if shown."] = true
@@ -81,12 +78,11 @@ L["Prompt for confirmation when abandoning multiple quests."] = true
 L["|cFFFF6B6BCaution: Turning this off means a group of quests will be abandoned instantly. Be careful!|r"] = true
 
 L["Automation Options"] = true
-L["These options will act upon your quest log automatically. This can save you time, however, care should be taken when using them."] = true
+L["These options will act upon your quest log automatically. This can save you time; however, care should be taken when using them."] = true
 L["|cFF00D1FFNote:|r Each character has their own automation options."] = true
-L["Abandon Quests"] = true
 L["Quest Type"] = true
 L["Automatically abandon quests of the given type if they are included in group abandons."] = true
-L["|cFFFF6B6BCaution:|r These quests will be abandoned for you, confirmation settings will be ignored."] = true
+L["|cFFFF6B6BCaution:|r These quests will be abandoned for you; confirmation settings will be ignored."] = true
 L["Automatically abandoned %s |4quest:quests;!"] = true
 L["Green"] = true
 L["Yellow"] = true
@@ -94,14 +90,14 @@ L["Orange"] = true
 L["Red"] = true
 L["Gray"] = true
 L["Quest IDs"] = true
-L["Enter quest ids separated by a comma. These quests will be abandoned automatically if they are included in group abandons."] = true
+L["Enter quest IDs separated by a comma. These quests will be abandoned automatically if they are included in group abandons."] = true
 
 L["Slash Commands"] = true
 L["|cFF00D1FFNote:|r The token |cff888888reckless|r can be replaced by |cff888888rab|r for all commands."] = true
 L["Enable |cff888888/reckless list all|r"] = true
 L["This command lists all quests in a table."] = true
 L["Enable |cff888888/reckless abandon all|r"] = true
-L["|cFFFFF569Warning:|r This command abandons all quests in your quest log that are not excluded from group abandons, use it wisely."] = true
+L["|cFFFFF569Warning:|r This command abandons all quests in your quest log that are not excluded from group abandons; use it wisely."] = true
 L["Enable |cff888888/reckless abandon <questID>|r"] = true
 L["This command abandons a quest that matches the provided questID."] = true
 L["Enable |cff888888/reckless exclude <questID>|r"] = true
@@ -149,20 +145,18 @@ L["The quest exclusion list allows you to exclude quests from group abandons. To
 L["|cFF00D1FFNote:|r Each character has their own exclusion list."] = true
 L["Quests that appear in |cFFFF6B6Bred|r are no longer detected in your quest log."] = true
 L["You can prune them by clicking this button, or leave them and they will be excluded again the next time they are picked up."] = true
-L["|cFF808080There are currently no quests being excluded.|r"] = true
 L["Pruning '%s' from the exclusion list"] = true
 L["Pruned %s |4orphan:orphans;!"] = true
-L["Pruned %s |4orphan:orphans; from source '%s'!"] = true
+L["Pruned %s automation |4orphan:orphans;!"] = true
 L["Clear the exclusion list by including quests that are still in your quest log and pruning those that aren't."] = true
 L["Automatic Pruning"] = true
 L["Automatically prune quests from the exclusion list when they are abandoned, or when they are no longer in your quest log and were excluded via automation."] = true
-L["|cFF00D1FFNote:|r This does not retroactively prune quests that have already been abandoned, but are still in the exclusion list."] = true
+L["|cFF00D1FFNote:|r This does not retroactively prune quests that have already been abandoned but are still in the exclusion list."] = true
 L["Use the 'Prune Exclusion List' button below to do this manually."] = true
-L["Unable to prune quests from the exclusion list from source '%s'"] = true
 
 L["About"] = true
 L["Testers"] = true
-L["Written by %s%s%s%s %s"] = true
+L["Written by %s %s"] = true
 L["Please report any bugs or request features on our issue board:"] = true
 
 L["|cFFFFFF00Abandoned quest %s|r"] = true
@@ -190,9 +184,9 @@ L["%s is already excluded from group abandons!"] = true
 
 L["Including quests from the command line is currently |cFFFF6B6Bdisabled|r. You can enable it in the configuration settings |cff888888/reckless config|r"] = true
 L["Unable to include quest, '%s' is not recognized. Either the quest is not in your quest log, or you may have entered the wrong id."] = true
-L["%s is alr1eady included in group abandons!"] = true
+L["%s is already included in group abandons!"] = true
 
-L["You are running |cFFB5FFEBv%s|r. Type |cff888888/reckless config|r to configure settings."] = true
+L["You are running |cFFB5FFEBv%s|r. Type |cff888888/rab|r to configure settings."] = true
 
 L["Abandon invoked with qualifier '%s'"] = true
 L["Available Qualifiers:%s"] = true

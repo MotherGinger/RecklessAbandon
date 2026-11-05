@@ -1,0 +1,69 @@
+name: Publish to Wago
+
+# Uploads an existing release tag to Wago, tagged with every game version in the TOC files.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to publish, e.g. v3.2.0
+        required: true
+        type: string
+      dry_run:
+        description: Dry run (build and show everything, upload nothing)
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-wago
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ inputs.tag }}
+          fetch-depth: 0 # release notes and the packager look back to the previous tag
+
+      - name: Check Wago setup
+        env:
+          WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if ! grep -qE '^## X-Wago-ID: *[A-Za-z0-9]+' RecklessAbandon/*.toc; then
+            echo "::error::No '## X-Wago-ID:' in the TOC files at this tag."
+            exit 1
+          fi
+          if [[ $DRY_RUN != true && -z $WAGO_API_TOKEN ]]; then
+            echo "::error::The WAGO_API_TOKEN repository secret is not set."
+            exit 1
+          fi
+
+      - name: Build release notes from CHANGELOG.txt
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          bash .github/scripts/release-notes.sh "$TAG" > .release-notes.md
+          cat .release-notes.md
+
+      - name: Package and upload
+        uses: BigWigsMods/packager@v2
+        with:
+          args: ${{ inputs.dry_run && '-d' || '' }} -n "{package-name}_{project-version}"
+        env:
+          # Only the Wago token is passed, so nothing else is uploaded
+          WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
+
+      - name: Keep the dry run output
+        if: inputs.dry_run
+        uses: actions/upload-artifact@v4
+        with:
+          name: wago-dry-run
+          include-hidden-files: true
+          path: |
+            .release/*.zip
+            .release-notes.md

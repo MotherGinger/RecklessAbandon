@@ -40,7 +40,11 @@ luac.out
 *.hex
 
 # Scripts
-scripts/
+/scripts/*
+!/scripts/test.sh
 .claude/
 **/.claude/
 .vscode/
+# Release builds (BigWigs packager)
+.release/
+.release-notes.md

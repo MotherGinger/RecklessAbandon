@@ -327,12 +327,13 @@ function E:GenerateQuestTable()
     -- 	},
     -- }
 
-    local currentGroup = { quests = {} }
+    -- * Catches quests listed before the first header, which belong to no group
+    local currentGroup = { quests = {} } -- luacheck: ignore 331
 
     for i = 1, E.Shim:GetNumQuestLogEntries() do
         local info = E.Shim:GetInfo(i)
         if not info then
-            E:Error(format("Failed to get quest info for index %d", i))
+            E:Debug(format("Failed to get quest info for index %d", i))
         else
             if info.isHeader then
                 currentGroup = {

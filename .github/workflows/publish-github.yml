@@ -1,0 +1,86 @@
+name: Publish GitHub release
+
+# Runs when a "Release v<version>" pull request from prepare-release.yml is merged:
+# tags the merged commit and publishes the GitHub release with the zip.
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-github
+
+jobs:
+  publish:
+    if: >-
+      github.event.pull_request.merged &&
+      startsWith(github.event.pull_request.head.ref, 'release/v') &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout merged commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: 0 # release notes and the packager look back to the previous tag
+
+      - name: Check the version
+        env:
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          tag="${BRANCH#release/}"
+          if [[ ! $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-(alpha|beta)\.[0-9]+)?$ ]]; then
+            echo "::error::'$BRANCH' does not name a version like release/v3.2.0."
+            exit 1
+          fi
+          for toc in RecklessAbandon/*.toc; do
+            if ! tr -d '\r' < "$toc" | grep -qx "## Version: ${tag#v}"; then
+              echo "::error::$toc is not at version ${tag#v}."
+              exit 1
+            fi
+          done
+          echo "TAG=$tag" >> "$GITHUB_ENV"
+
+      - name: Tag the merged commit
+        run: |
+          if git rev-parse --quiet --verify "refs/tags/$TAG" > /dev/null; then
+            # Re-run after a later step failed: fine if the tag is already on this commit
+            if [[ $(git rev-parse "$TAG^{commit}") != $(git rev-parse HEAD) ]]; then
+              echo "::error::Tag $TAG already exists on a different commit."
+              exit 1
+            fi
+            echo "PUSH_TAG=" >> "$GITHUB_ENV"
+          else
+            git tag "$TAG"
+            echo "PUSH_TAG=1" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build release notes from CHANGELOG.txt
+        run: |
+          bash .github/scripts/release-notes.sh "$TAG" > .release-notes.md
+          cat .release-notes.md
+
+      - name: Build the zip
+        uses: BigWigsMods/packager@v2
+        with:
+          args: -d -n "{package-name}_{project-version}"
+
+      - name: Push the tag
+        if: env.PUSH_TAG
+        run: git push origin "refs/tags/$TAG"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          flags=()
+          [[ ${TAG,,} == *alpha* || ${TAG,,} == *beta* ]] && flags+=(--prerelease)
+          gh release create "$TAG" .release/*.zip --verify-tag --title "$TAG" --notes-file .release-notes.md "${flags[@]}"
+
+      - name: Delete the release branch
+        env:
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: git push origin --delete "$BRANCH" || true

@@ -3,16 +3,20 @@ local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateD
 local _, interfaceVersion
 E.wowpatch, E.wowbuild, _, interfaceVersion = GetBuildInfo()
 E.wowbuild = tonumber(E.wowbuild)
-E.isRetail = WOW_PROJECT_ID == (WOW_PROJECT_MAINLINE or 1)
-E.isClassic = WOW_PROJECT_ID == (WOW_PROJECT_CLASSIC or 2)
-E.isBC = WOW_PROJECT_ID == (WOW_PROJECT_BURNING_CRUSADE_CLASSIC or 5)
-E.isWrath = WOW_PROJECT_ID == (WOW_PROJECT_WRATH_CLASSIC or 11)
-E.isCata = WOW_PROJECT_ID == (WOW_PROJECT_CATACLYSM_CLASSIC or 14)
-E.isMop = WOW_PROJECT_ID == (WOW_PROJECT_MISTS_CLASSIC or 19)
 
--- Camelot is a vanilla (1.x) client with its own WOW_PROJECT_ID, so it follows the Classic code paths
-E.isCamelot = not E.isClassic and interfaceVersion >= 10000 and interfaceVersion < 20000
-E.isClassic = E.isClassic or E.isCamelot
+-- Camelot (WoW Forever) is a vanilla (1.x) client, so it follows the Classic code paths. Its project ID
+-- has changed during the beta (WOW_PROJECT_MAINLINE up to at least build 69913, WOW_PROJECT_CAMELOT = 18
+-- since 70245), so either signal is enough: that ID (the constant only exists on Forever, hence the
+-- literal), or an interface number of 1.60 and up (16000 to 19999, which no other client uses).
+E.isCamelot = WOW_PROJECT_ID == (WOW_PROJECT_CAMELOT or 18)
+    or (interfaceVersion >= 16000 and interfaceVersion < 20000)
+
+E.isRetail = not E.isCamelot and WOW_PROJECT_ID == (WOW_PROJECT_MAINLINE or 1)
+E.isClassic = E.isCamelot or WOW_PROJECT_ID == (WOW_PROJECT_CLASSIC or 2)
+E.isBC = not E.isCamelot and WOW_PROJECT_ID == (WOW_PROJECT_BURNING_CRUSADE_CLASSIC or 5)
+E.isWrath = not E.isCamelot and WOW_PROJECT_ID == (WOW_PROJECT_WRATH_CLASSIC or 11)
+E.isCata = not E.isCamelot and WOW_PROJECT_ID == (WOW_PROJECT_CATACLYSM_CLASSIC or 14)
+E.isMop = not E.isCamelot and WOW_PROJECT_ID == (WOW_PROJECT_MISTS_CLASSIC or 19)
 
 -- Retail and Camelot removed the legacy quest log globals in favor of C_QuestLog
 E.hasQuestLogAPI = E.isRetail or GetNumQuestLogEntries == nil
@@ -70,6 +74,16 @@ function E.Shim:GetInfo(questIndex)
         Info.isHidden = info.isHidden
         Info.questLogIndex = info.questLogIndex
         Info.frequency = info.frequency
+
+        -- Camelot uses C_QuestLog but still relies on the Classic tag/failed qualifiers,
+        -- which C_QuestLog.GetInfo does not provide
+        if not E.isRetail and not info.isHeader and info.questID then
+            Info.questTag = E.Shim:GetQuestTagName(info.questID)
+
+            if C_QuestLog.IsFailed and C_QuestLog.IsFailed(info.questID) then
+                Info.isComplete = -1
+            end
+        end
     else
         local title, level, questTag, isHeader, isCollapsed, isComplete, isDaily, questID,
         _, _, _, _, _, _, _, isHidden = GetQuestLogTitle(questIndex)
@@ -89,6 +103,46 @@ function E.Shim:GetInfo(questIndex)
     end
 
     return Info
+end
+
+local QuestTag = Enum and Enum.QuestTag or {}
+
+-- Map tag IDs to the same localized labels GetQuestLogTitle returns on Classic,
+-- so they match the tag cache regardless of how the client names the tag
+local TAG_LABELS = {
+    [QuestTag.Group or 1] = GROUP,
+    [QuestTag.PvP or 41] = PVP,
+    [QuestTag.Raid or 62] = RAID,
+    [QuestTag.Dungeon or 81] = LFG_TYPE_DUNGEON,
+    [QuestTag.Heroic or 85] = PLAYER_DIFFICULTY2
+}
+
+---@param questId number The quest ID
+---@return string? tagName The quest type label (e.g. "PvP", "Dungeon", "Elite"), or nil if untagged
+function E.Shim:GetQuestTagName(questId)
+    if not (C_QuestLog and C_QuestLog.GetQuestTagInfo) then
+        return nil
+    end
+
+    local tagInfo = C_QuestLog.GetQuestTagInfo(questId)
+    if not tagInfo then
+        return nil
+    end
+
+    local label = tagInfo.tagID and TAG_LABELS[tagInfo.tagID]
+    if label then
+        return label
+    end
+
+    if tagInfo.tagName and tagInfo.tagName ~= "" then
+        return tagInfo.tagName
+    end
+
+    if tagInfo.isElite then
+        return ELITE
+    end
+
+    return nil
 end
 
 ---@return number numEntries Number of entries in the quest log, including collapsible zone headers

@@ -3,6 +3,20 @@ All notable changes to this project will be documented in this file.
 This project adheres to Semantic Versioning.
 
 - Unreleased
+  - Fixed
+    - Automatic abandons by quest type (PvP, dungeon, raid, elite, group, heroic, failed) not working on Forever
+    - Automatic abandons sometimes waiting until the next quest log change before firing
+    - Automatic abandons no longer repeat messages for quests that can't be abandoned
+    - Slash command output (e.g. /rab list all) no longer hidden by the messaging rate setting
+    - Lua errors when loading on Spanish (Spain), Portuguese (Portugal), Traditional Chinese and Korean game clients
+    - Spanish (Spain), Portuguese (Portugal) and Traditional Chinese clients now use the Spanish, Portuguese and Chinese translations
+    - Many settings descriptions and messages showing in English instead of the game's language
+    - Quest IDs for automatic abandons being lost on login when no quest types were selected
+    - Forever is now recognized by its own project ID as well as its interface number, so a build reporting the Retail project ID is no longer treated as both Retail and Classic
+  - Changed
+    - Messaging rate now defaults to "Only show important messages"
+    - Removed the "Only show messages for errors" messaging rate, existing selections move to "Only show problems"
+    - "Automatically abandoned N quests" summary now only shows with "Show all messages"
 
 - v3.1.1
   - Fixed

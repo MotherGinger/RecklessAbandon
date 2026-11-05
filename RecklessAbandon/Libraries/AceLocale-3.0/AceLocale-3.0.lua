@@ -12,10 +12,13 @@ if not AceLocale then return end -- no upgrade needed
 local assert, tostring, error = assert, tostring, error
 local getmetatable, setmetatable, rawset, rawget = getmetatable, setmetatable, rawset, rawget
 
+-- Reckless: clients whose language ships under a sister locale load that locale's translations
+-- (the same mapping E:GetLocale uses). Without this an esES client never registers esMX, and
+-- GetLocale had nothing to return.
+local SISTER_LOCALES = { enGB = "enUS", esES = "esMX", ptPT = "ptBR", zhTW = "zhCN" }
+
 local gameLocale = GetLocale()
-if gameLocale == "enGB" then
-	gameLocale = "enUS"
-end
+gameLocale = SISTER_LOCALES[gameLocale] or gameLocale
 
 AceLocale.apps = AceLocale.apps or {}          -- array of ["AppName"]=localetableref
 AceLocale.appnames = AceLocale.appnames or {}  -- array of [localetableref]="AppName"
@@ -111,7 +114,7 @@ end
 function AceLocale:NewLocale(application, locale, isDefault, silent)
 
 	-- GAME_LOCALE allows translators to test translations of addons without having that wow client installed
-	local activeGameLocale = GAME_LOCALE or gameLocale
+	local activeGameLocale = GAME_LOCALE and (SISTER_LOCALES[GAME_LOCALE] or GAME_LOCALE) or gameLocale
 
 	local app = AceLocale.apps[application]
 
@@ -166,9 +169,23 @@ function AceLocale:GetLocale(application, locale, silent)
 		error("Usage: GetLocale(application[,locale[, silent]]): 'application' - No locales registered for '" .. tostring(application) .. "'", 2)
 	end
 
-	if locale ~= AceLocale.apps[application].defaultLocale then
-		BackfillTable(AceLocale.apps[application][locale], AceLocale.apps[application][AceLocale.apps[application].defaultLocale])
+	local app = AceLocale.apps[application]
+	if not app then return nil end -- silent and nothing registered
+
+	-- Reckless: rawget, because the app table's metatable answers any unknown key (such as a locale
+	-- with no translation, e.g. koKR) with the key itself, a string.
+	local default = rawget(app, rawget(app, "defaultLocale") or "")
+	local translation = rawget(app, SISTER_LOCALES[locale] or locale)
+	if type(translation) ~= "table" then
+		translation = rawget(app, gameLocale)
+	end
+	if type(translation) ~= "table" then
+		return default -- no translation for this client: the default locale (enUS)
 	end
 
-	return AceLocale.apps[application][locale] or AceLocale.apps[application][gameLocale] -- Just in case the table doesn't exist it reverts to default
+	if translation ~= default then
+		BackfillTable(translation, default)
+	end
+
+	return translation
 end
