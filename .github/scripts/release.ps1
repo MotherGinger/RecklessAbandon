@@ -4,21 +4,19 @@ Cuts a release: files the Unreleased changelog entries under the new version,
 updates the TOC versions, commits "Bump to v<version>", and tags it.
 
 .DESCRIPTION
-Pushing the tag starts .github/workflows/release.yml, which builds the zip,
-creates the GitHub release, and uploads to Wago.
+Run by the Release workflow (.github/workflows/release.yml), which then builds
+the zip, pushes, and creates the GitHub release. Running it locally only makes
+the commit and tag, which is handy for checking the result; nothing is pushed.
 
 .EXAMPLE
 ./.github/scripts/release.ps1 3.2.0
 
 .EXAMPLE
-./.github/scripts/release.ps1 3.2.0-beta.1 -Push
+./.github/scripts/release.ps1 3.2.0-beta.1
 #>
 param(
     [Parameter(Mandatory)]
-    [string]$Version,
-
-    # Push the commit and tag to origin, which starts the release workflow
-    [switch]$Push
+    [string]$Version
 )
 
 $ErrorActionPreference = 'Stop'
@@ -59,11 +57,6 @@ try {
     & git rev-parse --quiet --verify "refs/tags/$tag" *> $null
     if ($LASTEXITCODE -eq 0) {
         throw "Tag $tag already exists."
-    }
-
-    $branch = Invoke-Git branch --show-current
-    if ($branch -ne 'main') {
-        Write-Warning "Releasing from '$branch', not 'main'."
     }
 
     # Changelog: "- Unreleased" keeps its place and the entries under it move to "- v<version>".
@@ -109,16 +102,6 @@ try {
     Invoke-Git commit --quiet -m "Bump to $tag" | Out-Null
     Invoke-Git tag $tag | Out-Null
     Write-Host "Committed and tagged $tag."
-
-    if ($Push) {
-        Invoke-Git push origin HEAD | Out-Null
-        Invoke-Git push origin $tag | Out-Null
-        Write-Host "Pushed $tag. The release workflow will publish it to GitHub and Wago."
-    } else {
-        Write-Host "Push when ready to publish:"
-        Write-Host "  git push origin HEAD"
-        Write-Host "  git push origin $tag"
-    }
 } finally {
     Pop-Location
 }

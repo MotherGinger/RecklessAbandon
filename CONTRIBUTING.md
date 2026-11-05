@@ -45,10 +45,11 @@ Note player-facing changes in `CHANGELOG.txt` under `- Unreleased`, grouped as `
 
 ## Releasing (maintainers)
 
-1. Run `./.github/scripts/release.ps1 <version>` (e.g. `3.2.0` or `3.2.0-beta.1`). It moves the Unreleased entries under the new version (betas leave them in place), updates `## Version:` in every TOC, commits `Bump to v<version>`, and tags it.
-2. Push the commit and tag, or pass `-Push`. The tag starts the Release workflow, which builds the zip, publishes the GitHub release, and uploads to Wago for every game version in the TOC files.
+All three workflows are started by hand from the Actions tab and default to a dry run, which builds everything and attaches the zip and release notes to the run without pushing or uploading anything.
 
-The workflow needs a `WAGO_API_TOKEN` repository secret.
+1. **Release** (version, e.g. `3.2.0` or `3.2.0-beta.1`, run on `main`): moves the Unreleased entries under the new version (betas leave them in place), updates `## Version:` in every TOC, commits `Bump to v<version>`, tags it, and publishes the GitHub release.
+2. **Publish to Wago** (tag, e.g. `v3.2.0`): uploads that release to Wago for every game version in the TOC files. Needs the `WAGO_API_TOKEN` secret.
+3. **Publish to CurseForge** (tag): the same for CurseForge. Needs the `CF_API_TOKEN` secret and `## X-Curse-Project-ID:` in the TOC files.
 
 ## Use a Consistent Coding Style
 

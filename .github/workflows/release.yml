@@ -1,32 +1,85 @@
 name: Release
 
-# Runs when a version tag is pushed (see .github/scripts/release.ps1).
-# Builds one zip, publishes the GitHub release, and uploads to Wago tagged
-# with every game version found in the TOC files.
+# Bumps the version, tags it, and publishes the GitHub release.
+# Wago and CurseForge are published separately with their own workflows.
 on:
-  push:
-    tags:
-      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release, e.g. 3.2.0 or 3.2.0-beta.1
+        required: true
+        type: string
+      dry_run:
+        description: Dry run (build and show everything, push nothing)
+        type: boolean
+        default: true
 
 permissions:
   contents: write
+
+concurrency:
+  group: release
 
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      - name: Require main for real releases
+        if: ${{ !inputs.dry_run && github.ref_name != 'main' }}
+        env:
+          REF: ${{ github.ref_name }}
+        run: |
+          echo "::error::Releases must run on main, not '$REF'."
+          exit 1
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # release notes and the packager look back to the previous tag
+          fetch-depth: 0 # the release script and notes look back through tags
+
+      - name: Bump version, commit, and tag
+        shell: pwsh
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          ./.github/scripts/release.ps1 $env:VERSION
+          "TAG=$(git describe --tags --exact-match HEAD)" >> $env:GITHUB_ENV
+
+      - name: Show the release commit
+        run: git show --format='%s' HEAD
 
       - name: Build release notes from CHANGELOG.txt
-        run: bash .github/scripts/release-notes.sh "$GITHUB_REF_NAME" > .release-notes.md
+        run: |
+          bash .github/scripts/release-notes.sh "$TAG" > .release-notes.md
+          cat .release-notes.md
 
-      - name: Package and publish
+      - name: Build the zip
         uses: BigWigsMods/packager@v2
         with:
-          args: -n "{package-name}_{project-version}"
+          args: -d -n "{package-name}_{project-version}"
+
+      - name: Keep the dry run output
+        if: inputs.dry_run
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-dry-run
+          include-hidden-files: true
+          path: |
+            .release/*.zip
+            .release-notes.md
+
+      - name: Push commit and tag
+        if: ${{ !inputs.dry_run }}
+        # Atomic: if main moved since checkout, nothing is pushed
+        run: git push --atomic origin HEAD:main "refs/tags/$TAG"
+
+      - name: Create GitHub release
+        if: ${{ !inputs.dry_run }}
         env:
-          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
-          WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          flags=()
+          [[ ${TAG,,} == *alpha* || ${TAG,,} == *beta* ]] && flags+=(--prerelease)
+          gh release create "$TAG" .release/*.zip --verify-tag --title "$TAG" --notes-file .release-notes.md "${flags[@]}"
