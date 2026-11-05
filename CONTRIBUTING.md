@@ -47,9 +47,11 @@ Note player-facing changes in `CHANGELOG.txt` under `- Unreleased`, grouped as `
 
 All three workflows are started by hand from the Actions tab and default to a dry run, which builds everything and attaches the zip and release notes to the run without pushing or uploading anything.
 
-1. **Release** (version, e.g. `3.2.0` or `3.2.0-beta.1`, run on `main`): moves the Unreleased entries under the new version (betas leave them in place), updates `## Version:` in every TOC, commits `Bump to v<version>`, tags it, and publishes the GitHub release.
+1. **Release** (version, e.g. `3.2.0` or `3.2.0-beta.1`, run on `main`): moves the Unreleased entries under the new version (betas leave them in place), updates `## Version:` in every TOC, commits `Bump to v<version>`, tags it, and publishes the GitHub release. Pushes with the `RELEASE_DEPLOY_KEY` secret, a deploy key with write access that the `main` ruleset lets bypass the pull request rule.
 2. **Publish to Wago** (tag, e.g. `v3.2.0`): uploads that release to Wago for every game version in the TOC files. Needs the `WAGO_API_TOKEN` secret.
 3. **Publish to CurseForge** (tag): the same for CurseForge. Needs the `CF_API_TOKEN` secret and `## X-Curse-Project-ID:` in the TOC files.
+
+The repository rulesets are kept in `.github/rulesets/` and imported under Settings → Rules → Rulesets → New ruleset → Import a ruleset.
 
 ## Use a Consistent Coding Style
 
