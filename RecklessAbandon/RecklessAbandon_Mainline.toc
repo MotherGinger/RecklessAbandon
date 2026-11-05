@@ -17,6 +17,7 @@
 ## SavedVariables: RecklessAbandonDB, RecklessAbandonPrivateDB
 ## SavedVariablesPerCharacter: RecklessAbandonCharacterDB
 ## AddonCompartmentFunc: RecklessAbandon_AddonCompartmentFunc
+## X-Curse-Project-ID: 432954
 ## X-Wago-ID: yQKyDE67
 
 Libraries\load.xml
