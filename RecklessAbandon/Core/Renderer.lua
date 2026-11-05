@@ -314,6 +314,8 @@ function E:ClassicRenderer()
 end
 
 function E:GenerateQuestTable()
+    E:EnsurePrivateDefaults()
+
     -- This generates a table of quests
     -- {
     -- 	[<zone_header_id>] = {

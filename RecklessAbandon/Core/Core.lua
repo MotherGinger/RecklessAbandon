@@ -664,6 +664,8 @@ end
 
 -- Consolidated event handler for UNIT_QUEST_LOG_CHANGED
 function E:OnQuestLogChanged()
+	E:EnsurePrivateDefaults()
+
 	-- Auto-abandon if enabled
 	if self.private.automationOptions.autoAbandonQuests then
 		local hasAnyEnabled = false
@@ -748,6 +750,21 @@ function E:NormalizeSettings()
 		E.db.commands = {
 			["generic"] = E.db.commands
 		}
+	end
+end
+
+-- AceDB strips values that match defaults when it saves (including whole
+-- tables like an untouched exclusions list). On some clients that can happen
+-- while the game is still running, which leaves E.private.exclusions nil.
+-- Put back any missing top-level tables from the defaults.
+function E:EnsurePrivateDefaults()
+	local private = E.private
+	if not private then return end
+
+	for key, value in pairs(E.privateVars.profile) do
+		if private[key] == nil then
+			private[key] = type(value) == "table" and E:CopyTable({}, value) or value
+		end
 	end
 end
 
