@@ -15,3 +15,5 @@ ignore:
   - CONTRIBUTING.md
   - LICENSE
   - README.md
+  - scripts
+  - spec

@@ -2,6 +2,7 @@ std = "lua51"
 max_line_length = false
 exclude_files = {
     ".github/",
+    ".release/",
     ".vscode/",
     "RecklessAbandon/Libraries/",
     ".luacheckrc"
@@ -45,6 +46,30 @@ globals = {
     "RecklessAbandon",
     "RecklessAbandonDB",
     "RecklessAbandonPrivateDB",
+    "RecklessAbandonCharacterDB",
+    "RecklessAbandon_AddonCompartmentFunc",
+    "LOG_LEVEL_SYSTEM",
+    "LOG_LEVEL_ERROR",
+    "LOG_LEVEL_WARN",
+    "LOG_LEVEL_INFO",
+    "LOG_LEVEL_VERBOSE",
+    "LOG_LEVEL_DEBUG",
+    "MANUAL",
+    "AUTOMATIC",
+    -- Script handlers the abandon button templates in Core/load.xml call
+    "onButtonEnter",
+    "onButtonLeave",
+    "onButtonUpdate",
+    "onAbandonButtonClick",
+    "onGroupAbandonButtonClick",
+
+    -- WoW API used by Reckless Abandon (missing from the shared list)
+    "C_QuestLog",
+    "QuestScrollFrame",
+    "QuestLogListScrollFrame",
+    "QUESTS_DISPLAYED",
+    "UnitQuestTrivialLevelRange",
+    "WOW_PROJECT_WRATH_CLASSIC",
 
     -- WeakAuras
     "WeakAuras_DropDownMenu",
@@ -19550,3 +19575,6 @@ globals = {
     "ZOOM_OUT_BUTTON_TEXT",
     "_RECORDING_WARNING_CORRUPTED",
 }
+
+-- Specs run under busted, which provides describe, it, assert and friends.
+files["spec/"] = { std = "+busted" }

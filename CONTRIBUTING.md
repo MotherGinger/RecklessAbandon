@@ -39,6 +39,22 @@ We use GitHub issues to track public bugs. Report a bug by [opening a new issue]
 - What actually happens
 - Notes (possibly including why you think this might be happening, or stuff you tried that didn't work)
 
+## Run the Tests and Linter
+
+Every push and pull request runs [luacheck](https://github.com/lunarmodules/luacheck) and the [busted](https://lunarmodules.github.io/busted/) suite in `spec/` (the **Test** workflow). To run them yourself you need Lua 5.1 and LuaRocks (on Windows, inside WSL):
+
+```bash
+luarocks install busted
+luarocks install luacheck
+bash scripts/test.sh
+```
+
+`scripts/test.sh` prints a summary and any failures; `busted` and `luacheck RecklessAbandon spec` run them on their own.
+
+The specs boot the real addon files, in TOC order, inside a small stand-in for the game client (`spec/helpers/wow_stub.lua`) for each flavor: Classic, TBC, Mists, Forever and Retail. `spec/helpers/loader.lua` does the booting, and the stub has helpers to set up a quest log, open it, click buttons, run slash commands and move time forward. When the addon starts using a client API the stub doesn't have, the test fails with a message naming it; add it to the stub with the real client's behavior.
+
+A test wrapped in `Known.Issue` (`spec/helpers/known.lua`) checks for a bug that hasn't been fixed yet. It shows as pending until the bug is fixed, then fails to remind you to remove the wrapper.
+
 ## Add a Changelog Entry
 
 Note player-facing changes in `CHANGELOG.txt` under `- Unreleased`, grouped as `Fixed` or `Changed`. These entries become the release notes on GitHub and Wago.

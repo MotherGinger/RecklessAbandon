@@ -40,7 +40,8 @@ luac.out
 *.hex
 
 # Scripts
-/scripts/
+/scripts/*
+!/scripts/test.sh
 .claude/
 **/.claude/
 .vscode/

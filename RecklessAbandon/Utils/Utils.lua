@@ -177,7 +177,7 @@ end
 ---@param t table A table to check
 ---@return boolean isEmpty Whether the table is empty
 function E:IsEmpty(t)
-    for _, _ in pairs(t) do
+    for _, _ in pairs(t) do -- luacheck: ignore 512 (any key at all means not empty)
         return false
     end
     return true
