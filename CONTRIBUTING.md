@@ -39,6 +39,17 @@ We use GitHub issues to track public bugs. Report a bug by [opening a new issue]
 - What actually happens
 - Notes (possibly including why you think this might be happening, or stuff you tried that didn't work)
 
+## Add a Changelog Entry
+
+Note player-facing changes in `CHANGELOG.txt` under `- Unreleased`, grouped as `Fixed` or `Changed`. These entries become the release notes on GitHub and Wago.
+
+## Releasing (maintainers)
+
+1. Run `./.github/scripts/release.ps1 <version>` (e.g. `3.2.0` or `3.2.0-beta.1`). It moves the Unreleased entries under the new version (betas leave them in place), updates `## Version:` in every TOC, commits `Bump to v<version>`, and tags it.
+2. Push the commit and tag, or pass `-Push`. The tag starts the Release workflow, which builds the zip, publishes the GitHub release, and uploads to Wago for every game version in the TOC files.
+
+The workflow needs a `WAGO_API_TOKEN` repository secret.
+
 ## Use a Consistent Coding Style
 
 If contributing to the code, please follow a style consistent with the existing codebase.

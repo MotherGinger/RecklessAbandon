@@ -14,6 +14,7 @@
 ## Notes-zhTW: 一個快速（且魯莽）放棄任務的工具
 ## SavedVariables: RecklessAbandonDB, RecklessAbandonPrivateDB
 ## SavedVariablesPerCharacter: RecklessAbandonCharacterDB
+## X-Wago-ID: yQKyDE67
 
 Libraries\load.xml
 init.lua

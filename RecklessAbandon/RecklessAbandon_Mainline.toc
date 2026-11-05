@@ -17,6 +17,7 @@
 ## SavedVariables: RecklessAbandonDB, RecklessAbandonPrivateDB
 ## SavedVariablesPerCharacter: RecklessAbandonCharacterDB
 ## AddonCompartmentFunc: RecklessAbandon_AddonCompartmentFunc
+## X-Wago-ID: yQKyDE67
 
 Libraries\load.xml
 init.lua

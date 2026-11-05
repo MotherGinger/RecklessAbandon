@@ -1,0 +1,32 @@
+name: Release
+
+# Runs when a version tag is pushed (see .github/scripts/release.ps1).
+# Builds one zip, publishes the GitHub release, and uploads to Wago tagged
+# with every game version found in the TOC files.
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # release notes and the packager look back to the previous tag
+
+      - name: Build release notes from CHANGELOG.txt
+        run: bash .github/scripts/release-notes.sh "$GITHUB_REF_NAME" > .release-notes.md
+
+      - name: Package and publish
+        uses: BigWigsMods/packager@v2
+        with:
+          args: -n "{package-name}_{project-version}"
+        env:
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+          WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}

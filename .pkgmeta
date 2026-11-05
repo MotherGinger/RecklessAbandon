@@ -1,0 +1,17 @@
+package-as: RecklessAbandon
+
+# The addon lives in a subfolder of the repository, so lift it to the root of the package
+move-folders:
+  RecklessAbandon/RecklessAbandon: RecklessAbandon
+
+# Written for each tag by .github/scripts/release-notes.sh from CHANGELOG.txt
+manual-changelog:
+  filename: .release-notes.md
+  markup-type: markdown
+
+# Repository files that don't belong in the addon zip
+ignore:
+  - CHANGELOG.txt
+  - CONTRIBUTING.md
+  - LICENSE
+  - README.md
