@@ -725,6 +725,38 @@ function E:PrintWelcomeMessage()
 	end
 end
 
+-- * Moves the true/false switches in `source` to `target`, keeping any `target` already has.
+local function MoveSwitches(source, target)
+	local moved = {}
+	for key, value in pairs(source) do
+		if type(value) == "boolean" then moved[key] = value end
+	end
+	for key, value in pairs(moved) do
+		source[key] = nil
+		if rawget(target, key) == nil then target[key] = value end
+	end
+end
+
+-- * A table of switches should hold only name = true/false. An earlier version of NormalizeSettings
+-- * nested the whole settings table inside it on every new character (AceDB's "*" defaults made it
+-- * look empty). Lifts the nested switches back up and returns the other values it found by name.
+local function FlattenSwitches(switches)
+	local nested, strings = {}, {}
+	for key, value in pairs(switches) do
+		if type(value) ~= "boolean" then nested[key] = value end
+	end
+	for key, value in pairs(nested) do
+		switches[key] = nil
+		if type(value) == "table" then
+			for innerKey, innerValue in pairs(FlattenSwitches(value)) do strings[innerKey] = innerValue end
+			MoveSwitches(value, switches)
+		else
+			strings[key] = value
+		end
+	end
+	return strings
+end
+
 function E:NormalizeSettings()
 	-- * Verify default settings and guard against corrupted tables
 
@@ -743,7 +775,7 @@ function E:NormalizeSettings()
 
 	-- Set debugging if not set
 	if E.db.debugging == nil then
-		E.db.debugging.debugLogging = false
+		E.db.debugging = { debugLogging = false }
 	end
 
 	-- Rebuild exclusion list
@@ -755,23 +787,24 @@ function E:NormalizeSettings()
 		end
 	end
 
-	-- Rebuild automation options
-	if
-		E.private.automationOptions.autoAbandonQuests.questType == nil or
-		E:IsEmpty(E.private.automationOptions.autoAbandonQuests.questType)
-	then
-		E.private.automationOptions.autoAbandonQuests.questType = nil
-		E.private.automationOptions.autoAbandonQuests = {
-			["questType"] = E.private.automationOptions.autoAbandonQuests
-		}
+	-- * Automation: before v1.6.0 the quest types were switches straight under autoAbandonQuests
+	-- * (and under private.general in the v1.6.0 betas). They now live in autoAbandonQuests.questType.
+	local automation = E.private.automationOptions.autoAbandonQuests
+	local betaGeneral = E.private.general
+	if type(betaGeneral) == "table" and type(betaGeneral.autoAbandonQuests) == "table" then
+		MoveSwitches(betaGeneral.autoAbandonQuests, automation.questType)
+		betaGeneral.autoAbandonQuests = nil
+	end
+	MoveSwitches(automation, automation.questType)
+	local strings = FlattenSwitches(automation.questType)
+	-- * The quest ID list an earlier version of this function moved into questType
+	if type(strings.ids) == "string" and (automation.ids == nil or automation.ids == "") then
+		automation.ids = strings.ids
 	end
 
-	-- Rebuild command settings
-	if E.db.commands.generic == nil or E:IsEmpty(E.db.commands.generic) then
-		E.db.commands = {
-			["generic"] = E.db.commands
-		}
-	end
+	-- * Commands: before v1.6.0 the command switches were straight under commands. They now live in commands.generic.
+	MoveSwitches(E.db.commands, E.db.commands.generic)
+	FlattenSwitches(E.db.commands.generic)
 end
 
 -- AceDB strips values that match defaults when it saves (including whole
