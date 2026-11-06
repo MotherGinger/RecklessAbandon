@@ -30,6 +30,7 @@ local FRAME_NOOPS = {
     "EnableKeyboard", "RegisterForClicks", "RegisterForDrag", "SetAllPoints", "SetTexCoord", "SetJustifyH",
     "SetJustifyV", "SetFont", "SetFontObject", "SetHighlightTexture", "SetPushedTexture", "LockHighlight",
     "UnlockHighlight", "SetBorderColor", "SetBackdrop", "SetBackdropColor", "SetBackdropBorderColor",
+    "SetToplevel",
 }
 
 -- Fields the real frames only have on some clients (Retail's DetailsFrame, TagTexture, SearchBox...).
@@ -135,6 +136,11 @@ NewFrame = function(kind, name, parent)
     function frame:GetPushedTexture() return self.__pushed end
     function frame:GetHighlightTexture() return self.__highlight end
     function frame:SetNormalTexture(texture) self.__normal = texture end
+    -- A button's label, like the one UIPanelButtonTemplate gives it.
+    function frame:GetFontString()
+        self.__fontString = self.__fontString or NewFrame("FontString", nil, self)
+        return self.__fontString
+    end
 
     -- Tooltips.
     function frame:SetOwner() self.__lines = {} end
