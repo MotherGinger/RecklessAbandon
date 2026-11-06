@@ -7,11 +7,16 @@ E.classIcons = {
     evoker = E.isRetail and "|T4574311:0|t" or "",
     hunter = "|T626000:0|t",
     mage = "|T626001:0|t",
-    monk = E.isRetail and "T|626002:0|t" or "",
+    monk = (E.isRetail or E.isMop) and "|T626002:0|t" or "",
     paladin = "|T626003:0|t",
     priest = "|T626004:0|t",
     rogue = "|T626005:0|t",
     shaman = "|T626006:0|t",
     warlock = "|T626007:0|t",
     warrior = "|T626008:0|t",
+}
+
+E.factionIcons = {
+    alliance = "|TInterface\\Icons\\INV_BannerPVP_02:0|t",
+    horde = "|TInterface\\Icons\\INV_BannerPVP_01:0|t",
 }

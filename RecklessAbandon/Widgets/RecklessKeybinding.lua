@@ -236,14 +236,20 @@ local function Constructor()
         msgframe = msgframe,
         frame = frame,
         alignoffset = 30,
-        type = Type
+        -- UI skins (ElvUI, AddOnSkins) style a widget as it registers, by its type, and only know the
+        -- stock "Keybinding". This widget has the same parts, so it registers under that name and then
+        -- takes its own back, which AceGUI needs to pool it.
+        type = "Keybinding"
     }
     for method, func in pairs(methods) do
         Widget[method] = func
     end
     button.obj = Widget
 
-    return AceGUI:RegisterAsWidget(Widget)
+    AceGUI:RegisterAsWidget(Widget)
+    Widget.type = Type
+
+    return Widget
 end
 
 AceGUI:RegisterWidgetType(Type, Constructor, Version)

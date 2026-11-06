@@ -3,6 +3,8 @@ local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateD
 local _, interfaceVersion
 E.wowpatch, E.wowbuild, _, interfaceVersion = GetBuildInfo()
 E.wowbuild = tonumber(E.wowbuild)
+E.interfaceVersion = interfaceVersion
+E.projectID = WOW_PROJECT_ID
 
 -- Camelot (WoW Forever) is a vanilla (1.x) client, so it follows the Classic code paths. Its project ID
 -- has changed during the beta (WOW_PROJECT_MAINLINE up to at least build 69913, WOW_PROJECT_CAMELOT = 18
@@ -17,6 +19,16 @@ E.isBC = not E.isCamelot and WOW_PROJECT_ID == (WOW_PROJECT_BURNING_CRUSADE_CLAS
 E.isWrath = not E.isCamelot and WOW_PROJECT_ID == (WOW_PROJECT_WRATH_CLASSIC or 11)
 E.isCata = not E.isCamelot and WOW_PROJECT_ID == (WOW_PROJECT_CATACLYSM_CLASSIC or 14)
 E.isMop = not E.isCamelot and WOW_PROJECT_ID == (WOW_PROJECT_MISTS_CLASSIC or 19)
+
+-- The client's name, shown on the About page for bug reports
+E.clientName = (E.isCamelot and "WoW Forever")
+    or (E.isRetail and "Retail")
+    or (E.isClassic and "Classic Era")
+    or (E.isBC and "Burning Crusade Classic")
+    or (E.isWrath and "Wrath Classic")
+    or (E.isCata and "Cataclysm Classic")
+    or (E.isMop and "Mists of Pandaria Classic")
+    or "Unknown"
 
 -- Retail and Camelot removed the legacy quest log globals in favor of C_QuestLog
 E.hasQuestLogAPI = E.isRetail or GetNumQuestLogEntries == nil

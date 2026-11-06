@@ -12,11 +12,13 @@ This project adheres to Semantic Versioning.
     - Spanish (Spain), Portuguese (Portugal) and Traditional Chinese clients now use the Spanish, Portuguese and Chinese translations
     - Many settings descriptions and messages showing in English instead of the game's language
     - Quest IDs for automatic abandons being lost on login when no quest types were selected
+    - Keybinding buttons and the exclusion list's scroll bar in the settings not being styled by ElvUI and AddOnSkins
     - Forever is now recognized by its own project ID as well as its interface number, so a build reporting the Retail project ID is no longer treated as both Retail and Classic
   - Changed
     - Messaging rate now defaults to "Only show important messages"
     - Removed the "Only show messages for errors" messaging rate, existing selections move to "Only show problems"
     - "Automatically abandoned N quests" summary now only shows with "Show all messages"
+    - About page now credits Frauke Betz (hover the name to see the author's mains on each client), and lists the addon version, detected client, game version, interface version, project ID, quest log API and locale for bug reports
 
 - v3.1.1
   - Fixed

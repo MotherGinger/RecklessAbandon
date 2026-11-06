@@ -30,6 +30,7 @@ local FRAME_NOOPS = {
     "EnableKeyboard", "RegisterForClicks", "RegisterForDrag", "SetAllPoints", "SetTexCoord", "SetJustifyH",
     "SetJustifyV", "SetFont", "SetFontObject", "SetHighlightTexture", "SetPushedTexture", "LockHighlight",
     "UnlockHighlight", "SetBorderColor", "SetBackdrop", "SetBackdropColor", "SetBackdropBorderColor",
+    "SetToplevel",
 }
 
 -- Fields the real frames only have on some clients (Retail's DetailsFrame, TagTexture, SearchBox...).
@@ -135,11 +136,19 @@ NewFrame = function(kind, name, parent)
     function frame:GetPushedTexture() return self.__pushed end
     function frame:GetHighlightTexture() return self.__highlight end
     function frame:SetNormalTexture(texture) self.__normal = texture end
+    function frame:SetScrollChild(child) self.__scrollChild = child end
+    function frame:GetScrollChild() return self.__scrollChild end
+    -- A button's label, like the one UIPanelButtonTemplate gives it.
+    function frame:GetFontString()
+        self.__fontString = self.__fontString or NewFrame("FontString", nil, self)
+        return self.__fontString
+    end
 
     -- Tooltips.
     function frame:SetOwner() self.__lines = {} end
     function frame:ClearLines() self.__lines = {} end
     function frame:AddLine(text) table.insert(self.__lines, text) end
+    function frame:AddDoubleLine(left, right) table.insert(self.__lines, left .. "\t" .. right) end
     function frame:SetHyperlink(link)
         local id = tonumber(link:match("^quest:(%d+)"))
         local line = _G[(self.__name or "") .. "TextLeft1"]
@@ -164,6 +173,11 @@ local function CreateFrame(kind, name, parent, template)
         for event, body in pairs(Stub.state.templates[templateName] or {}) do
             frame:SetScript(event, compileScript(body, event))
         end
+    end
+    -- Blizzard's scroll frame template comes with its scroll bar, as ScrollBar and $parentScrollBar.
+    if (template or ""):find("UIPanelScrollFrameTemplate", 1, true) then
+        frame.ScrollBar = NewFrame("Slider", name and name .. "ScrollBar", frame)
+        if name then _G[name .. "ScrollBar"] = frame.ScrollBar end
     end
     if kind == "GameTooltip" and name then
         _G[name .. "TextLeft1"] = NewFrame("FontString", name .. "TextLeft1", frame)

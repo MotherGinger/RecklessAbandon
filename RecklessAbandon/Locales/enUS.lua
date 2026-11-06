@@ -158,6 +158,14 @@ L["About"] = true
 L["Testers"] = true
 L["Written by %s %s"] = true
 L["Please report any bugs or request features on our issue board:"] = true
+L["Addon Version"] = true
+L["Detected Client"] = true
+L["Game Version"] = true
+L["Interface Version"] = true
+L["Project ID"] = true
+L["Quest Log API"] = true
+L["Locale"] = true
+L["Find me on"] = true
 
 L["|cFFFFFF00Abandoned quest %s|r"] = true
 L["|cFFFFFF00You can't abandon %s|r"] = true
