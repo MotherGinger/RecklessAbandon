@@ -64,6 +64,20 @@ describe("settings", function()
         end)
     end)
 
+    it("puts back a missing messaging rate and debugging settings", function()
+        local E = Loader.Boot("classic")
+        E.db.general.logLevel = nil
+        E.db.debugging = nil
+        E:NormalizeSettings()
+        assert.are.equal(LOG_LEVEL_INFO, E.db.general.logLevel)
+        assert.are.same({ debugLogging = false }, E.db.debugging)
+    end)
+
+    it("restores account-wide settings", function()
+        local E = Loader.Boot("classic", { saved = { RecklessAbandonDB = { global = { seen = true } } } })
+        assert.is_true(E.global.seen)
+    end)
+
     it("upgrades exclusions saved as a bare title", function()
         local E = Loader.Boot("classic", { saved = private({ exclusions = { excludedQuests = { [101] = "Old Title" } } }) })
         assert.are.same({ title = "Old Title", source = MANUAL }, E.private.exclusions.excludedQuests[101])

@@ -17,6 +17,16 @@ describe("booting", function()
         end)
     end
 
+    it("skips a library registered without a name", function()
+        local E = Loader.Boot("classic")
+        local count = 0
+        for _ in pairs(E.Libs) do count = count + 1 end
+        E:AddLib(nil, "AceDB-3.0")
+        local after = 0
+        for _ in pairs(E.Libs) do after = after + 1 end
+        assert.are.equal(count, after)
+    end)
+
     describe("detects the client", function()
         local EXPECTED = {
             classic = { isClassic = true, isCamelot = false, isBC = false, isMop = false, isRetail = false, hasQuestLogAPI = false, hasQuestMapFrame = false },

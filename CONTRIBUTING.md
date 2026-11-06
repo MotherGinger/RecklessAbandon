@@ -55,6 +55,13 @@ The specs boot the real addon files, in TOC order, inside a small stand-in for t
 
 A test wrapped in `Known.Issue` (`spec/helpers/known.lua`) checks for a bug that hasn't been fixed yet. It shows as pending until the bug is fixed, then fails to remind you to remove the wrapper.
 
+The specs cover every line of the addon's own code (the bundled `Libraries/` aren't counted). To check coverage after a change, install [LuaCov](https://lunarmodules.github.io/luacov/) and run busted with `-c`; `.luacov` sets what is counted, and the summary is at the end of `luacov.report.out`:
+
+```bash
+luarocks install luacov
+busted -c && luacov
+```
+
 ## Add a Changelog Entry
 
 Note player-facing changes in `CHANGELOG.txt` under `- Unreleased`, grouped as `Fixed` or `Changed`. These entries become the release notes on GitHub and Wago.

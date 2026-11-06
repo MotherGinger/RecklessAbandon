@@ -204,3 +204,39 @@ describe("complete protection", function()
         assert.is_true(E:IsExcluded(102))
     end)
 end)
+
+-- The client can briefly have no entry at an index it still counts, e.g. while the log is changing.
+describe("a quest log entry the client can't describe", function()
+    for _, flavor in ipairs(Loader.FLAVORS) do
+        it("is skipped, and the rest of the log handled, on " .. flavor, function()
+            local E, Stub = Loader.Boot(flavor, {
+                questLog = {
+                    { header = "Zone" },
+                    { id = 101, title = "Undescribed" },
+                    { id = 102, title = "Done", complete = true },
+                    { id = 103, title = "Unwanted" },
+                },
+            })
+            if E.hasQuestLogAPI then
+                local getInfo = C_QuestLog.GetInfo
+                C_QuestLog.GetInfo = function(index) if index ~= 2 then return getInfo(index) end end
+            else
+                local getTitle = GetQuestLogTitle
+                _G.GetQuestLogTitle = function(index) if index ~= 2 then return getTitle(index) end end
+            end
+            E.db.debugging.debugLogging = true
+            E.private.automationOptions.autoAbandonQuests.ids = "103"
+            E:UpdateParsedExclusions()
+            Stub.ClearChat()
+
+            Stub.QuestLogChanged()
+            Stub.Advance(SWEEP)
+
+            assert.is_true(Stub.ChatContains("Failed to get quest info for index 2 in AutoExcludeQuests"))
+            assert.is_true(Stub.ChatContains("Failed to get quest info for index 2 in AutoAbandonQuests"))
+            assert.is_true(Stub.ChatContains("Failed to get quest info for index 2"))
+            assert.is_true(E:IsExcluded(102))
+            assert.are.same({ 103 }, Stub.state.abandoned)
+        end)
+    end
+end)

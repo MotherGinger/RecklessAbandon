@@ -66,6 +66,19 @@ describe("utilities", function()
         end)
     end)
 
+    it("Dump hands the table to the client's /dump when asked", function()
+        local dumped
+        _G.DevTools_Dump = function(value) dumped = value end
+        local value = { zone = 1 }
+        assert.is_nil(E:Dump(value, true))
+        _G.DevTools_Dump = nil
+        assert.are.equal(value, dumped)
+    end)
+
+    it("SerializeTable marks values it can't write", function()
+        assert.are.equal('"[inserializeable datatype:function]"', E:SerializeTable(print, nil, true))
+    end)
+
     it("Dump prints nested tables", function()
         local dumped = E:Dump({ zone = { [101] = "Quest" } })
         assert.is_truthy(dumped:find("['zone'] = {", 1, true))

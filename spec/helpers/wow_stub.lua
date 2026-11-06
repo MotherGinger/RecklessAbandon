@@ -111,6 +111,11 @@ NewFrame = function(kind, name, parent)
     function frame:GetID() return self.__id end
     function frame:SetText(text) self.__text = text end
     function frame:GetText() return self.__text end
+    function frame:SetFormattedText(pattern, ...) self.__text = pattern:format(...) end
+    function frame:SetTextColor(r, g, b, a) self.__textColor = { r, g, b, a } end
+    function frame:GetTextColor() if self.__textColor then return unpack(self.__textColor) end end
+    function frame:SetNormalFontObject(font) self.__fontObject = font end
+    function frame:GetNormalFontObject() return self.__fontObject end
     function frame:SetEnabled(enabled) self.__enabled = enabled and true or false end
     function frame:Enable() self.__enabled = true end
     function frame:Disable() self.__enabled = false end
@@ -120,6 +125,7 @@ NewFrame = function(kind, name, parent)
     function frame:SetTexture(texture) self.__texture = texture end
     function frame:GetTexture() return self.__texture end
     function frame:SetVertexColor(r, g, b, a) self.__vertexColor = { r, g, b, a } end
+    function frame:SetColorTexture(r, g, b, a) self.__color = { r, g, b, a } end
     function frame:GetVertexColor() if self.__vertexColor then return unpack(self.__vertexColor) end end
     function frame:SetDesaturated(desaturated) self.__desaturated = desaturated and true or false end
     function frame:IsDesaturated() return self.__desaturated == true end
@@ -232,7 +238,8 @@ end
 -- Quest log
 ----------------------------------------------------------------
 
--- Entries are { header = "Zone" [, collapsed = true] } or a quest:
+-- Entries are { header = "Zone" [, collapsed = true] [, campaign = true | calling = true] } or a quest:
+-- (Retail draws campaign and covenant calling headers from their own frame pools.)
 -- { id =, title =, level = (60), tag = "Elite", tagID =, elite =, frequency = "daily" | "weekly",
 --   complete = true, failed = true, hidden = true, canAbandon = false }
 
@@ -455,9 +462,22 @@ local function layoutQuestLog()
     local scroll = _G.QuestScrollFrame
     scroll.headerFramePool:ReleaseAll()
     scroll.titleFramePool:ReleaseAll()
+    if Stub.flavor.retail then
+        scroll.campaignHeaderFramePool:ReleaseAll()
+        scroll.covenantCallingsHeaderFramePool:ReleaseAll()
+    end
     local collapsed = false
     for index, entry in ipairs(S.questLog) do
-        if entry.header then
+        if entry.header and Stub.flavor.retail and (entry.campaign or entry.calling) then
+            collapsed = entry.collapsed == true
+            local pool = entry.campaign and scroll.campaignHeaderFramePool or scroll.covenantCallingsHeaderFramePool
+            local header = pool:Acquire()
+            header.questLogIndex = index
+            header.Text = rawget(header, "Text") or header:CreateFontString()
+            header.Text:SetText(entry.header)
+            header.CollapseButton = rawget(header, "CollapseButton") or CreateFrame("Button", nil, header)
+            header:Show()
+        elseif entry.header then
             collapsed = entry.collapsed == true
             local header = scroll.headerFramePool:Acquire()
             header.questLogIndex = index
@@ -589,6 +609,7 @@ function Stub.Install(flavorName)
     _G.DAILY, _G.WEEKLY, _G.FAILED = "Daily", "Weekly", "Failed"
     _G.LFG_TYPE_DUNGEON, _G.RAID, _G.GROUP, _G.ELITE, _G.PLAYER_DIFFICULTY2, _G.PVP = "Dungeon", "Raid", "Group", "Elite", "Heroic", "PvP"
     _G.RETRIEVING_DATA = "Retrieving item information"
+    _G.NOT_BOUND = "Not Bound"
     _G.ERR_NOT_IN_COMBAT = "You can't do that while in combat."
 
     -- Timers. AceTimer schedules through C_Timer.After and checks GetTime when the callback runs.

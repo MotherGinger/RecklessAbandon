@@ -45,6 +45,10 @@ describe("Shim", function()
                 assert.is_true(E.Shim:GetInfo(4).isHidden)
             end)
 
+            it("has no info for an index the quest log has no entry at", function()
+                assert.is_nil(E.Shim:GetInfo(99))
+            end)
+
             it("finds a quest's log index, and nil for a quest not in the log", function()
                 assert.are.equal(2, E.Shim:GetLogIndexForQuestID(101))
                 assert.is_nil(E.Shim:GetLogIndexForQuestID(999))
@@ -99,12 +103,36 @@ describe("Shim", function()
             assert.are.equal("Legendary", tagFor("forever", { tagID = 83, tag = "Legendary" }))
             assert.are.equal("Elite", tagFor("forever", { elite = true }))
             assert.is_nil(tagFor("forever", {}))
+            assert.is_nil(tagFor("forever", { tag = "" }))
         end)
 
         it("leaves Retail quests untagged", function()
             assert.is_nil(tagFor("retail", { tagID = 81 }))
         end)
     end)
+
+    it("has no tag lookup on clients without C_QuestLog", function()
+        local E = Loader.Boot("classic", { questLog = { { id = 201, title = "Tagged", tag = "Elite" } } })
+        assert.is_nil(E.Shim:GetQuestTagName(201))
+    end)
+
+    it("reads the TOC on clients from before C_AddOns", function()
+        local E = Loader.Boot("classic", {
+            before = function(Stub)
+                _G.C_AddOns = nil
+                _G.GetAddOnMetadata = function(_, field) return Stub.state.metadata[field] end
+            end,
+        })
+        assert.are.equal(Loader.TocFields(Loader.TOC_FOR.classic).Version, E.version)
+    end)
+
+    for _, flavor in ipairs({ "classic", "tbc" }) do
+        it("gives no link for a quest the client can't describe on " .. flavor, function()
+            local E = Loader.Boot(flavor, { questLog = LOG, before = function(Stub) Stub.state.noQuestLinks = true end })
+            _G.GetQuestLogTitle = function() end
+            assert.is_nil(E.Shim:GetQuestLink(101))
+        end)
+    end
 
     it("passes the Classic quest tag straight through", function()
         local E = Loader.Boot("classic", { questLog = { { id = 201, title = "Tagged", tag = "Elite" } } })
