@@ -211,25 +211,6 @@ function E:HideAbandonButtons()
     E.buttonStateCache.activeGroupButtons = {}
 end
 
--- Smart button management: only release buttons no longer needed
-function E:SmartReleaseButtons(neededQuestIds, neededGroupKeys)
-    -- Release quest buttons that are no longer needed
-    for questId, button in pairs(E.buttonStateCache.activeQuestButtons) do
-        if not neededQuestIds[questId] then
-            E.questButtonPool:Release(button)
-            E.buttonStateCache.activeQuestButtons[questId] = nil
-        end
-    end
-
-    -- Release group buttons that are no longer needed
-    for groupKey, button in pairs(E.buttonStateCache.activeGroupButtons) do
-        if not neededGroupKeys[groupKey] then
-            E.groupButtonPool:Release(button)
-            E.buttonStateCache.activeGroupButtons[groupKey] = nil
-        end
-    end
-end
-
 function E:RetailRenderer()
     E:HideAbandonButtons()
 

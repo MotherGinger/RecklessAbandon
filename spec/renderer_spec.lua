@@ -146,6 +146,41 @@ for _, flavor in ipairs(Loader.FLAVORS) do
                 assert.are.equal(2, #Stub.state.rowClicks)
             end)
 
+            it("abandons a zone from its header straight away when group confirmation is off", function()
+                E.db.general.confirmGroup = false
+                Stub.Click(Stub.QuestLogRow("Westfall"), "LeftButton", { alt = true })
+                Stub.Advance(SWEEP)
+                assert.are.same({}, Stub.state.popups)
+                assert.are.same({ 201 }, Stub.state.abandoned)
+            end)
+
+            it("asks first when individual confirmation is on", function()
+                E.db.general.confirmIndividual = true
+                Stub.Click(Stub.QuestLogRow(101), "LeftButton", { alt = true })
+                Stub.Advance(SWEEP)
+                assert.are.same({}, Stub.state.abandoned)
+                Stub.AcceptPopup()
+                Stub.Advance(SWEEP)
+                assert.are.same({ 101 }, Stub.state.abandoned)
+            end)
+
+            it("says what a binding did when debugging is on", function()
+                E.db.debugging.debugLogging = true
+                Stub.ClearChat()
+                Stub.Click(Stub.QuestLogRow(101), "RightButton", { alt = true })
+                assert.is_true(Stub.ChatContains("A Threat Within excluded via keybinding (ALT-BUTTON2)"))
+            end)
+
+            it("binds the middle and side mouse buttons", function()
+                local names = { MiddleButton = "BUTTON3", Button4 = "BUTTON4", Button5 = "BUTTON5" }
+                for mouseButton, key in pairs(names) do
+                    E.db.general.individualQuests.excludeBinding = key
+                    Stub.Click(Stub.QuestLogRow(101), mouseButton)
+                    assert.is_true(E:IsExcluded(101), key)
+                    E:IncludeQuest(101)
+                end
+            end)
+
             it("follows a rebound key", function()
                 E.db.general.individualQuests.abandonBinding = "CTRL-BUTTON1"
                 Stub.Click(Stub.QuestLogRow(101), "LeftButton", { alt = true })
@@ -159,7 +194,76 @@ for _, flavor in ipairs(Loader.FLAVORS) do
     end)
 end
 
+for _, flavor in ipairs(Loader.FLAVORS) do
+    it("greys out a zone's button when none of its quests can be abandoned on " .. flavor, function()
+        local E, Stub = Loader.Boot(flavor, { questLog = { { header = "Duskwood" }, { id = 301, title = "Escort", canAbandon = false } } })
+        Stub.OpenQuestLog()
+        local button = groupButton(E, "duskwood")
+        assert.is_false(button:IsEnabled())
+        assert.is_true(button:GetNormalTexture():IsDesaturated())
+    end)
+end
+
 describe("quest log buttons on Retail", function()
+    it("come back when the quest map handles an event, unless the details pane is open", function()
+        local E, Stub = Loader.Boot("retail", { questLog = LOG })
+        Stub.OpenQuestLog()
+        local onEvent = QuestMapFrame:GetScript("OnEvent")
+        E:HideAbandonButtons()
+        QuestMapFrame.QuestsFrame.DetailsFrame:Show()
+        onEvent(QuestMapFrame, "QUEST_LOG_UPDATE")
+        assert.are.equal(0, count(E.questButtonPool))
+        QuestMapFrame.QuestsFrame.DetailsFrame.__shown = false -- closed without its OnHide, which redraws on its own
+        onEvent(QuestMapFrame, "QUEST_LOG_UPDATE")
+        assert.are.equal(3, count(E.questButtonPool))
+    end)
+
+    it("hide the buttons scrolled out of view", function()
+        local E, Stub = Loader.Boot("retail", { questLog = LOG })
+        Stub.OpenQuestLog()
+        local scrolledAway = questButton(E, 101)
+        scrolledAway.GetTop = function() return 500 end
+        local onScroll = QuestScrollFrame:GetScript("OnVerticalScroll")
+        onScroll(QuestScrollFrame, 20)
+        assert.is_false(scrolledAway:IsShown())
+        assert.is_true(questButton(E, 201):IsShown())
+        assert.is_true(groupButton(E, "westfall"):IsShown())
+    end)
+
+    it("stay put when scrolled behind the details pane", function()
+        local E, Stub = Loader.Boot("retail", { questLog = LOG })
+        Stub.OpenQuestLog()
+        local button = questButton(E, 101)
+        button.GetTop = function() return 500 end
+        QuestMapFrame.QuestsFrame.DetailsFrame:Show()
+        E:HideAbandonButtons()
+        QuestScrollFrame:GetScript("OnVerticalScroll")(QuestScrollFrame, 20)
+        assert.are.equal(0, count(E.questButtonPool))
+    end)
+
+    it("put a group button on campaign headers and on covenant callings, when asked", function()
+        local E, Stub = Loader.Boot("retail", {
+            questLog = {
+                { header = "The War Within", campaign = true },
+                { id = 401, title = "Chapter One" },
+                { header = "Callings", calling = true },
+                { id = 501, title = "A Calling" },
+            },
+        })
+        E.db.general.covenantCallings.showAbandonButton = true
+        Stub.OpenQuestLog()
+        assert.is_truthy(groupButton(E, "thewarwithin"))
+        local calling = groupButton(E, "callings")
+        assert.are.equal("covenant callings", calling.title)
+        assert.is_truthy(calling.tooltip:find("Abandon all covenant calling quests", 1, true))
+    end)
+
+    it("leave covenant callings alone by default", function()
+        local E, Stub = Loader.Boot("retail", { questLog = { { header = "Callings", calling = true }, { id = 501, title = "A Calling" } } })
+        Stub.OpenQuestLog()
+        assert.is_nil(groupButton(E, "callings"))
+    end)
+
     it("stay hidden while the quest details pane is open", function()
         local E, Stub = Loader.Boot("retail", { questLog = LOG })
         QuestMapFrame.QuestsFrame.DetailsFrame:Show()
@@ -182,6 +286,41 @@ describe("quest log buttons on Retail", function()
         assert.are.equal(0, count(E.questButtonPool))
         Stub.Advance(0.2)
         assert.are.equal(3, count(E.questButtonPool))
+    end)
+end)
+
+for _, flavor in ipairs({ "classic", "tbc", "mists" }) do
+    it("follow the quest log as it scrolls on " .. flavor, function()
+        local long = { { header = "Elwynn Forest" } }
+        for i = 1, 10 do long[i + 1] = { id = 100 + i, title = "Quest " .. i } end
+        long[12] = { header = "Westfall" }
+        long[13] = { id = 201, title = "Last" }
+        local E, Stub = Loader.Boot(flavor, { questLog = long })
+        Stub.OpenQuestLog()
+        assert.is_truthy(groupButton(E, "elwynnforest"))
+        assert.is_nil(groupButton(E, "westfall"))
+
+        local scroll = QuestLogListScrollFrame
+        scroll.offset = 7
+        if flavor == "mists" then
+            scroll.scrollBar:GetScript("OnValueChanged")(scroll.scrollBar, 7)
+        else
+            scroll:GetScript("OnVerticalScroll")(scroll, 7)
+        end
+        assert.is_truthy(groupButton(E, "westfall"))
+        assert.is_truthy(questButton(E, 201))
+        assert.is_nil(questButton(E, 101))
+    end)
+end
+
+describe("quest log rows on Classic", function()
+    it("still run the client's own mouse-down handler", function()
+        local _, Stub = Loader.Boot("classic", { questLog = LOG })
+        local downs = 0
+        _G.QuestLogTitle2:SetScript("OnMouseDown", function() downs = downs + 1 end)
+        Stub.OpenQuestLog()
+        Stub.Click(Stub.QuestLogRow(101), "LeftButton")
+        assert.are.equal(1, downs)
     end)
 end)
 

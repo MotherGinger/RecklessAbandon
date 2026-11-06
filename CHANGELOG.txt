@@ -14,6 +14,9 @@ This project adheres to Semantic Versioning.
     - Quest IDs for automatic abandons being lost on login when no quest types were selected
     - Keybinding buttons and the exclusion list's scroll bar in the settings not being styled by ElvUI and AddOnSkins
     - Forever is now recognized by its own project ID as well as its interface number, so a build reporting the Retail project ID is no longer treated as both Retail and Classic
+    - Lua error when confirming an abandon after the quest, or the zone's quests, had already left the quest log
+    - Lua error when using the zone abandon keybinding on a zone header that had stayed collapsed since login (Classic, TBC, Mists)
+    - Lua error on Retail and Forever when the game briefly has no entry for a quest log line
   - Changed
     - Messaging rate now defaults to "Only show important messages"
     - Removed the "Only show messages for errors" messaging rate, existing selections move to "Only show problems"

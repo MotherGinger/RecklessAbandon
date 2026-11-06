@@ -33,6 +33,27 @@ describe("slash commands", function()
         assert.is_true(Stub.ChatContains("You can't do that while in combat."))
     end)
 
+    describe("dump", function()
+        it("prints a global table", function()
+            _G.RecklessDumpSample = { zone = "Elwynn" }
+            Stub.RunSlash("/rab dump RecklessDumpSample")
+            _G.RecklessDumpSample = nil
+            assert.is_true(Stub.ChatContains("['zone'] = 'Elwynn'"))
+        end)
+
+        it("prints a global value", function()
+            _G.RecklessDumpSample = 42
+            Stub.RunSlash("/rab dump RecklessDumpSample")
+            _G.RecklessDumpSample = nil
+            assert.is_true(Stub.ChatContains("42"))
+        end)
+
+        it("echoes a name that isn't set", function()
+            Stub.RunSlash("/rab dump NoSuchGlobal")
+            assert.is_true(Stub.ChatContains("NoSuchGlobal"))
+        end)
+    end)
+
     it("toggles debugging", function()
         Stub.RunSlash("/rab debug")
         assert.is_true(E.db.debugging.debugLogging)

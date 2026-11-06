@@ -170,23 +170,21 @@ function onAbandonButtonClick(self, button)
 		if excluded then
 			E:IncludeQuest(self.questId)
 			texture:SetVertexColor(1, 1, 1, 1)
-			self.tooltip =
-				format(
-					E.abandonTooltipFormat,
-					self.title,
-					L["Left Click: Abandon quest"],
-					L["Right Click: Exclude quest from group abandons"]
-				)
+			self.tooltip = format(
+				E.abandonTooltipFormat,
+				self.title,
+				L["Left Click: Abandon quest"],
+				L["Right Click: Exclude quest from group abandons"]
+			)
 		else
 			E:ExcludeQuest(self.questId, MANUAL)
 			texture:SetVertexColor(0.5, 0.5, 1, 0.7)
-			self.tooltip =
-				format(
-					E.abandonTooltipFormat,
-					self.title,
-					L["Left Click: Abandon quest"],
-					L["Right Click: Include quest in group abandons"]
-				)
+			self.tooltip = format(
+				E.abandonTooltipFormat,
+				self.title,
+				L["Left Click: Abandon quest"],
+				L["Right Click: Include quest in group abandons"]
+			)
 		end
 
 		self:SetNormalTexture(texture)
@@ -239,16 +237,8 @@ function E:Warn(...)
 	E:Print(LOG_LEVEL_WARN, ...)
 end
 
-function E:Error(...)
-	E:Print(LOG_LEVEL_ERROR, ...)
-end
-
 function E:System(...)
 	E:Print(LOG_LEVEL_SYSTEM, ...)
-end
-
-function E:Critical(...)
-	print(strjoin("", E.title, format("|cFFFF6B6B: %s|r", ...)))
 end
 
 function E:Debug(...)
@@ -346,9 +336,10 @@ function E:AbandonZoneQuests(key)
 	-- * Rebuild first so we act on the quest log as it is now, not as it was at the last update
 	E:GenerateQuestTable()
 
-	local group = E.questGroupsByName[key] or {}
+	-- * Classic only knows a zone once its header has been expanded
+	local group = E.questGroupsByName[key] or { quests = {} }
 	local questIds = {}
-	for questId, _ in pairs(group.quests or {}) do
+	for questId, _ in pairs(group.quests) do
 		tinsert(questIds, questId)
 	end
 
@@ -431,6 +422,8 @@ function E:AbandonQuests(questIds, exclusionBypass)
 	for _, questId in ipairs(questIds) do
 		if E.pendingAbandons[questId] then
 			-- * Already queued
+		elseif not E:IsOnQuest(questId) then
+			-- * Already gone: turned in, or abandoned, since it was offered (a popup, or a zone's last known quests)
 		elseif not exclusionBypass and E.private.exclusions.excludedQuests[questId] then
 			E:Verbose(format(L["Skipping %s since it is excluded from group abandons"], E.Shim:GetQuestLink(questId)))
 		elseif not E.Shim:CanAbandonQuest(questId) then

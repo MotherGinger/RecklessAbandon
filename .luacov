@@ -1,0 +1,6 @@
+return {
+    include = { "RecklessAbandon/" },
+    exclude = { "RecklessAbandon/Libraries/" },
+    statsfile = "luacov.stats.out",
+    reportfile = "luacov.report.out",
+}
