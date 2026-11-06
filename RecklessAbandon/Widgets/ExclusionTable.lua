@@ -31,6 +31,26 @@ local function UpdateData(tbl)
     data = tbl
 end
 
+-- UI skins style the scroll bars of AceGUI's own ScrollFrame, but not this Blizzard one, so hand it
+-- to whichever skin is loaded, when its option for settings windows (Ace3) is on. AddOnSkins leaves
+-- settings windows to ElvUI when both are loaded.
+local function SkinScrollBar(scrollBar)
+    local ElvUI = _G.ElvUI and _G.ElvUI[1]
+    if ElvUI then
+        local S = ElvUI.GetModule and ElvUI:GetModule("Skins", true)
+        local skins = ElvUI.private and ElvUI.private.skins
+        if S and S.HandleScrollBar and skins and skins.ace3Enable then
+            S:HandleScrollBar(scrollBar)
+        end
+        return
+    end
+
+    local AS = _G.AddOnSkins and _G.AddOnSkins[1]
+    if AS and AS.SkinScrollBar and AS.CheckOption and AS:CheckOption("Ace3") then
+        AS:SkinScrollBar(scrollBar)
+    end
+end
+
 local function CreateRow(parent, i)
     local row = CreateFrame("Frame", "RecklessAbandon_ExclusionListRow" .. i, parent)
     row.columns = {} -- creating columns for the row
@@ -129,6 +149,7 @@ local function Constructor()
     Frame.scrollFrame = CreateFrame("ScrollFrame", "RecklessAbandon_ExclusionListScrollFrame", Frame, "UIPanelScrollFrameTemplate")
     Frame.scrollFrame:SetPoint("TOPLEFT", 12, -8)
     Frame.scrollFrame:SetPoint("BOTTOMRIGHT", -34, 8)
+    SkinScrollBar(Frame.scrollFrame.ScrollBar)
 
     Frame.scrollFrame.scrollChild = CreateFrame("Frame", "RecklessAbandon_ExclusionListScrollChildFrame", Frame.scrollFrame)
     Frame.scrollFrame.scrollChild:SetSize(100, 100)
