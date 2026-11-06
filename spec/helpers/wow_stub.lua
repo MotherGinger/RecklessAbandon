@@ -140,6 +140,7 @@ NewFrame = function(kind, name, parent)
     function frame:SetOwner() self.__lines = {} end
     function frame:ClearLines() self.__lines = {} end
     function frame:AddLine(text) table.insert(self.__lines, text) end
+    function frame:AddDoubleLine(left, right) table.insert(self.__lines, left .. "\t" .. right) end
     function frame:SetHyperlink(link)
         local id = tonumber(link:match("^quest:(%d+)"))
         local line = _G[(self.__name or "") .. "TextLeft1"]

@@ -1,4 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
     <Script file="ExclusionTable.lua" />
     <Script file="RecklessKeybinding.lua" />
+    <Script file="RecklessAuthor.lua" />
 </Ui>

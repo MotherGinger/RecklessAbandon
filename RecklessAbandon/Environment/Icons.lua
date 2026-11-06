@@ -15,3 +15,8 @@ E.classIcons = {
     warlock = "|T626007:0|t",
     warrior = "|T626008:0|t",
 }
+
+E.factionIcons = {
+    alliance = "|TInterface\\Icons\\INV_BannerPVP_02:0|t",
+    horde = "|TInterface\\Icons\\INV_BannerPVP_01:0|t",
+}

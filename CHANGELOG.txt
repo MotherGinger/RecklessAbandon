@@ -17,6 +17,7 @@ This project adheres to Semantic Versioning.
     - Messaging rate now defaults to "Only show important messages"
     - Removed the "Only show messages for errors" messaging rate, existing selections move to "Only show problems"
     - "Automatically abandoned N quests" summary now only shows with "Show all messages"
+    - About page now credits Frauke Betz (hover the name to see the author's mains on each client), and lists the addon version, detected client, game version, interface version, project ID, quest log API and locale for bug reports
 
 - v3.1.1
   - Fixed
