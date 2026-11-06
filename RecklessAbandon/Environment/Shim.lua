@@ -77,6 +77,9 @@ function E.Shim:GetInfo(questIndex)
 
     if E.hasQuestLogAPI then
         local info = C_QuestLog.GetInfo(questIndex)
+        if not info then
+            return nil
+        end
 
         Info.title = info.title
         Info.level = info.level
@@ -99,6 +102,9 @@ function E.Shim:GetInfo(questIndex)
     else
         local title, level, questTag, isHeader, isCollapsed, isComplete, isDaily, questID,
         _, _, _, _, _, _, _, isHidden = GetQuestLogTitle(questIndex)
+        if not title then
+            return nil
+        end
 
         Info.title = title
         Info.level = level

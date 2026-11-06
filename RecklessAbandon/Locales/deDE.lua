@@ -10,8 +10,7 @@ L["Version"] = "Version"
 L["Configuration"] = "Konfiguration"
 L["Description"] = "Ein Werkzeug zum schnellen (und rücksichtslosen) Aufgeben von Quests"
 
-L["You are currently running a pre-release version of %s. Please report any issues on github (|cFFB5FFEB%s|r) so they can be addressed quickly. Thank you for your interest in testing new features!"] =
-"Sie verwenden derzeit eine Vorabversion von %s. Bitte melden Sie etwaige Probleme auf GitHub (|cFFB5FFEB%s|r), damit diese schnell behoben werden können. Vielen Dank für Ihr Interesse am Testen neuer Funktionen!"
+L["You are currently running a pre-release version of %s. Please report any issues on github (|cFFB5FFEB%s|r) so they can be addressed quickly. Thank you for your interest in testing new features!"] = "Sie verwenden derzeit eine Vorabversion von %s. Bitte melden Sie etwaige Probleme auf GitHub (|cFFB5FFEB%s|r), damit diese schnell behoben werden können. Vielen Dank für Ihr Interesse am Testen neuer Funktionen!"
 
 
 L["Yes"] = "Ja"
