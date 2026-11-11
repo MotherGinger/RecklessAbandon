@@ -17,7 +17,10 @@ This project adheres to Semantic Versioning.
     - Lua error when confirming an abandon after the quest, or the zone's quests, had already left the quest log
     - Lua error when using the zone abandon keybinding on a zone header that had stayed collapsed since login (Classic, TBC, Mists)
     - Lua error on Retail and Forever when the game briefly has no entry for a quest log line
+    - Quest abandon buttons overlapping the quest tag (e.g. "(Elite)") on Classic, TBC and Mists; long quest titles and the tracking check now end before the tag
+    - Quest abandon buttons covering the quest type and storyline icons on Retail and Forever
   - Changed
+    - Quest abandon buttons on Retail and Forever now sit at the right end of the quest row, with the tracking checkbox and quest icons moved left to make room; quest type icons (elite, dungeon, account...) are no longer hidden
     - Messaging rate now defaults to "Only show important messages"
     - Removed the "Only show messages for errors" messaging rate, existing selections move to "Only show problems"
     - "Automatically abandoned N quests" summary now only shows with "Show all messages"

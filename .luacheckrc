@@ -68,6 +68,7 @@ globals = {
     "QuestScrollFrame",
     "QuestLogListScrollFrame",
     "QUESTS_DISPLAYED",
+    "QuestLog_Update",
     "UnitQuestTrivialLevelRange",
     "WOW_PROJECT_WRATH_CLASSIC",
     "WOW_PROJECT_CAMELOT",

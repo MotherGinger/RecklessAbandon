@@ -337,3 +337,133 @@ describe("quest log buttons on Classic", function()
         assert.is_nil(questButton(E, 101))
     end)
 end)
+
+-- Classic rows are 300 wide; the addon takes 50 off the right for its buttons, leaving 250.
+-- Text is Stub.CHAR_WIDTH (6) pixels a character, and the title starts 20 pixels in.
+local ROW_WIDTH = 250
+local TAG_WIDTH = 7 * 6 -- "(Elite)"
+local LONG_TITLE = string.rep("Long Title ", 4) -- 44 characters, 264 pixels: wider than the row
+
+local function rowParts(row)
+    local name = row:GetName()
+    if name then return _G[name .. "Tag"], _G[name .. "Check"], _G[name .. "NormalText"] end
+    return row.tag, row.check, row.normalText
+end
+
+for _, flavor in ipairs({ "classic", "tbc", "mists" }) do
+    describe("quest log row layout on " .. flavor, function()
+        local function boot(log)
+            local E, Stub = Loader.Boot(flavor, { questLog = log })
+            Stub.OpenQuestLog()
+            return E, Stub
+        end
+
+        it("puts the abandon buttons just past the narrowed row, where the quest tag can't reach", function()
+            local E, Stub = boot({ { header = "Elwynn Forest" }, { id = 101, title = "Hogger", tag = "Elite" } })
+            local row, header = Stub.QuestLogRow(101), Stub.QuestLogRow("Elwynn Forest")
+            assert.are.equal(ROW_WIDTH, row:GetWidth())
+            assert.are.same({ "LEFT", row, "RIGHT", 4, 0 }, { questButton(E, 101):GetPoint(1) })
+            assert.are.same({ "LEFT", header, "RIGHT", 29, 0 }, { groupButton(E, "elwynnforest"):GetPoint(1) })
+            -- The client pins the tag to the row's right edge, which is now left of the button.
+            local tag = rowParts(row)
+            assert.are.same({ "RIGHT", row, "RIGHT", -2, 0 }, { tag:GetPoint(1) })
+        end)
+
+        it("cuts a long title short of the quest tag", function()
+            local _, Stub = boot({ { id = 101, title = LONG_TITLE, tag = "Elite" } })
+            local _, _, text = rowParts(Stub.QuestLogRow(101))
+            -- The row, less the tag's 2 pixel inset, the tag, a 4 pixel gap, and the title's 20 pixel indent.
+            assert.are.equal(ROW_WIDTH - 2 - TAG_WIDTH - 4 - 20, text:GetWidth())
+        end)
+
+        it("leaves a short title its own width", function()
+            local _, Stub = boot({ { header = "Elwynn Forest" }, { id = 101, title = "Hogger", tag = "Elite" } })
+            local _, _, text = rowParts(Stub.QuestLogRow(101))
+            assert.are.equal(6 * 6, text:GetWidth())
+            local _, _, headerText = rowParts(Stub.QuestLogRow("Elwynn Forest"))
+            assert.are.equal(13 * 6, headerText:GetWidth())
+        end)
+
+        it("cuts a long untagged title short of the row's edge", function()
+            local _, Stub = boot({ { id = 101, title = LONG_TITLE } })
+            local _, _, text = rowParts(Stub.QuestLogRow(101))
+            assert.are.equal(ROW_WIDTH - 20, text:GetWidth())
+        end)
+
+        it("keeps the tracking check right after the title, before the tag", function()
+            local _, Stub = boot({ { id = 101, title = LONG_TITLE, tag = "Elite", tracked = true } })
+            local _, check, text = rowParts(Stub.QuestLogRow(101))
+            assert.are.equal(ROW_WIDTH - 2 - TAG_WIDTH - 4 - 2 - 16 - 20, text:GetWidth())
+            assert.are.same({ "LEFT", text, "RIGHT", 2, 0 }, { check:GetPoint(1) })
+        end)
+
+        it("measures the title from where the client placed it", function()
+            local _, Stub = boot({ { id = 101, title = LONG_TITLE, tag = "Elite" } })
+            local row = Stub.QuestLogRow(101)
+            local _, _, text = rowParts(row)
+            row.__left, text.__left = 100, 130
+            QuestLog_Update()
+            assert.are.equal(ROW_WIDTH - 2 - TAG_WIDTH - 4 - 30, text:GetWidth())
+        end)
+
+        it("lays the rows out again when the client redraws them", function()
+            local _, Stub = boot({ { id = 101, title = LONG_TITLE, tag = "Elite", tracked = true } })
+            local _, check, text = rowParts(Stub.QuestLogRow(101))
+            -- Selecting or tracking a quest redraws the rows, sizing the title for the full row again.
+            QuestLog_Update()
+            assert.are.equal(ROW_WIDTH - 2 - TAG_WIDTH - 4 - 2 - 16 - 20, text:GetWidth())
+            assert.are.same({ "LEFT", text, "RIGHT", 2, 0 }, { check:GetPoint(1) })
+        end)
+    end)
+end
+
+for _, flavor in ipairs({ "forever", "retail" }) do
+    describe("quest log row layout on " .. flavor, function()
+        local function checkboxPoint(Stub, questId)
+            local row = Stub.QuestLogRow(questId)
+            return { row.Checkbox:GetPoint(1) }, row
+        end
+
+        it("moves the tracking checkbox left and puts the abandon button where it was", function()
+            local E, Stub = Loader.Boot(flavor, { questLog = LOG })
+            Stub.OpenQuestLog()
+            local point, row = checkboxPoint(Stub, 101)
+            assert.are.same({ "TOPRIGHT", row, "TOPRIGHT", -20, -8 }, point)
+            assert.are.same({ "LEFT", row.Checkbox, "RIGHT", 4, 0 }, { questButton(E, 101):GetPoint(1) })
+        end)
+
+        it("makes room as the client hands a row out, before it draws the title", function()
+            Loader.Boot(flavor, { questLog = LOG })
+            local row = QuestScrollFrame.titleFramePool:Acquire()
+            assert.are.same({ "TOPRIGHT", row, "TOPRIGHT", -20, -8 }, { row.Checkbox:GetPoint(1) })
+        end)
+
+        it("moves each row's checkbox only once, however often the row is reused", function()
+            local _, Stub = Loader.Boot(flavor, { questLog = LOG })
+            Stub.OpenQuestLog()
+            Stub.CloseQuestLog()
+            Stub.OpenQuestLog()
+            local point, row = checkboxPoint(Stub, 101)
+            assert.are.same({ "TOPRIGHT", row, "TOPRIGHT", -20, -8 }, point)
+        end)
+
+        it("puts the checkbox back when quest buttons are turned off, and moves it again when they're on", function()
+            local E, Stub = Loader.Boot(flavor, { questLog = LOG })
+            Stub.OpenQuestLog()
+            E.db.general.individualQuests.showAbandonButton = false
+            Stub.OpenQuestLog()
+            local point, row = checkboxPoint(Stub, 101)
+            assert.are.same({ "TOPRIGHT", row, "TOPRIGHT", 0, -8 }, point)
+            E.db.general.individualQuests.showAbandonButton = true
+            Stub.OpenQuestLog()
+            point, row = checkboxPoint(Stub, 101)
+            assert.are.same({ "TOPRIGHT", row, "TOPRIGHT", -20, -8 }, point)
+        end)
+    end)
+end
+
+it("leaves a quest's tag icon showing on Retail", function()
+    local _, Stub = Loader.Boot("retail", { questLog = { { header = "Dornogal" }, { id = 101, title = "Elite Quest", tag = "Elite" } } })
+    Stub.OpenQuestLog()
+    assert.is_true(Stub.QuestLogRow(101).TagTexture:IsShown())
+end)
