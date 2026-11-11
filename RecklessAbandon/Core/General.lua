@@ -396,7 +396,9 @@ E.Options.args.general = {
 
                         for questId, meta in pairs(E.private.exclusions.excludedQuests) do
                             local title = meta.title
-                            local source = meta.source == MANUAL and L["Manual"] or L["Automation"]
+                            local source = (meta.source == MANUAL and L["Manual"])
+                                or (meta.source == QUESTIE_PROTECTION and L["Questie"])
+                                or L["Automation"]
                             local orphaned = E.Shim:GetLogIndexForQuestID(questId) == nil
 
                             -- * Excluded quests are stored with the localized version of the title at time of exclusion
@@ -457,6 +459,75 @@ E.Options.args.general = {
                     func = function()
                         E:ClearQuestExclusions()
                     end
+                }
+            }
+        },
+        integrations = {
+            order = 2.5,
+            type = "group",
+            name = L["Integrations"],
+            -- * Questie is only made for the Classic clients
+            hidden = function()
+                return E.isRetail
+            end,
+            args = {
+                questieHeader = {
+                    order = 0,
+                    type = "header",
+                    name = L["Questie"]
+                },
+                questieDescription = {
+                    order = 1,
+                    type = "description",
+                    width = "full",
+                    name = function()
+                        local lines = { L["Uses the quest database that comes with Questie to protect quests and to find quests you can no longer turn in."] }
+                        if not E.Questie:IsAvailable() then
+                            tinsert(lines, L["|cFFFF6B6BQuestieDB isn't loaded.|r Install or enable Questie to use this integration."])
+                        end
+                        return table.concat(lines, "\n\n") .. "\n\n"
+                    end
+                },
+                questieEnabled = {
+                    order = 2,
+                    type = "toggle",
+                    width = "full",
+                    name = L["Questie integration"],
+                    desc = L["Turn off to ignore Questie's quest database. Quests excluded by Item Quest Protection are included again."],
+                    disabled = function()
+                        return not E.Questie:IsAvailable()
+                    end,
+                    get = function()
+                        return E.db.questie.enabled
+                    end,
+                    set = function(_, value)
+                        E.Questie:SetEnabled(value)
+                    end
+                },
+                itemProtection = {
+                    order = 3,
+                    type = "toggle",
+                    width = "full",
+                    name = L["Item Quest Protection"],
+                    desc = L["Automatically exclude quests that can only be started from an item from group abandons and automation options. The item is usually used up when you accept the quest, or destroyed when you abandon it."],
+                    disabled = function()
+                        return not E.Questie:IsEnabled()
+                    end,
+                    get = function()
+                        return E.db.questie.itemProtection
+                    end,
+                    set = function(_, value)
+                        E.Questie:SetItemProtection(value)
+                    end
+                },
+                obsoleteDescription = {
+                    order = 4,
+                    type = "description",
+                    width = "full",
+                    name = "\n" .. format(
+                        L["Also adds the |cff888888%s|r quest type to automation and to |cff888888/reckless abandon <qualifier>|r. It matches breadcrumbs to quests you've already done, and quests you can no longer turn in because you completed an alternative."],
+                        L["obsolete"]
+                    )
                 }
             }
         },
@@ -530,7 +601,10 @@ E.Options.args.general = {
                         abandonByQualifier = {
                             order = 3,
                             name = L["Enable |cff888888/reckless abandon <qualifier>|r"],
-                            desc = format("%s\n\n%s\n\n%s", L["This command abandons all quests that match a given qualifier and are not excluded from group abandons."], L["Available Qualifiers:"], E:Tabulate(E:GetAvailableQualifiers(), "|cFFF2E699%s|r - %s\n")),
+                            -- * Built when shown: the Questie integration adds a qualifier while it's on
+                            desc = function()
+                                return format("%s\n\n%s\n\n%s", L["This command abandons all quests that match a given qualifier and are not excluded from group abandons."], L["Available Qualifiers:"], E:Tabulate(E:GetAvailableQualifiers(), "|cFFF2E699%s|r - %s\n"))
+                            end,
                             descStyle = "inline",
                             width = "full",
                             type = "toggle",

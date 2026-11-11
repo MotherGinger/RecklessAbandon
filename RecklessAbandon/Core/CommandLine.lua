@@ -106,8 +106,9 @@ function E:CliAbandonByQualifier(qualifier)
                 local isFailed = qualifier == strlower(FAILED) and info.isComplete == -1
                 local isDaily = qualifier == strlower(DAILY) and info.frequency == 1
                 local isWeekly = qualifier == strlower(WEEKLY) and info.frequency == 2
+                local isObsolete = qualifier == L["obsolete"] and E.Questie:IsEnabled() and E.Questie:IsObsolete(info.questID)
 
-                if (isColor or isQualifier or isFailed or isDaily or isWeekly) and qualifiers[qualifier] ~= nil then
+                if (isColor or isQualifier or isFailed or isDaily or isWeekly or isObsolete) and qualifiers[qualifier] ~= nil then
                     tinsert(questIds, info.questID)
                     tinsert(questTitles, info.title)
                 end

@@ -56,6 +56,7 @@ globals = {
     "LOG_LEVEL_DEBUG",
     "MANUAL",
     "AUTOMATIC",
+    "QUESTIE_PROTECTION",
     -- Script handlers the abandon button templates in Core/load.xml call
     "onButtonEnter",
     "onButtonLeave",

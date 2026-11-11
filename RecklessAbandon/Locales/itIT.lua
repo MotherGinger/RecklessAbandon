@@ -214,3 +214,17 @@ L["Excluded Quests: "] = "Missioni Escluse: "
 L["%s abandoned via keybinding (%s)"] = "%s abbandonato tramite scorciatoia (%s)"
 L["%s excluded via keybinding (%s)"] = "%s escluso tramite scorciatoia (%s)"
 L["%s included via keybinding (%s)"] = "%s incluso tramite scorciatoia (%s)"
+
+-- Questie integration
+L["Integrations"] = "Integrazioni"
+L["Questie"] = true
+L["Uses the quest database that comes with Questie to protect quests and to find quests you can no longer turn in."] = "Usa il database delle missioni incluso in Questie per proteggere le missioni e trovare quelle che non puoi più consegnare."
+L["|cFFFF6B6BQuestieDB isn't loaded.|r Install or enable Questie to use this integration."] = "|cFFFF6B6BQuestieDB non è caricato.|r Installa o attiva Questie per usare questa integrazione."
+L["Questie integration"] = "Integrazione con Questie"
+L["Turn off to ignore Questie's quest database. Quests excluded by Item Quest Protection are included again."] = "Disattiva per ignorare il database delle missioni di Questie. Le missioni escluse dalla Protezione missioni da oggetto vengono incluse di nuovo."
+L["Item Quest Protection"] = "Protezione missioni da oggetto"
+L["Automatically exclude quests that can only be started from an item from group abandons and automation options. The item is usually used up when you accept the quest, or destroyed when you abandon it."] = "Escludi automaticamente dagli abbandoni di gruppo e dalle opzioni di automazione le missioni che si possono iniziare solo da un oggetto. Di solito l'oggetto viene consumato quando accetti la missione, o distrutto quando la abbandoni."
+L["Also adds the |cff888888%s|r quest type to automation and to |cff888888/reckless abandon <qualifier>|r. It matches breadcrumbs to quests you've already done, and quests you can no longer turn in because you completed an alternative."] = "Aggiunge anche il tipo di missione |cff888888%s|r all'automazione e a |cff888888/reckless abandon <qualifier>|r. Corrisponde alle missioni introduttive verso missioni già completate e alle missioni che non puoi più consegnare perché hai completato un'alternativa."
+L["obsolete"] = "obsoleta"
+L["Obsolete"] = "Obsoleta"
+L["Matches quests you can no longer turn in, such as breadcrumbs to quests you've already done."] = "Corrisponde alle missioni che non puoi più consegnare, come le missioni introduttive verso missioni già completate."

@@ -210,3 +210,17 @@ L["Excluded Quests: "] = true
 L["%s abandoned via keybinding (%s)"] = true
 L["%s excluded via keybinding (%s)"] = true
 L["%s included via keybinding (%s)"] = true
+
+-- Questie integration
+L["Integrations"] = true
+L["Questie"] = true
+L["Uses the quest database that comes with Questie to protect quests and to find quests you can no longer turn in."] = true
+L["|cFFFF6B6BQuestieDB isn't loaded.|r Install or enable Questie to use this integration."] = true
+L["Questie integration"] = true
+L["Turn off to ignore Questie's quest database. Quests excluded by Item Quest Protection are included again."] = true
+L["Item Quest Protection"] = true
+L["Automatically exclude quests that can only be started from an item from group abandons and automation options. The item is usually used up when you accept the quest, or destroyed when you abandon it."] = true
+L["Also adds the |cff888888%s|r quest type to automation and to |cff888888/reckless abandon <qualifier>|r. It matches breadcrumbs to quests you've already done, and quests you can no longer turn in because you completed an alternative."] = true
+L["obsolete"] = true
+L["Obsolete"] = true
+L["Matches quests you can no longer turn in, such as breadcrumbs to quests you've already done."] = true

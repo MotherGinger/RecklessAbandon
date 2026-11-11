@@ -214,3 +214,17 @@ L["Excluded Quests: "] = "Исключенные задания: "
 L["%s abandoned via keybinding (%s)"] = "%s отказано через сочетание клавиш (%s)"
 L["%s excluded via keybinding (%s)"] = "%s исключено через сочетание клавиш (%s)"
 L["%s included via keybinding (%s)"] = "%s включено через сочетание клавиш (%s)"
+
+-- Questie integration
+L["Integrations"] = "Интеграции"
+L["Questie"] = true
+L["Uses the quest database that comes with Questie to protect quests and to find quests you can no longer turn in."] = "Использует базу данных заданий, которая поставляется с Questie, чтобы защищать задания и находить те, которые больше нельзя сдать."
+L["|cFFFF6B6BQuestieDB isn't loaded.|r Install or enable Questie to use this integration."] = "|cFFFF6B6BQuestieDB не загружен.|r Установите или включите Questie, чтобы использовать эту интеграцию."
+L["Questie integration"] = "Интеграция с Questie"
+L["Turn off to ignore Questie's quest database. Quests excluded by Item Quest Protection are included again."] = "Выключите, чтобы не использовать базу данных заданий Questie. Задания, исключенные защитой заданий от предметов, снова будут включены."
+L["Item Quest Protection"] = "Защита заданий от предметов"
+L["Automatically exclude quests that can only be started from an item from group abandons and automation options. The item is usually used up when you accept the quest, or destroyed when you abandon it."] = "Автоматически исключать из групповых отказов и опций автоматизации задания, которые можно начать только с предмета. Обычно предмет расходуется при принятии задания или уничтожается при отказе от него."
+L["Also adds the |cff888888%s|r quest type to automation and to |cff888888/reckless abandon <qualifier>|r. It matches breadcrumbs to quests you've already done, and quests you can no longer turn in because you completed an alternative."] = "Также добавляет тип заданий |cff888888%s|r в автоматизацию и в |cff888888/reckless abandon <qualifier>|r. Он включает задания-указатели к уже выполненным заданиям и задания, которые больше нельзя сдать, потому что вы выполнили альтернативное."
+L["obsolete"] = "устаревшие"
+L["Obsolete"] = "Устаревшие"
+L["Matches quests you can no longer turn in, such as breadcrumbs to quests you've already done."] = "Соответствует заданиям, которые больше нельзя сдать, например заданиям-указателям к уже выполненным заданиям."

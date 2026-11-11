@@ -3,7 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to Semantic Versioning.
 
 - Unreleased
-  - Fixed
+  - Added
+    - Questie integration (Classic, TBC, Mists, Forever), on by default when Questie is installed. Turn it off under Integrations in the settings
+    - Item Quest Protection: quests that can only be started from an item are excluded from group abandons and automation
+    - "obsolete" quest type for automation and /reckless abandon <qualifier>: breadcrumbs to quests you've already done, and quests you can no longer turn in because you completed an alternative  - Fixed
     - Automatic abandons by quest type (PvP, dungeon, raid, elite, group, heroic, failed) not working on Forever
     - Automatic abandons sometimes waiting until the next quest log change before firing
     - Automatic abandons no longer repeat messages for quests that can't be abandoned

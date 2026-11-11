@@ -23,6 +23,12 @@ P.general = {
     }
 }
 
+-- * Integrations/Questie.lua. Does nothing unless QuestieDB is loaded.
+P.questie = {
+    enabled = true,
+    itemProtection = true
+}
+
 P.commands = {
     generic = {
         ["*"] = false

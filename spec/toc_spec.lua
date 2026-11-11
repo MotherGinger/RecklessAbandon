@@ -11,6 +11,11 @@ local REQUIRED = { "Title", "Notes", "Author", "Version", "SavedVariables", "Sav
 local NOTE_LOCALES = { "deDE", "esES", "esMX", "frFR", "itIT", "ptBR", "ruRU", "zhCN", "zhTW" }
 -- Clients with the addon compartment (the minimap addon menu).
 local COMPARTMENT = { ["RecklessAbandon_Camelot.toc"] = true, ["RecklessAbandon_Mainline.toc"] = true }
+-- Clients Questie (and its QuestieDB) is made for. Loading after QuestieDB lets the integration see it.
+local QUESTIE = {
+    ["RecklessAbandon_Vanilla.toc"] = true, ["RecklessAbandon_TBC.toc"] = true,
+    ["RecklessAbandon_Mists.toc"] = true, ["RecklessAbandon_Camelot.toc"] = true,
+}
 
 describe("TOC files", function()
     for toc, interface in pairs(TOCS) do
@@ -44,6 +49,10 @@ describe("TOC files", function()
             it("saves the variables the addon reads", function()
                 assert.are.equal("RecklessAbandonDB, RecklessAbandonPrivateDB", fields.SavedVariables)
                 assert.are.equal("RecklessAbandonCharacterDB", fields.SavedVariablesPerCharacter)
+            end)
+
+            it(QUESTIE[toc] and "loads after QuestieDB when it's installed" or "doesn't wait for QuestieDB", function()
+                assert.are.equal(QUESTIE[toc] and "QuestieDB" or nil, fields.OptionalDeps)
             end)
 
             if COMPARTMENT[toc] then

@@ -214,3 +214,17 @@ L["Excluded Quests: "] = "Ausgeschlossene Quests: "
 L["%s abandoned via keybinding (%s)"] = "%s aufgegeben über Tastenkombination (%s)"
 L["%s excluded via keybinding (%s)"] = "%s ausgeschlossen über Tastenkombination (%s)"
 L["%s included via keybinding (%s)"] = "%s eingeschlossen über Tastenkombination (%s)"
+
+-- Questie integration
+L["Integrations"] = "Integrationen"
+L["Questie"] = true
+L["Uses the quest database that comes with Questie to protect quests and to find quests you can no longer turn in."] = "Nutzt die Questdatenbank, die mit Questie kommt, um Quests zu schützen und Quests zu finden, die du nicht mehr abgeben kannst."
+L["|cFFFF6B6BQuestieDB isn't loaded.|r Install or enable Questie to use this integration."] = "|cFFFF6B6BQuestieDB ist nicht geladen.|r Installiere oder aktiviere Questie, um diese Integration zu nutzen."
+L["Questie integration"] = "Questie-Integration"
+L["Turn off to ignore Questie's quest database. Quests excluded by Item Quest Protection are included again."] = "Ausschalten, um Questies Questdatenbank zu ignorieren. Durch den Gegenstandsquest-Schutz ausgeschlossene Quests werden wieder eingeschlossen."
+L["Item Quest Protection"] = "Gegenstandsquest-Schutz"
+L["Automatically exclude quests that can only be started from an item from group abandons and automation options. The item is usually used up when you accept the quest, or destroyed when you abandon it."] = "Schließe Quests, die nur über einen Gegenstand begonnen werden können, automatisch von Gruppenaufgaben und Automatisierungsoptionen aus. Der Gegenstand wird meist beim Annehmen der Quest verbraucht oder beim Abbrechen zerstört."
+L["Also adds the |cff888888%s|r quest type to automation and to |cff888888/reckless abandon <qualifier>|r. It matches breadcrumbs to quests you've already done, and quests you can no longer turn in because you completed an alternative."] = "Fügt außerdem den Questtyp |cff888888%s|r zur Automatisierung und zu |cff888888/reckless abandon <qualifier>|r hinzu. Er umfasst Hinführungsquests zu Quests, die du bereits erledigt hast, und Quests, die du nicht mehr abgeben kannst, weil du eine Alternative abgeschlossen hast."
+L["obsolete"] = "veraltet"
+L["Obsolete"] = "Veraltet"
+L["Matches quests you can no longer turn in, such as breadcrumbs to quests you've already done."] = "Entspricht Quests, die du nicht mehr abgeben kannst, etwa Hinführungsquests zu bereits erledigten Quests."
