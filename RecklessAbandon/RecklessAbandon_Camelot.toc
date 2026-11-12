@@ -16,6 +16,7 @@
 ## Category: Quests
 ## SavedVariables: RecklessAbandonDB, RecklessAbandonPrivateDB
 ## SavedVariablesPerCharacter: RecklessAbandonCharacterDB
+## OptionalDeps: QuestieDB
 ## AddonCompartmentFunc: RecklessAbandon_AddonCompartmentFunc
 ## X-Curse-Project-ID: 432954
 ## X-Wago-ID: yQKyDE67
@@ -28,3 +29,4 @@ Settings\load.xml
 Utils\load.xml
 Environment\load.xml
 Core\load.xml
+Integrations\load.xml

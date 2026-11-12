@@ -10,8 +10,10 @@ LOG_LEVEL_INFO = 3
 LOG_LEVEL_VERBOSE = 4
 LOG_LEVEL_DEBUG = 5
 
+-- * Where a quest exclusion came from
 MANUAL = 0
 AUTOMATIC = 1
+QUESTIE_PROTECTION = 2 -- * Item Quest Protection (Integrations/Questie.lua)
 
 --Lua functions
 local tonumber, pairs, ipairs = tonumber, pairs, ipairs
@@ -315,6 +317,11 @@ function E:GetAvailableQualifiers()
 		selections["pvp"] = PVP
 	end
 
+	if E.Questie:IsEnabled() then
+		qualifiers[L["obsolete"]] = L["Matches quests you can no longer turn in, such as breadcrumbs to quests you've already done."]
+		selections["obsolete"] = L["Obsolete"]
+	end
+
 	return qualifiers, selections
 end
 
@@ -484,7 +491,7 @@ function E:PruneQuestExclusionsFromAutomation()
 		for questId, meta in pairs(E.private.exclusions.excludedQuests) do
 			local orphaned = E.Shim:GetLogIndexForQuestID(questId) == nil
 			local source = meta.source
-			if orphaned and source == AUTOMATIC then
+			if orphaned and (source == AUTOMATIC or source == QUESTIE_PROTECTION) then
 				count = count + 1
 				E:PruneQuestExclusion(questId)
 			end
@@ -635,6 +642,11 @@ function E:AutoAbandonQuests()
 				eligible = true
 			end
 
+			-- Check quests that can no longer be turned in (Questie integration)
+			if not eligible and autoAbandonQuests.questType.obsolete and E.Questie:IsEnabled() and E.Questie:IsObsolete(questId) then
+				eligible = true
+			end
+
 			if eligible then
 				tinsert(eligibleIds, questId)
 			end
@@ -660,8 +672,17 @@ function E:AutoExcludeQuests()
 			local isComplete = E.Shim:IsComplete(questId)
 
 			if not info.isHeader then
-				if E.db.general.individualQuests.completeProtection and isComplete and not E:IsExcluded(questId) then
+				local exclusion = E.private.exclusions.excludedQuests[questId]
+
+				if E.db.general.individualQuests.completeProtection and isComplete and not exclusion then
 					E:ExcludeQuest(questId, AUTOMATIC)
+				elseif E.Questie:ShouldProtect(questId) then
+					if not exclusion then
+						E:ExcludeQuest(questId, QUESTIE_PROTECTION)
+					end
+				elseif exclusion and exclusion.source == QUESTIE_PROTECTION then
+					-- * Item Quest Protection or the Questie integration was turned off
+					E:IncludeQuest(questId)
 				end
 			end
 		end

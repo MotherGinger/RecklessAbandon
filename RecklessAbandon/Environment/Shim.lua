@@ -198,6 +198,18 @@ function E.Shim:GetAddOnMetadata(name, variable)
 end
 
 ---@param questId number The quest ID
+---@return boolean completed If the character has turned the quest in
+function E.Shim:IsQuestFlaggedCompleted(questId)
+    if C_QuestLog and C_QuestLog.IsQuestFlaggedCompleted then
+        return C_QuestLog.IsQuestFlaggedCompleted(questId) == true
+    elseif IsQuestFlaggedCompleted then
+        return IsQuestFlaggedCompleted(questId) == true
+    end
+
+    return false
+end
+
+---@param questId number The quest ID
 function E.Shim:SetSelectedQuest(questId)
     if E.hasQuestLogAPI then
         C_QuestLog.SetSelectedQuest(questId)
@@ -222,7 +234,6 @@ function E.Shim:AbandonQuest()
         AbandonQuest()
     end
 end
-
 ---@param questId number The quest ID
 ---@return number? questLogIndex The quest log index
 function E.Shim:GetLogIndexForQuestID(questId)

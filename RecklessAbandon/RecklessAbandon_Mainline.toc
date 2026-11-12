@@ -28,3 +28,4 @@ Settings\load.xml
 Utils\load.xml
 Environment\load.xml
 Core\load.xml
+Integrations\load.xml

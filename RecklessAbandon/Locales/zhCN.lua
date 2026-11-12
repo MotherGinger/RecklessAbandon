@@ -214,3 +214,17 @@ L["Excluded Quests: "] = "排除的任务："
 L["%s abandoned via keybinding (%s)"] = "%s 通过按键绑定放弃了任务 (%s)"
 L["%s excluded via keybinding (%s)"] = "%s 通过按键绑定排除了任务 (%s)"
 L["%s included via keybinding (%s)"] = "%s 通过按键绑定包含了任务 (%s)"
+
+-- Questie integration
+L["Integrations"] = "整合"
+L["Questie"] = true
+L["Uses the quest database that comes with Questie to protect quests and to find quests you can no longer turn in."] = "使用 Questie 附带的任务数据库来保护任务，并找出你已无法交付的任务。"
+L["|cFFFF6B6BQuestieDB isn't loaded.|r Install or enable Questie to use this integration."] = "|cFFFF6B6B未加载 QuestieDB。|r 安装或启用 Questie 以使用此整合。"
+L["Questie integration"] = "Questie 整合"
+L["Turn off to ignore Questie's quest database. Quests excluded by Item Quest Protection are included again."] = "关闭后将忽略 Questie 的任务数据库。被物品任务保护排除的任务会重新被包含。"
+L["Item Quest Protection"] = "物品任务保护"
+L["Automatically exclude quests that can only be started from an item from group abandons and automation options. The item is usually used up when you accept the quest, or destroyed when you abandon it."] = "自动将只能通过物品开始的任务排除在组队放弃和自动化选项之外。该物品通常会在接受任务时被消耗，或在放弃任务时被摧毁。"
+L["Also adds the |cff888888%s|r quest type to automation and to |cff888888/reckless abandon <qualifier>|r. It matches breadcrumbs to quests you've already done, and quests you can no longer turn in because you completed an alternative."] = "同时在自动化和 |cff888888/reckless abandon <qualifier>|r 中加入 |cff888888%s|r 任务类型。它匹配指向你已完成任务的引导任务，以及因你完成了另一个可选任务而无法再交付的任务。"
+L["obsolete"] = "过时"
+L["Obsolete"] = "过时"
+L["Matches quests you can no longer turn in, such as breadcrumbs to quests you've already done."] = "匹配你已无法交付的任务，例如指向已完成任务的引导任务。"

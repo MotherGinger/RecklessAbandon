@@ -14,6 +14,7 @@
 ## Notes-zhTW: 一個快速（且魯莽）放棄任務的工具
 ## SavedVariables: RecklessAbandonDB, RecklessAbandonPrivateDB
 ## SavedVariablesPerCharacter: RecklessAbandonCharacterDB
+## OptionalDeps: QuestieDB
 ## X-Curse-Project-ID: 432954
 ## X-Wago-ID: yQKyDE67
 
@@ -25,3 +26,4 @@ Settings\load.xml
 Utils\load.xml
 Environment\load.xml
 Core\load.xml
+Integrations\load.xml

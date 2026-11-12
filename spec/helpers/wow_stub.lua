@@ -514,7 +514,7 @@ function Stub.Install(flavorName)
     Stub.state = {
         loggedIn = false, inCombat = false, now = 1000, seq = 0, locale = "enUS",
         frames = {}, chat = {}, errors = {}, timers = {}, templates = {}, popups = {}, rowClicks = {},
-        questLog = {}, questTitles = {}, abandoned = {}, dropped = {}, dropAbandons = 0, greenRange = 8,
+        questLog = {}, questTitles = {}, abandoned = {}, dropped = {}, dropAbandons = 0, greenRange = 8, completed = {},
         modifiers = {}, metadata = {},
         player = {},
     }
@@ -650,6 +650,36 @@ function Stub.Install(flavorName)
 
     installQuestLog(flavor)
     installQuestFrames(flavor)
+
+    -- Turned-in quests. The older clients have the global, the newer ones C_QuestLog's.
+    local function isCompleted(id) return S.completed[id] == true end
+    if flavor.legacy then
+        _G.IsQuestFlaggedCompleted = isCompleted
+    else
+        _G.IsQuestFlaggedCompleted = nil
+        _G.C_QuestLog.IsQuestFlaggedCompleted = isCompleted
+    end
+
+    -- QuestieDB is another addon: absent unless a test installs it (Stub.InstallQuestieDB).
+    _G.LibQuestieDB = nil
+end
+
+--- Installs a stand-in for QuestieDB's LibQuestieDB, the quest database Questie depends on.
+-- quests: { [questId] = { startedBy = { npcs, objects, items }, breadcrumbForQuestId =, exclusiveTo = {} } }
+-- opts.contract: the newest API version it supports (4); opts.broken: Quest.Get errors
+function Stub.InstallQuestieDB(quests, opts)
+    opts = opts or {}
+    local contract = opts.contract or 4
+    _G.LibQuestieDB = {
+        RequireContract = function(required) return required <= contract end,
+        Quest = {
+            Get = function(id, field)
+                if opts.broken then error("LibQuestieDB: broken") end
+                local quest = quests[id]
+                return quest and quest[field]
+            end,
+        },
+    }
 end
 
 ----------------------------------------------------------------
