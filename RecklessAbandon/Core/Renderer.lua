@@ -15,6 +15,27 @@ E.buttonStateCache = {
 E.abandonTooltipFormat = "|cFFFFFAB8%s|r\n\n|cFFFFF569%s|r\n|cFFB5FFEB%s|r"
 E.groupAbandonTooltipFormat = "|cFFFFFAB8%s|r\n\n|cFFFFF569%s|r"
 
+-- * Quest log row layout. Our buttons take a fixed spot at the right end of each row,
+-- * and the row's own parts (title, tracking check, quest tag) move left to make room.
+local CLASSIC_ROW_RESERVED = 50   -- Width taken off the right of each Classic row for our buttons
+local CLASSIC_QUEST_GAP = 4       -- Quest button, right of the row's new right edge
+local CLASSIC_HEADER_GAP = 29     -- Header button, right of the row's new right edge
+local CLASSIC_TAG_INSET = 2       -- The client pins the quest tag this far in from the row's right edge
+local CLASSIC_TEXT_GAP = 4        -- Space between the title and the quest tag
+local CLASSIC_CHECK_GAP = 2       -- Space between the title and the tracking check
+local RETAIL_BUTTON_GAP = 4       -- Space between the tracking checkbox and our button
+local RETAIL_SLOT = 16 + RETAIL_BUTTON_GAP -- How far the tracking checkbox moves left: our button plus the gap
+
+-- * Retail quest rows whose tracking checkbox we moved, so the setting can put them back.
+E.reservedQuestRows = {}
+
+local function Place(button, ...)
+    if button then
+        button:ClearAllPoints()
+        button:SetPoint(...)
+    end
+end
+
 -- * Normalizes a header title so the frame text and the quest log title match.
 -- * Removes color codes, spaces, digits and ASCII punctuation, but keeps every non-ASCII byte.
 -- * Stripping everything outside a-z gave every Russian/Chinese header the same empty key,
@@ -123,8 +144,8 @@ local function onQuestLogEntryMouseDown(self, button)
     end
 end
 
-function E:RenderAbandonButton(parent, offset, questId, excluded, title, tooltip)
-    title = title or parent:GetText()
+-- * Sets up a quest's abandon button and returns it; the caller places it on the row.
+function E:RenderAbandonButton(questId, excluded, title, tooltip)
     tooltip = tooltip or format(
         E.abandonTooltipFormat,
         title,
@@ -158,13 +179,13 @@ function E:RenderAbandonButton(parent, offset, questId, excluded, title, tooltip
         ntex:SetVertexColor(1, 1, 1, 1)
     end
 
-    button:SetPoint("CENTER", parent, "CENTER", offset, 0)
     button:SetEnabled(canAbandon)
     button:Show()
+    return button
 end
 
-function E:RenderGroupAbandonButton(parent, offset, title, tooltip, key)
-    title = title or parent:GetText()
+-- * Sets up a quest group's abandon button and returns it (nil for an unknown group); the caller places it.
+function E:RenderGroupAbandonButton(title, tooltip, key)
     tooltip = tooltip or format(E.groupAbandonTooltipFormat, title, L["Left Click: Abandon all quests"], title)
     key = key or GetKey(title)
 
@@ -189,9 +210,9 @@ function E:RenderGroupAbandonButton(parent, offset, title, tooltip, key)
 
         ntex:SetDesaturated(not hasQuests or not canAbandonAny)
 
-        button:SetPoint("CENTER", parent, "CENTER", offset, 0)
         button:SetEnabled(hasQuests and canAbandonAny)
         button:Show()
+        return button
     end
 end
 
@@ -211,14 +232,54 @@ function E:HideAbandonButtons()
     E.buttonStateCache.activeGroupButtons = {}
 end
 
+-- * Retail lays a quest row out right to left from its tracking checkbox: the checkbox, then the tag icon,
+-- * then the storyline icon, then the title, each anchored to the one on its right. Moving the checkbox left
+-- * frees the row's right end for our button, and everything anchored to it moves along.
+-- * The client never re-anchors the checkbox, so the move lasts while the row is reused for other quests.
+local function ReserveRetailRow(quest, reserve)
+    local checkbox = quest.Checkbox
+
+    if reserve and not quest.raCheckboxPoint then
+        local point, relativeTo, relativePoint, x, y = checkbox:GetPoint(1)
+        if point then
+            quest.raCheckboxPoint = { point, relativeTo, relativePoint, x or 0, y or 0 }
+            checkbox:ClearAllPoints()
+            checkbox:SetPoint(point, relativeTo, relativePoint, (x or 0) - RETAIL_SLOT, y or 0)
+            E.reservedQuestRows[quest] = true
+        end
+    elseif not reserve and quest.raCheckboxPoint then
+        checkbox:ClearAllPoints()
+        checkbox:SetPoint(unpack(quest.raCheckboxPoint))
+        quest.raCheckboxPoint = nil
+        E.reservedQuestRows[quest] = nil
+    end
+end
+
+-- * Makes room on Retail quest rows while individual abandon buttons are on, and gives it back when they're off.
+-- * Runs as the client hands out each row too, so the title wraps to the narrower width the first time it's drawn.
+function E:UpdateQuestRowSpace()
+    local general = E.db and E.db.general
+    if general and general.individualQuests and general.individualQuests.showAbandonButton then
+        for quest in QuestScrollFrame.titleFramePool:EnumerateActive() do
+            ReserveRetailRow(quest, true)
+        end
+    else
+        for quest in pairs(E.reservedQuestRows) do
+            ReserveRetailRow(quest, false)
+        end
+    end
+end
+
 function E:RetailRenderer()
     E:HideAbandonButtons()
+    E:UpdateQuestRowSpace()
 
     -- Guard against a bad cache (https://github.com/MotherGinger/RecklessAbandon/issues/25)
     if E.db ~= nil and E.db.general ~= nil then
         if E.db.general.campaignQuests ~= nil and E.db.general.campaignQuests.showAbandonButton and QuestScrollFrame.campaignHeaderFramePool then
             for header in QuestScrollFrame.campaignHeaderFramePool:EnumerateActive() do
-                E:RenderGroupAbandonButton(header.CollapseButton, -25, header.Text:GetText())
+                local button = E:RenderGroupAbandonButton(header.Text:GetText())
+                Place(button, "CENTER", header.CollapseButton, "CENTER", -25, 0)
             end
         end
 
@@ -228,36 +289,99 @@ function E:RetailRenderer()
                 if info then
                     local title = info.title
                     local key = GetKey(title)
-                    E:RenderGroupAbandonButton(
-                        calling.CollapseButton,
-                        -25,
+                    local button = E:RenderGroupAbandonButton(
                         L["covenant callings"],
                         L["Left Click: Abandon all covenant calling quests"],
                         key
                     )
+                    Place(button, "CENTER", calling.CollapseButton, "CENTER", -25, 0)
                 end
             end
         end
 
         if E.db.general.zoneQuests ~= nil and E.db.general.zoneQuests.showAbandonButton then
             for header in QuestScrollFrame.headerFramePool:EnumerateActive() do
-                E:RenderGroupAbandonButton(header.CollapseButton, -25, header.ButtonText:GetText())
+                local button = E:RenderGroupAbandonButton(header.ButtonText:GetText())
+                Place(button, "CENTER", header.CollapseButton, "CENTER", -25, 0)
             end
         end
 
         if E.db.general.individualQuests ~= nil and E.db.general.individualQuests.showAbandonButton then
             for quest in QuestScrollFrame.titleFramePool:EnumerateActive() do
                 local questId = quest.questID
-                local text = quest.Text:GetText()
                 local excluded = E:IsExcluded(questId)
 
-                -- * This tag shows up in both the tooltip and the details pane, so lets hide it and collect more real estate for our button
-                -- TODO: This is a partial workaround since this will pop back in when hiding the details pane
-                if quest.TagTexture then
-                    quest.TagTexture:Hide()
-                end
-                E:RenderAbandonButton(quest.Checkbox, -25, questId, excluded, text)
+                -- * Our button takes the space the tracking checkbox moved out of (see ReserveRetailRow)
+                local button = E:RenderAbandonButton(questId, excluded, quest.Text:GetText())
+                Place(button, "LEFT", quest.Checkbox, "RIGHT", RETAIL_BUTTON_GAP, 0)
             end
+        end
+    end
+end
+
+local function GetClassicRow(i)
+    if E.isClassic or E.isBC then
+        -- * Vanilla needs to use _G to access the frame dynamically
+        return _G["QuestLogTitle" .. i]
+    end
+    return QuestLogListScrollFrame.buttons[i]
+end
+
+-- * Mists names the row's parts by key; Vanilla and TBC only by global name.
+local function GetClassicRowParts(row)
+    local name = row:GetName()
+    local tag = row.tag or (name and _G[name .. "Tag"])
+    local check = row.check or (name and _G[name .. "Check"])
+    local text = row.normalText or (name and _G[name .. "NormalText"])
+    return tag, check, text
+end
+
+-- * How far a region's left edge sits from the row's left edge
+local function GetLeftInRow(region, row)
+    local left, rowLeft = region:GetLeft(), row:GetLeft()
+    if left and rowLeft then
+        return left - rowLeft
+    end
+    local _, _, _, x = region:GetPoint(1)
+    return x or 0
+end
+
+-- * A Classic row is a fixed-width button. The title and the tracking check run left to right from its
+-- * left edge, and the client pins the quest tag ("(Elite)", "(Daily)") to its right edge.
+-- * Narrowing the row moves the tag left, clear of our button. The client sizes the title for the full
+-- * width (Vanilla and TBC assume 275 pixels), so the title is cut down to end before the tag and the
+-- * check is moved back to the title's end.
+function E:LayoutClassicRow(row)
+    row:SetWidth(QuestLogListScrollFrame:GetWidth() - CLASSIC_ROW_RESERVED)
+
+    local tag, check, text = GetClassicRowParts(row)
+
+    local right = row:GetWidth()
+    if tag:IsShown() and (tag:GetText() or "") ~= "" then
+        right = right - CLASSIC_TAG_INSET - tag:GetStringWidth() - CLASSIC_TEXT_GAP
+    end
+
+    local checkShown = check:IsShown()
+    if checkShown then
+        right = right - CLASSIC_CHECK_GAP - check:GetWidth()
+    end
+
+    local available = math.max(right - GetLeftInRow(text, row), 0)
+    text:SetWidth(math.min(text:GetStringWidth(), available))
+
+    if checkShown then
+        check:ClearAllPoints()
+        check:SetPoint("LEFT", text, "RIGHT", CLASSIC_CHECK_GAP, 0)
+    end
+end
+
+-- * Lays out every row the quest log shows. The client redraws the rows on its own (selecting a quest,
+-- * tracking one), which sizes the titles for the full row again, so this also runs after QuestLog_Update.
+function E:LayoutClassicRows()
+    for i = 1, QUESTS_DISPLAYED do
+        local row = GetClassicRow(i)
+        if row and row:IsShown() then
+            E:LayoutClassicRow(row)
         end
     end
 end
@@ -272,22 +396,18 @@ function E:ClassicRenderer()
             local questIndex = floor(i + QuestLogListScrollFrame.offset)
             if questIndex <= numEntries then
                 local info = E.Shim:GetInfo(questIndex)
+                local questLogTitle = GetClassicRow(i)
 
-                local questLogTitle
-                if E.isClassic or E.isBC then
-                    -- * Vanilla needs to use _G to access the frame dynamically
-                    questLogTitle = _G["QuestLogTitle" .. i]
-                else
-                    questLogTitle = QuestLogListScrollFrame.buttons[i]
-                end
+                E:LayoutClassicRow(questLogTitle)
 
-                questLogTitle:SetWidth(QuestLogListScrollFrame:GetWidth() - 50)
-
+                -- * Our buttons sit just past the row's right edge, which the layout moved left to make room
                 if info.isHeader and E.db.general.zoneQuests.showAbandonButton then
-                    E:RenderGroupAbandonButton(questLogTitle, QuestLogListScrollFrame:GetWidth() - 138, info.title)
+                    local button = E:RenderGroupAbandonButton(info.title)
+                    Place(button, "LEFT", questLogTitle, "RIGHT", CLASSIC_HEADER_GAP, 0)
                 elseif not info.isHeader and E.db.general.individualQuests.showAbandonButton then
                     local excluded = E:IsExcluded(info.questID)
-                    E:RenderAbandonButton(questLogTitle, QuestLogListScrollFrame:GetWidth() - 163, info.questID, excluded, info.title)
+                    local button = E:RenderAbandonButton(info.questID, excluded, info.title)
+                    Place(button, "LEFT", questLogTitle, "RIGHT", CLASSIC_QUEST_GAP, 0)
                 end
             end
         end
@@ -366,13 +486,7 @@ end
 
 function E:RegisterClassicHotkeys()
     for i = 1, E.Shim:GetNumQuestLogEntries() do
-        local questLogTitle
-        if E.isClassic or E.isBC then
-            -- * Vanilla needs to use _G to access the frame dynamically
-            questLogTitle = _G["QuestLogTitle" .. i]
-        else
-            questLogTitle = QuestLogListScrollFrame.buttons[i]
-        end
+        local questLogTitle = GetClassicRow(i)
 
         if questLogTitle and not questLogTitle.hasOnMouseDownScript then
             questLogTitle.origOnClick = questLogTitle:GetScript("OnClick")

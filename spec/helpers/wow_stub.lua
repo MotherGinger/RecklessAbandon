@@ -23,6 +23,9 @@ Stub.PLAYER = { name = "Frauke", realm = "Area 52", classFile = "WARRIOR", class
 -- How many quest titles the legacy quest log shows at once.
 Stub.QUESTS_DISPLAYED = 6
 
+-- How wide one character of text is, in pixels.
+Stub.CHAR_WIDTH = 6
+
 local function noop() end
 
 local FRAME_NOOPS = {
@@ -99,7 +102,15 @@ NewFrame = function(kind, name, parent)
     function frame:SetWidth(width) self.__width = width end
     function frame:SetHeight(height) self.__height = height end
     function frame:SetSize(width, height) self.__width, self.__height = width, height end
-    function frame:GetWidth() return self.__width or 0 end
+    function frame:GetWidth()
+        -- A font string without a set width is as wide as its text, like on the client.
+        if kind == "FontString" and (self.__width or 0) == 0 then return self:GetStringWidth() end
+        return self.__width or 0
+    end
+    -- Text is Stub.CHAR_WIDTH pixels per character.
+    function frame:GetStringWidth() return #(self.__text or "") * Stub.CHAR_WIDTH end
+    -- Screen positions are nil until a test sets __left, like a frame the client hasn't placed yet.
+    function frame:GetLeft() return self.__left end
     function frame:GetHeight() return self.__height or 0 end
     -- Every frame sits at the same place, so buttons always count as inside the quest log's scroll area.
     function frame:GetTop() return 0 end
@@ -194,12 +205,16 @@ local function CreateFrame(kind, name, parent, template)
     return frame
 end
 
-local function CreateFramePool(kind, parent, template)
+-- init, when set, builds a new frame's template children (the stub has no XML templates of the client's own).
+local function CreateFramePool(kind, parent, template, init)
     local pool = { active = {}, inactive = {} }
     function pool:Acquire()
         local frame = table.remove(self.inactive)
         local new = frame == nil
-        frame = frame or CreateFrame(kind, nil, parent, template)
+        if new then
+            frame = CreateFrame(kind, nil, parent, template)
+            if init then init(frame) end
+        end
         self.active[frame] = true
         return frame, new
     end
@@ -404,26 +419,84 @@ local function rowOnClick(self, button)
     table.insert(Stub.state.rowClicks, { row = self, button = button })
 end
 
+-- A legacy quest log row, with the parts QuestLogTitleButtonTemplate gives it: the quest tag pinned to its
+-- right edge, the tracking check, and the title text 20 pixels in from its left edge. Classic and TBC name
+-- the parts $parentTag, $parentCheck and $parentNormalText; Mists also keys them as tag, check and normalText.
+local function newQuestLogRow(name, parent, width)
+    local row = CreateFrame("Button", name, parent)
+    row:SetScript("OnClick", rowOnClick)
+    row:SetWidth(width)
+    local tag = CreateFrame("FontString", name and name .. "Tag", row)
+    tag:SetPoint("RIGHT", row, "RIGHT", -2, 0)
+    local check = CreateFrame("Texture", name and name .. "Check", row)
+    check:SetSize(16, 16)
+    check:Hide()
+    local text = CreateFrame("FontString", name and name .. "NormalText", row)
+    text:SetPoint("LEFT", row, "LEFT", 20, 0)
+    if not name then row.tag, row.check, row.normalText = tag, check, text end
+    return row
+end
+
+local function questLogRowParts(row)
+    local name = row:GetName()
+    if name then return _G[name .. "Tag"], _G[name .. "Check"], _G[name .. "NormalText"] end
+    return row.tag, row.check, row.normalText
+end
+
+-- The client's QuestLog_Update: draws each row the legacy quest log shows. Like Vanilla and TBC, it sizes
+-- a tagged title for a 275-pixel row whatever the row's width, and puts the tracking check after the title.
+-- Entries can set tracked = true to show the check.
+local function questLogUpdate()
+    local S = Stub.state
+    local scroll = _G.QuestLogListScrollFrame
+    for i = 1, Stub.QUESTS_DISPLAYED do
+        local row = scroll.buttons and scroll.buttons[i] or _G["QuestLogTitle" .. i]
+        local index = i + scroll.offset
+        local entry = S.questLog[index]
+        local label = entry and (entry.header or entry.title) or nil
+        row:SetID(index)
+        row:SetText(label)
+        row:SetShown(entry ~= nil)
+
+        local tag, check, text = questLogRowParts(row)
+        text:SetText(label)
+        text:SetWidth(0)
+        tag:SetText(entry and not entry.header and entry.tag and ("(" .. entry.tag .. ")") or "")
+        local textWidth = text:GetStringWidth()
+        if tag:GetText() ~= "" then text:SetWidth(275 - 15 - tag:GetStringWidth()) end
+        check:ClearAllPoints()
+        check:SetPoint("LEFT", row, "LEFT", textWidth + 24, 0)
+        check:SetShown(entry ~= nil and entry.tracked == true)
+    end
+end
+
+-- The tracking checkbox QuestLogTitleTemplate pins to a Retail quest row's top right corner.
+local function newQuestTitle(title)
+    title.Checkbox = CreateFrame("Button", nil, title)
+    title.Checkbox:SetPoint("TOPRIGHT", title, "TOPRIGHT", 0, -8)
+    title.Text = title:CreateFontString()
+    if Stub.flavor.retail then title.TagTexture = title:CreateTexture() end
+end
+
 local function installQuestFrames(flavor)
     if flavor.legacy then
         _G.QuestMapFrame, _G.QuestScrollFrame = nil, nil
         _G.QUESTS_DISPLAYED = Stub.QUESTS_DISPLAYED
+        _G.QuestLog_Update = questLogUpdate
         _G.QuestLogFrame = CreateFrame("Frame", "QuestLogFrame", _G.UIParent)
         _G.QuestLogFrame:Hide()
         local scroll = CreateFrame("ScrollFrame", "QuestLogListScrollFrame", _G.QuestLogFrame)
         scroll.offset = 0
         scroll:SetWidth(300)
         if flavor.titleButtons then
-            for i = 1, Stub.QUESTS_DISPLAYED do CreateFrame("Button", "QuestLogTitle" .. i, scroll):SetScript("OnClick", rowOnClick) end
+            for i = 1, Stub.QUESTS_DISPLAYED do newQuestLogRow("QuestLogTitle" .. i, scroll, 300) end
         else
             scroll.buttons = {}
-            for i = 1, Stub.QUESTS_DISPLAYED do
-                scroll.buttons[i] = CreateFrame("Button", nil, scroll)
-                scroll.buttons[i]:SetScript("OnClick", rowOnClick)
-            end
+            for i = 1, Stub.QUESTS_DISPLAYED do scroll.buttons[i] = newQuestLogRow(nil, scroll, 299) end
             scroll.scrollBar = CreateFrame("Slider", nil, scroll)
         end
     else
+        _G.QuestLog_Update = nil
         _G.QuestLogFrame, _G.QuestLogListScrollFrame, _G.QUESTS_DISPLAYED = nil, nil, nil
         local map = CreateFrame("Frame", "QuestMapFrame", _G.UIParent)
         map:Hide()
@@ -435,7 +508,7 @@ local function installQuestFrames(flavor)
         local scroll = CreateFrame("ScrollFrame", "QuestScrollFrame", map.QuestsFrame)
         scroll.SearchBox = flavor.retail and CreateFrame("EditBox", nil, scroll) or nil
         scroll.headerFramePool = CreateFramePool("Button", scroll)
-        scroll.titleFramePool = CreateFramePool("Button", scroll)
+        scroll.titleFramePool = CreateFramePool("Button", scroll, nil, newQuestTitle)
         if flavor.retail then
             scroll.campaignHeaderFramePool = CreateFramePool("Frame", scroll)
             scroll.covenantCallingsHeaderFramePool = CreateFramePool("Frame", scroll)
@@ -447,15 +520,8 @@ end
 local function layoutQuestLog()
     local S = Stub.state
     if Stub.flavor.legacy then
-        local scroll = _G.QuestLogListScrollFrame
-        for i = 1, Stub.QUESTS_DISPLAYED do
-            local button = scroll.buttons and scroll.buttons[i] or _G["QuestLogTitle" .. i]
-            local index = i + scroll.offset
-            local entry = S.questLog[index]
-            button:SetID(index)
-            button:SetText(entry and (entry.header or entry.title) or nil)
-            button:SetShown(entry ~= nil)
-        end
+        -- Through the global, so the addon's hook on it runs too.
+        _G.QuestLog_Update()
         return
     end
 
@@ -490,10 +556,8 @@ local function layoutQuestLog()
             if new then title:SetScript("OnClick", rowOnClick) end
             title.questID = entry.id
             title.questLogIndex = index
-            title.Text = rawget(title, "Text") or title:CreateFontString()
             title.Text:SetText(entry.title)
-            title.Checkbox = rawget(title, "Checkbox") or CreateFrame("Button", nil, title)
-            if Stub.flavor.retail then title.TagTexture = rawget(title, "TagTexture") or title:CreateTexture() end
+            if Stub.flavor.retail then title.TagTexture:SetShown(entry.tag ~= nil) end
             title:Show()
         end
     end
@@ -638,6 +702,19 @@ function Stub.Install(flavorName)
         local dialog = { which = which, text = info.text:format(textArg1, textArg2), data = data }
         table.insert(S.popups, dialog)
         return dialog
+    end
+
+    -- hooksecurefunc([table,] name, hook): hook runs after the original, with the same arguments,
+    -- and the caller still gets the original's return values.
+    _G.hooksecurefunc = function(target, name, hook)
+        if type(target) == "string" then target, name, hook = _G, target, name end
+        local original = assert(target[name], "wow_stub: hooksecurefunc on missing function " .. tostring(name))
+        local function pack(...) return { n = select("#", ...), ... } end
+        target[name] = function(...)
+            local results = pack(original(...))
+            hook(...)
+            return unpack(results, 1, results.n)
+        end
     end
 
     -- UI.
