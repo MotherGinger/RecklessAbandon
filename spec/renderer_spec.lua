@@ -406,6 +406,18 @@ for _, flavor in ipairs({ "classic", "tbc", "mists" }) do
             assert.are.equal(ROW_WIDTH - 2 - TAG_WIDTH - 4 - 30, text:GetWidth())
         end)
 
+        it("gives a row's title its whole width after the row showed a shorter one", function()
+            local mushrooms = "Stealing Back the Mushrooms" -- 27 characters, 162 pixels: fits
+            local _, Stub = boot({ { id = 101, title = "Have" }, { id = 102, title = mushrooms } })
+            local row = Stub.QuestLogRow(101)
+            -- Scrolling down one line puts the longer title on the row that showed "Have".
+            QuestLogListScrollFrame.offset = 1
+            QuestLog_Update()
+            assert.are.equal(row, Stub.QuestLogRow(102))
+            local _, _, text = rowParts(row)
+            assert.are.equal(#mushrooms * 6, text:GetWidth())
+        end)
+
         it("lays the rows out again when the client redraws them", function()
             local _, Stub = boot({ { id = 101, title = LONG_TITLE, tag = "Elite", tracked = true } })
             local _, check, text = rowParts(Stub.QuestLogRow(101))

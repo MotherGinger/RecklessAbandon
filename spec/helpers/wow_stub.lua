@@ -107,8 +107,14 @@ NewFrame = function(kind, name, parent)
         if kind == "FontString" and (self.__width or 0) == 0 then return self:GetStringWidth() end
         return self.__width or 0
     end
-    -- Text is Stub.CHAR_WIDTH pixels per character.
-    function frame:GetStringWidth() return #(self.__text or "") * Stub.CHAR_WIDTH end
+    -- Text is Stub.CHAR_WIDTH pixels per character. Like on the client, GetStringWidth stops at a set width
+    -- (the text is cut off there); GetUnboundedStringWidth is the whole text's width.
+    function frame:GetUnboundedStringWidth() return #(self.__text or "") * Stub.CHAR_WIDTH end
+    function frame:GetStringWidth()
+        local full = self:GetUnboundedStringWidth()
+        if (self.__width or 0) > 0 then return math.min(full, self.__width) end
+        return full
+    end
     -- Screen positions are nil until a test sets __left, like a frame the client hasn't placed yet.
     function frame:GetLeft() return self.__left end
     function frame:GetHeight() return self.__height or 0 end
@@ -445,6 +451,7 @@ end
 
 -- The client's QuestLog_Update: draws each row the legacy quest log shows. Like Vanilla and TBC, it sizes
 -- a tagged title for a 275-pixel row whatever the row's width, and puts the tracking check after the title.
+-- An untagged title's width is only reset when it's over 275, so a row keeps the width last set on it.
 -- Entries can set tracked = true to show the check.
 local function questLogUpdate()
     local S = Stub.state
@@ -460,10 +467,14 @@ local function questLogUpdate()
 
         local tag, check, text = questLogRowParts(row)
         text:SetText(label)
-        text:SetWidth(0)
         tag:SetText(entry and not entry.header and entry.tag and ("(" .. entry.tag .. ")") or "")
-        local textWidth = text:GetStringWidth()
-        if tag:GetText() ~= "" then text:SetWidth(275 - 15 - tag:GetStringWidth()) end
+        -- The client measures the title on a separate, unsized font string (QuestLogDummyText).
+        local textWidth = text:GetUnboundedStringWidth()
+        if tag:GetText() ~= "" then
+            text:SetWidth(275 - 15 - tag:GetStringWidth())
+        elseif text:GetWidth() > 275 then
+            text:SetWidth(260)
+        end
         check:ClearAllPoints()
         check:SetPoint("LEFT", row, "LEFT", textWidth + 24, 0)
         check:SetShown(entry ~= nil and entry.tracked == true)

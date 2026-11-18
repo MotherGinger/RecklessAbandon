@@ -366,8 +366,10 @@ function E:LayoutClassicRow(row)
         right = right - CLASSIC_CHECK_GAP - check:GetWidth()
     end
 
+    -- * Measure the whole title: GetStringWidth stops at the width last set on the row, which may have been
+    -- * for a shorter title, since Vanilla and TBC only reset an untagged title's width when it's over 275
     local available = math.max(right - GetLeftInRow(text, row), 0)
-    text:SetWidth(math.min(text:GetStringWidth(), available))
+    text:SetWidth(math.min(text:GetUnboundedStringWidth(), available))
 
     if checkShown then
         check:ClearAllPoints()
