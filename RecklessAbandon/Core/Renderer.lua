@@ -346,6 +346,20 @@ local function GetLeftInRow(region, row)
     return x or 0
 end
 
+-- * Measures a title's whole width on a hidden, unsized font string of our own, like the client's QuestLogDummyText.
+-- * A title's own font string keeps reporting the width it was cut to (on TBC Anniversary even from
+-- * GetUnboundedStringWidth), so measuring it after the client redraws a row would cut the title short again.
+local titleMeasure
+local function GetTitleWidth(text)
+    if not titleMeasure then
+        titleMeasure = QuestLogFrame:CreateFontString(nil, "BACKGROUND", "GameFontNormal")
+        titleMeasure:Hide()
+    end
+    titleMeasure:SetFontObject(text:GetFontObject() or GameFontNormal)
+    titleMeasure:SetText(text:GetText())
+    return titleMeasure:GetUnboundedStringWidth()
+end
+
 -- * A Classic row is a fixed-width button. The title and the tracking check run left to right from its
 -- * left edge, and the client pins the quest tag ("(Elite)", "(Daily)") to its right edge.
 -- * Narrowing the row moves the tag left, clear of our button. The client sizes the title for the full
@@ -366,10 +380,10 @@ function E:LayoutClassicRow(row)
         right = right - CLASSIC_CHECK_GAP - check:GetWidth()
     end
 
-    -- * Measure the whole title: GetStringWidth stops at the width last set on the row, which may have been
-    -- * for a shorter title, since Vanilla and TBC only reset an untagged title's width when it's over 275
+    -- * The width last set on the row may have been for a shorter title, since Vanilla and TBC only reset an
+    -- * untagged title's width when it's over 275, so measure the title apart from the row (see GetTitleWidth)
     local available = math.max(right - GetLeftInRow(text, row), 0)
-    text:SetWidth(math.min(text:GetUnboundedStringWidth(), available))
+    text:SetWidth(math.min(GetTitleWidth(text), available))
 
     if checkShown then
         check:ClearAllPoints()

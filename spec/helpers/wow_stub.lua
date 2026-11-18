@@ -31,7 +31,7 @@ local function noop() end
 local FRAME_NOOPS = {
     "SetFrameStrata", "SetFrameLevel", "SetClampedToScreen", "SetMovable", "EnableMouse", "EnableMouseWheel",
     "EnableKeyboard", "RegisterForClicks", "RegisterForDrag", "SetAllPoints", "SetTexCoord", "SetJustifyH",
-    "SetJustifyV", "SetFont", "SetFontObject", "SetHighlightTexture", "SetPushedTexture", "LockHighlight",
+    "SetJustifyV", "SetFont", "SetHighlightTexture", "SetPushedTexture", "LockHighlight",
     "UnlockHighlight", "SetBorderColor", "SetBackdrop", "SetBackdropColor", "SetBackdropBorderColor",
     "SetToplevel",
 }
@@ -107,14 +107,17 @@ NewFrame = function(kind, name, parent)
         if kind == "FontString" and (self.__width or 0) == 0 then return self:GetStringWidth() end
         return self.__width or 0
     end
-    -- Text is Stub.CHAR_WIDTH pixels per character. Like on the client, GetStringWidth stops at a set width
-    -- (the text is cut off there); GetUnboundedStringWidth is the whole text's width.
-    function frame:GetUnboundedStringWidth() return #(self.__text or "") * Stub.CHAR_WIDTH end
-    function frame:GetStringWidth()
-        local full = self:GetUnboundedStringWidth()
+    -- Text is Stub.CHAR_WIDTH pixels per character. A font string with a set width measures only up to it,
+    -- from GetUnboundedStringWidth too: on TBC Anniversary a title cut to a width kept reporting that width
+    -- after the client redrew the row. Only an unsized font string (like QuestLogDummyText) measures its whole text.
+    function frame:GetUnboundedStringWidth()
+        local full = #(self.__text or "") * Stub.CHAR_WIDTH
         if (self.__width or 0) > 0 then return math.min(full, self.__width) end
         return full
     end
+    function frame:GetStringWidth() return self:GetUnboundedStringWidth() end
+    function frame:SetFontObject(font) self.__fontObject = font end
+    function frame:GetFontObject() return self.__fontObject end
     -- Screen positions are nil until a test sets __left, like a frame the client hasn't placed yet.
     function frame:GetLeft() return self.__left end
     function frame:GetHeight() return self.__height or 0 end
@@ -469,7 +472,7 @@ local function questLogUpdate()
         text:SetText(label)
         tag:SetText(entry and not entry.header and entry.tag and ("(" .. entry.tag .. ")") or "")
         -- The client measures the title on a separate, unsized font string (QuestLogDummyText).
-        local textWidth = text:GetUnboundedStringWidth()
+        local textWidth = #(label or "") * Stub.CHAR_WIDTH
         if tag:GetText() ~= "" then
             text:SetWidth(275 - 15 - tag:GetStringWidth())
         elseif text:GetWidth() > 275 then
