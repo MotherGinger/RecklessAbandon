@@ -129,7 +129,12 @@ NewFrame = function(kind, name, parent)
     function frame:GetParent() return self.__parent end
     function frame:SetID(id) self.__id = id end
     function frame:GetID() return self.__id end
-    function frame:SetText(text) self.__text = text end
+    -- A button's SetText sets its label font string's text, like on the client.
+    function frame:SetText(text)
+        self.__text = text
+        local label = rawget(self, "__fontString")
+        if label then label:SetText(text) end
+    end
     function frame:GetText() return self.__text end
     function frame:SetFormattedText(pattern, ...) self.__text = pattern:format(...) end
     function frame:SetTextColor(r, g, b, a) self.__textColor = { r, g, b, a } end
@@ -442,6 +447,7 @@ local function newQuestLogRow(name, parent, width)
     check:Hide()
     local text = CreateFrame("FontString", name and name .. "NormalText", row)
     text:SetPoint("LEFT", row, "LEFT", 20, 0)
+    row.__fontString = text
     if not name then row.tag, row.check, row.normalText = tag, check, text end
     return row
 end
@@ -469,7 +475,6 @@ local function questLogUpdate()
         row:SetShown(entry ~= nil)
 
         local tag, check, text = questLogRowParts(row)
-        text:SetText(label)
         tag:SetText(entry and not entry.header and entry.tag and ("(" .. entry.tag .. ")") or "")
         -- The client measures the title on a separate, unsized font string (QuestLogDummyText).
         local textWidth = #(label or "") * Stub.CHAR_WIDTH

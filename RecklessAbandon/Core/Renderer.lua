@@ -22,7 +22,7 @@ local CLASSIC_QUEST_GAP = 4       -- Quest button, right of the row's new right 
 local CLASSIC_HEADER_GAP = 29     -- Header button, right of the row's new right edge
 local CLASSIC_TAG_INSET = 2       -- The client pins the quest tag this far in from the row's right edge
 local CLASSIC_TEXT_GAP = 4        -- Space between the title and the quest tag
-local CLASSIC_CHECK_GAP = 2       -- Space between the title and the tracking check
+local CLASSIC_CHECK_GAP = 4       -- Space between the title and the tracking check (as Vanilla and TBC place it)
 local RETAIL_BUTTON_GAP = 4       -- Space between the tracking checkbox and our button
 local RETAIL_SLOT = 16 + RETAIL_BUTTON_GAP -- How far the tracking checkbox moves left: our button plus the gap
 
@@ -360,12 +360,26 @@ local function GetTitleWidth(text)
     return titleMeasure:GetUnboundedStringWidth()
 end
 
+-- * Other addons change a row's title after the client draws it: Leatrix Plus adds quest levels ("[60D]") from
+-- * its own QuestLog_Update hook, which runs after ours. Laying the row out again whenever its title is set
+-- * measures the title it ends up with, whichever hook runs last.
+local function OnClassicRowTextSet(row)
+    if QuestLogFrame:IsShown() and row:IsShown() then
+        E:LayoutClassicRow(row)
+    end
+end
+
 -- * A Classic row is a fixed-width button. The title and the tracking check run left to right from its
 -- * left edge, and the client pins the quest tag ("(Elite)", "(Daily)") to its right edge.
 -- * Narrowing the row moves the tag left, clear of our button. The client sizes the title for the full
 -- * width (Vanilla and TBC assume 275 pixels), so the title is cut down to end before the tag and the
 -- * check is moved back to the title's end.
 function E:LayoutClassicRow(row)
+    if not row.raTitleHooked then
+        hooksecurefunc(row, "SetText", OnClassicRowTextSet)
+        row.raTitleHooked = true
+    end
+
     row:SetWidth(QuestLogListScrollFrame:GetWidth() - CLASSIC_ROW_RESERVED)
 
     local tag, check, text = GetClassicRowParts(row)

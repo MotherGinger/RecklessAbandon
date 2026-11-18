@@ -393,8 +393,8 @@ for _, flavor in ipairs({ "classic", "tbc", "mists" }) do
         it("keeps the tracking check right after the title, before the tag", function()
             local _, Stub = boot({ { id = 101, title = LONG_TITLE, tag = "Elite", tracked = true } })
             local _, check, text = rowParts(Stub.QuestLogRow(101))
-            assert.are.equal(ROW_WIDTH - 2 - TAG_WIDTH - 4 - 2 - 16 - 20, text:GetWidth())
-            assert.are.same({ "LEFT", text, "RIGHT", 2, 0 }, { check:GetPoint(1) })
+            assert.are.equal(ROW_WIDTH - 2 - TAG_WIDTH - 4 - 4 - 16 - 20, text:GetWidth())
+            assert.are.same({ "LEFT", text, "RIGHT", 4, 0 }, { check:GetPoint(1) })
         end)
 
         it("measures the title from where the client placed it", function()
@@ -423,8 +423,27 @@ for _, flavor in ipairs({ "classic", "tbc", "mists" }) do
             local _, check, text = rowParts(Stub.QuestLogRow(101))
             -- Selecting or tracking a quest redraws the rows, sizing the title for the full row again.
             QuestLog_Update()
-            assert.are.equal(ROW_WIDTH - 2 - TAG_WIDTH - 4 - 2 - 16 - 20, text:GetWidth())
-            assert.are.same({ "LEFT", text, "RIGHT", 2, 0 }, { check:GetPoint(1) })
+            assert.are.equal(ROW_WIDTH - 2 - TAG_WIDTH - 4 - 4 - 16 - 20, text:GetWidth())
+            assert.are.same({ "LEFT", text, "RIGHT", 4, 0 }, { check:GetPoint(1) })
+        end)
+
+        it("measures the title another addon sets after the client redraws the rows", function()
+            local _, Stub = boot({ { id = 101, title = "Heart of Rage", level = 63 } })
+            local row = Stub.QuestLogRow(101)
+            -- Like Leatrix Plus: a later QuestLog_Update hook puts the quest level in front of the title.
+            hooksecurefunc("QuestLog_Update", function() row:SetText("  [63D] Heart of Rage") end)
+            QuestLog_Update()
+            local _, _, text = rowParts(row)
+            assert.are.equal(#"  [63D] Heart of Rage" * 6, text:GetWidth())
+        end)
+
+        it("leaves a row's title alone while the quest log is closed", function()
+            local _, Stub = boot({ { id = 101, title = "Heart of Rage" } })
+            local row = Stub.QuestLogRow(101)
+            local _, _, text = rowParts(row)
+            Stub.CloseQuestLog()
+            row:SetText("  [63D] Heart of Rage")
+            assert.are.equal(#"Heart of Rage" * 6, text:GetWidth())
         end)
     end)
 end
