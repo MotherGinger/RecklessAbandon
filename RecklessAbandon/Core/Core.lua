@@ -910,6 +910,13 @@ function E:Initialize()
 	)
 
 	if E.hasQuestMapFrame then
+		-- * Make room on each quest row as the client hands it out, before it measures the title
+		if QuestScrollFrame.titleFramePool then
+			hooksecurefunc(QuestScrollFrame.titleFramePool, "Acquire", function()
+				E:UpdateQuestRowSpace()
+			end)
+		end
+
 		-- Initialize debounce timer
 		E.searchDebounceTimer = nil
 
@@ -998,6 +1005,16 @@ function E:Initialize()
 				end
 			end
 		)
+	end
+
+	-- * The client redraws the Classic quest log's rows on its own (selecting or tracking a quest), sizing the
+	-- * titles for the full row again; lay them out around our buttons each time
+	if not E.hasQuestMapFrame and QuestLog_Update then
+		hooksecurefunc("QuestLog_Update", function()
+			if QuestLogFrame:IsShown() then
+				E:LayoutClassicRows()
+			end
+		end)
 	end
 
 	E.initialized = true
