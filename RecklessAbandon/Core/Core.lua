@@ -771,6 +771,12 @@ local function FlattenSwitches(switches)
 	return strings
 end
 
+local function ClearPlainClickBinding(group, key)
+	if group and type(group[key]) == "string" and group[key]:match("^BUTTON%d$") then
+		group[key] = ""
+	end
+end
+
 function E:NormalizeSettings()
 	-- * Verify default settings and guard against corrupted tables
 
@@ -791,6 +797,11 @@ function E:NormalizeSettings()
 	if E.db.debugging == nil then
 		E.db.debugging = { debugLogging = false }
 	end
+
+	-- * Keybinds now need a modifier (see E.rowCatchers), so a plain click saved by an older version is unbound
+	ClearPlainClickBinding(E.db.general.individualQuests, "abandonBinding")
+	ClearPlainClickBinding(E.db.general.individualQuests, "excludeBinding")
+	ClearPlainClickBinding(E.db.general.zoneQuests, "abandonBinding")
 
 	-- Rebuild exclusion list
 	if E.private.exclusions.excludedQuests ~= nil then
@@ -873,6 +884,7 @@ function E:Initialize()
 	E.Options.args.profiles.order = 1
 
 	E:NormalizeSettings()
+	E:RegisterEvent("MODIFIER_STATE_CHANGED", "UpdateRowCatchers")
 
 	local QuestFrame = E.hasQuestMapFrame and QuestMapFrame or QuestLogFrame
 	-- * Added in Retail 11.1.0: Render buttons are hidden while the quest details pane is open
@@ -1013,6 +1025,7 @@ function E:Initialize()
 		hooksecurefunc("QuestLog_Update", function()
 			if QuestLogFrame:IsShown() then
 				E:LayoutClassicRows()
+				E:RegisterHotkeys()
 			end
 		end)
 	end

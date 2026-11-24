@@ -158,15 +158,7 @@ E.Options.args.general = {
                                 end
                             end,
                             confirm = function(_, key)
-                                if key == "BUTTON1" or key == "BUTTON2" then
-                                    return table.concat(
-                                        {
-                                            format(L["Are you sure you want to bind %s?"], key),
-                                            L["|cFFFF6B6BCaution: This can cause you to accidentally abandon a quest when trying to select a quest in your quest log.|r"]
-                                        },
-                                        "\n\n"
-                                    )
-                                elseif key == "SHIFT-BUTTON1" or key == "SHIFT-BUTTON2" then
+                                if key == "SHIFT-BUTTON1" or key == "SHIFT-BUTTON2" then
                                     return table.concat(
                                         {
                                             format(L["Are you sure you want to bind %s?"], key),
@@ -196,15 +188,7 @@ E.Options.args.general = {
                                 end
                             end,
                             confirm = function(_, key)
-                                if key == "BUTTON1" or key == "BUTTON2" then
-                                    return table.concat(
-                                        {
-                                            format(L["Are you sure you want to bind %s?"], key),
-                                            L["|cFFFF6B6BCaution: This can cause you to accidentally toggle exclusion of a quest from group abandons when trying to select a quest in your quest log.|r"]
-                                        },
-                                        "\n\n"
-                                    )
-                                elseif key == "SHIFT-BUTTON1" or key == "SHIFT-BUTTON2" then
+                                if key == "SHIFT-BUTTON1" or key == "SHIFT-BUTTON2" then
                                     return table.concat(
                                         {
                                             format(L["Are you sure you want to bind %s?"], key),
@@ -253,19 +237,6 @@ E.Options.args.general = {
                             end,
                             set = function(_, value)
                                 E.db.general.zoneQuests.abandonBinding = value
-                            end,
-                            confirm = function(_, key)
-                                if key == "BUTTON1" or key == "BUTTON2" then
-                                    return table.concat(
-                                        {
-                                            format(L["Are you sure you want to bind %s?"], key),
-                                            L["|cFFFF6B6BCaution: This can cause you to accidentally abandon all quests in a zone when trying to expand a zone header in your quest log.|r"]
-                                        },
-                                        "\n\n"
-                                    )
-                                end
-
-                                return false
                             end
                         }
                     }

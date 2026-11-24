@@ -47,54 +47,53 @@ local function GetKey(value)
     end
 end
 
+local MOUSE_BUTTON_KEYS = {
+    LeftButton = "BUTTON1",
+    RightButton = "BUTTON2",
+    MiddleButton = "BUTTON3",
+    Button4 = "BUTTON4",
+    Button5 = "BUTTON5"
+}
+
+-- * The modifiers held right now, in the order bindings store them
+local function GetModifierPrefix()
+    return (IsAltKeyDown() and "ALT-" or "") .. (IsControlKeyDown() and "CTRL-" or "") .. (IsShiftKeyDown() and "SHIFT-" or "")
+end
+
 local function GetKeybinding(button)
-    if button == "LeftButton" then
-        button = "BUTTON1"
-    elseif button == "RightButton" then
-        button = "BUTTON2"
-    elseif button == "MiddleButton" then
-        button = "BUTTON3"
-    elseif button == "Button4" then
-        button = "BUTTON4"
-    elseif button == "Button5" then
-        button = "BUTTON5"
-    end
-
-    if IsShiftKeyDown() then
-        button = "SHIFT-" .. button
-    end
-
-    if IsControlKeyDown() then
-        button = "CTRL-" .. button
-    end
-
-    if IsAltKeyDown() then
-        button = "ALT-" .. button
-    end
-
-    return button
+    return GetModifierPrefix() .. (MOUSE_BUTTON_KEYS[button] or button)
 end
 
-local function onQuestLogEntryClick(self, button, down)
-    -- * Retail includes questLogIndex on the title object
-    local info = E.Shim:GetInfo(self.questLogIndex or self:GetID())
-    local isHeader = info.isHeader
-    local abandonQuestBinding = E.db.general.individualQuests.abandonBinding
-    local excludeQuestBinding = E.db.general.individualQuests.excludeBinding
-    local groupAbandonQuestBinding = E.db.general.zoneQuests.abandonBinding
-    local binding = GetKeybinding(button)
-    local isBound = (isHeader and binding == groupAbandonQuestBinding) or binding == abandonQuestBinding or binding == excludeQuestBinding
-
-    -- * If the click matches a binding, disable default behaviors
-    -- * In retail this prevents things like the right click context menu or the full page quest description
-    if self.origOnClick and not isBound then
-        self:origOnClick(button, down)
-    end
+-- * Retail includes questLogIndex on the title object
+local function GetRowInfo(row)
+    return E.Shim:GetInfo(row.questLogIndex or row:GetID())
 end
 
-local function onQuestLogEntryMouseDown(self, button)
-    -- * Retail includes questLogIndex on the title object
-    local info = E.Shim:GetInfo(self.questLogIndex or self:GetID())
+local function UsesModifiers(binding, prefix)
+    return binding ~= nil and binding:sub(1, #prefix) == prefix and binding:sub(#prefix + 1):match("^BUTTON%d$") ~= nil
+end
+
+-- * Whether a row has a binding on exactly these modifiers. Zone bindings apply to headers, quest bindings to quests.
+local function IsRowBound(row, prefix)
+    local info = GetRowInfo(row)
+    if not info then
+        return false
+    end
+
+    if info.isHeader then
+        return UsesModifiers(E.db.general.zoneQuests.abandonBinding, prefix)
+    end
+
+    local individual = E.db.general.individualQuests
+    return UsesModifiers(individual.abandonBinding, prefix) or UsesModifiers(individual.excludeBinding, prefix)
+end
+
+local function RunRowBinding(row, button)
+    local info = GetRowInfo(row)
+    if not info then
+        return
+    end
+
     local title = info.title
     local isHeader = info.isHeader
     local questId = info.questID
@@ -103,16 +102,18 @@ local function onQuestLogEntryMouseDown(self, button)
     local groupAbandonQuestBinding = E.db.general.zoneQuests.abandonBinding
     local binding = GetKeybinding(button)
 
-    if isHeader and binding == groupAbandonQuestBinding then
-        if E.db.general.confirmGroup then
-            local dialog = StaticPopup_Show("RECKLESS_ABANDON_GROUP_CONFIRMATION", title)
-            if dialog then
-                dialog.data = GetKey(title)
+    if isHeader then
+        if binding == groupAbandonQuestBinding then
+            if E.db.general.confirmGroup then
+                local dialog = StaticPopup_Show("RECKLESS_ABANDON_GROUP_CONFIRMATION", title)
+                if dialog then
+                    dialog.data = GetKey(title)
+                end
+            else
+                E:AbandonZoneQuests(GetKey(title))
             end
-        else
-            E:AbandonZoneQuests(GetKey(title))
+            E:Debug(format(L["%s abandoned via keybinding (%s)"], title, binding))
         end
-        E:Debug(format(L["%s abandoned via keybinding (%s)"], title, binding))
     elseif binding == abandonQuestBinding then
         if E.db.general.confirmIndividual then
             local dialog = StaticPopup_Show("RECKLESS_ABANDON_CONFIRMATION", title)
@@ -138,10 +139,55 @@ local function onQuestLogEntryMouseDown(self, button)
 
         E:ShowAbandonButtons()
     end
+end
 
-    if self.origOnMouseDown then
-        self:origOnMouseDown(button)
+-- * Keybinds never touch the client's row scripts: replacing them made the client's click code run tainted.
+-- * Instead each row gets a frame of ours, shown only while a modifier bound on that row is held. It takes the
+-- * click, so the row's own behavior (selecting, the context menu) doesn't run, and every other click reaches the row.
+-- * As a child of the row it scrolls, clips and hides with it.
+E.rowCatchers = {}
+
+function E:UpdateRowCatchers()
+    local prefix = GetModifierPrefix()
+    for row, catcher in pairs(E.rowCatchers) do
+        catcher:SetShown(prefix ~= "" and row:IsVisible() and IsRowBound(row, prefix))
     end
+end
+
+-- * The client may not report a modifier released while the game lost focus (Alt-Tab), so check again on contact
+local function onCatcherEnter()
+    E:UpdateRowCatchers()
+end
+
+local function onCatcherMouseDown(catcher, button)
+    E:UpdateRowCatchers()
+    if catcher:IsShown() then
+        RunRowBinding(catcher.row, button)
+    end
+end
+
+-- * rightEdge is a control on the row that must keep working, like the tracking checkbox
+local function EnsureRowCatcher(row, rightEdge)
+    if E.rowCatchers[row] then
+        return
+    end
+
+    -- * The template passes hovering through to the row. SetPropagateMouseMotion is restricted, and rows can appear in combat
+    local catcher = CreateFrame("Frame", nil, row, "RECKLESS_ROW_CATCHER")
+    catcher.row = row
+    catcher:SetFrameLevel(row:GetFrameLevel() + 10)
+    catcher:EnableMouse(true)
+    catcher:SetScript("OnEnter", onCatcherEnter)
+    catcher:SetScript("OnMouseDown", onCatcherMouseDown)
+    if rightEdge then
+        catcher:SetPoint("TOPLEFT", row, "TOPLEFT")
+        catcher:SetPoint("BOTTOMLEFT", row, "BOTTOMLEFT")
+        catcher:SetPoint("RIGHT", rightEdge, "LEFT")
+    else
+        catcher:SetAllPoints(row)
+    end
+    catcher:Hide()
+    E.rowCatchers[row] = catcher
 end
 
 -- * Sets up a quest's abandon button and returns it; the caller places it on the row.
@@ -492,40 +538,23 @@ end
 
 function E:RegisterRetailHotkeys()
     for quest in QuestScrollFrame.titleFramePool:EnumerateActive() do
-        if not quest.hasOnMouseDownScript then
-            quest.origOnClick = quest:GetScript("OnClick")
-            quest.origOnMouseDown = quest:GetScript("OnMouseDown")
-
-            quest:SetScript("OnClick", onQuestLogEntryClick)
-            quest:SetScript("OnMouseDown", onQuestLogEntryMouseDown)
-
-            quest.hasOnMouseDownScript = true
-        end
+        EnsureRowCatcher(quest, quest.Checkbox)
     end
 
     for header in QuestScrollFrame.headerFramePool:EnumerateActive() do
-        if not header.hasOnMouseDownScript then
-            header.origOnMouseDown = header:GetScript("OnMouseDown")
-
-            header:SetScript("OnMouseDown", onQuestLogEntryMouseDown)
-
-            header.hasOnMouseDownScript = true
-        end
+        EnsureRowCatcher(header, header.CollapseButton)
     end
+
+    E:UpdateRowCatchers()
 end
 
 function E:RegisterClassicHotkeys()
-    for i = 1, E.Shim:GetNumQuestLogEntries() do
-        local questLogTitle = GetClassicRow(i)
-
-        if questLogTitle and not questLogTitle.hasOnMouseDownScript then
-            questLogTitle.origOnClick = questLogTitle:GetScript("OnClick")
-            questLogTitle.origOnMouseDown = questLogTitle:GetScript("OnMouseDown")
-
-            questLogTitle:SetScript("OnClick", onQuestLogEntryClick)
-            questLogTitle:SetScript("OnMouseDown", onQuestLogEntryMouseDown)
-
-            questLogTitle.hasOnMouseDownScript = true
+    for i = 1, QUESTS_DISPLAYED do
+        local row = GetClassicRow(i)
+        if row then
+            EnsureRowCatcher(row)
         end
     end
+
+    E:UpdateRowCatchers()
 end

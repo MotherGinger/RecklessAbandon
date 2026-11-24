@@ -32,7 +32,10 @@
 			<OnUpdate>onButtonUpdate(self)</OnUpdate>
 		</Scripts>
 	</Button>
-	
+
+	<!-- Takes bound clicks but passes hovering through, so the row keeps its highlight and tooltip -->
+	<Frame name="RECKLESS_ROW_CATCHER" virtual="true" propagateMouseInput="Motion" />
+
 	<Script file="Core.lua" />
 	<Script file="Renderer.lua" />
 	<Script file="CommandLine.lua" />
