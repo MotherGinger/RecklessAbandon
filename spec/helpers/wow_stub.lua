@@ -29,7 +29,7 @@ Stub.CHAR_WIDTH = 6
 local function noop() end
 
 local FRAME_NOOPS = {
-    "SetFrameStrata", "SetFrameLevel", "SetClampedToScreen", "SetMovable", "EnableMouse", "EnableMouseWheel",
+    "SetFrameStrata", "SetFrameLevel", "SetClampedToScreen", "SetMovable", "EnableMouseWheel",
     "EnableKeyboard", "RegisterForClicks", "RegisterForDrag", "SetAllPoints", "SetTexCoord", "SetJustifyH",
     "SetJustifyV", "SetFont", "SetHighlightTexture", "SetPushedTexture", "LockHighlight",
     "UnlockHighlight", "SetBorderColor", "SetBackdrop", "SetBackdropColor", "SetBackdropBorderColor",
@@ -58,6 +58,8 @@ NewFrame = function(kind, name, parent)
     }
     for _, method in ipairs(FRAME_NOOPS) do frame[method] = noop end
 
+    function frame:EnableMouse(enabled) self.__mouse = enabled and true or false end
+    function frame:GetFrameLevel() return 1 end
     function frame:SetScript(event, handler) self.__scripts[event] = handler end
     function frame:GetScript(event) return self.__scripts[event] end
     function frame:HookScript(event, handler)
@@ -199,6 +201,7 @@ end
 
 local function CreateFrame(kind, name, parent, template)
     local frame = NewFrame(kind, name, parent)
+    frame.__template = template
     -- Scripts from the addon's own XML templates (Loader reads them from the .xml files).
     for templateName in (template or ""):gmatch("[^,%s]+") do
         for event, body in pairs(Stub.state.templates[templateName] or {}) do
@@ -216,6 +219,10 @@ local function CreateFrame(kind, name, parent, template)
     end
     if name then _G[name] = frame end
     table.insert(Stub.state.frames, frame)
+    if parent then
+        parent.__children = rawget(parent, "__children") or {}
+        table.insert(parent.__children, frame)
+    end
     return frame
 end
 
@@ -432,6 +439,7 @@ end
 local function rowOnClick(self, button)
     table.insert(Stub.state.rowClicks, { row = self, button = button })
 end
+Stub.RowOnClick = rowOnClick
 
 -- A legacy quest log row, with the parts QuestLogTitleButtonTemplate gives it: the quest tag pinned to its
 -- right edge, the tracking check, and the title text 20 pixels in from its left edge. Classic and TBC name
@@ -864,15 +872,30 @@ function Stub.QuestLogRow(questIdOrHeader)
     end
 end
 
+--- Holds these modifier keys, and tells the UI they changed. modifiers = { alt =, ctrl =, shift = }.
+function Stub.SetModifiers(modifiers)
+    Stub.state.modifiers = modifiers or {}
+    Stub.Fire("MODIFIER_STATE_CHANGED")
+end
+
+-- A visible, mouse-enabled child on top of a frame takes the click instead of it, like on the client.
+local function clickTarget(frame)
+    for _, child in ipairs(rawget(frame, "__children") or {}) do
+        if rawget(child, "__mouse") and child:IsVisible() then return child end
+    end
+    return frame
+end
+
 --- A mouse click on a frame: OnMouseDown, then OnClick. modifiers = { alt =, ctrl =, shift = }.
 function Stub.Click(frame, mouseButton, modifiers)
     mouseButton = mouseButton or "LeftButton"
-    Stub.state.modifiers = modifiers or {}
-    local down = frame.__scripts.OnMouseDown
-    if down then down(frame, mouseButton) end
-    local click = frame.__scripts.OnClick
-    if click then click(frame, mouseButton, false) end
-    Stub.state.modifiers = {}
+    Stub.SetModifiers(modifiers)
+    local target = clickTarget(frame)
+    local down = target.__scripts.OnMouseDown
+    if down then down(target, mouseButton) end
+    local click = target.__scripts.OnClick
+    if click then click(target, mouseButton, false) end
+    Stub.SetModifiers({})
 end
 
 --- Clicks the first button of the last popup shown (or of the one given).

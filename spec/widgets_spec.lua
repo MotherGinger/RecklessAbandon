@@ -150,11 +150,21 @@ describe("RecklessKeybinding widget in use", function()
 
     it("names each mouse button the way the bindings store it", function()
         local names = { RightButton = "BUTTON2", MiddleButton = "BUTTON3", Button4 = "BUTTON4", Button5 = "BUTTON5" }
+        Stub.state.modifiers = { alt = true }
         for mouseButton, key in pairs(names) do
             run("OnClick", "LeftButton")
             run("OnMouseDown", mouseButton)
-            assert.are.equal(key, widget:GetKey())
+            assert.are.equal("ALT-" .. key, widget:GetKey())
         end
+    end)
+
+    it("won't bind a click with no modifier, and keeps listening", function()
+        widget:SetKey("ALT-BUTTON1")
+        run("OnClick", "LeftButton")
+        run("OnMouseDown", "MiddleButton")
+        assert.is_true(widget.waitingForKey)
+        assert.are.equal("ALT-BUTTON1", widget:GetKey())
+        assert.are.same({}, fired(widget, "OnKeyChanged"))
     end)
 
     it("clears the binding on Escape", function()

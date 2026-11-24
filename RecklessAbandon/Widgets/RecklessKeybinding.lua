@@ -63,6 +63,11 @@ local function Keybinding_OnKeyDown(frame, key)
                 return
             end
 
+            -- * Keybinds are caught by a frame shown while their modifier is held (see E.rowCatchers), so they need one
+            if not (IsShiftKeyDown() or IsControlKeyDown() or IsAltKeyDown()) then
+                return
+            end
+
             if IsShiftKeyDown() then
                 keyPressed = "SHIFT-" .. keyPressed
             end
@@ -223,7 +228,7 @@ local function Constructor()
     msgframe:SetToplevel(true)
 
     local msg = msgframe:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    msg:SetText("Click to bind or ESC to clear the binding.") -- TODO: Localization
+    msg:SetText("Hold Alt, Ctrl or Shift and click to bind, or press ESC to clear.") -- TODO: Localization
     msgframe.msg = msg
     msg:SetPoint("TOPLEFT", 5, -5)
     msgframe:SetScript("OnUpdate", keybindingMsgFixWidth)

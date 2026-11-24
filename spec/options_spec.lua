@@ -106,32 +106,20 @@ describe("settings window", function()
             assert.are.equal("CTRL-BUTTON2", individual.excludeBinding.get())
         end)
 
-        it("warns before binding a plain click, which selecting a quest also uses", function()
-            for _, option in ipairs({ individual.abandonBinding, individual.excludeBinding }) do
-                for _, key in ipairs({ "BUTTON1", "BUTTON2" }) do
-                    local warning = option.confirm(nil, key)
-                    assert.is_truthy(warning:find("Are you sure you want to bind " .. key, 1, true))
-                    assert.is_truthy(warning:find("select a quest", 1, true))
-                end
-            end
-        end)
-
         it("warns before binding Shift + click, which tracking a quest also uses", function()
             for _, option in ipairs({ individual.abandonBinding, individual.excludeBinding }) do
                 for _, key in ipairs({ "SHIFT-BUTTON1", "SHIFT-BUTTON2" }) do
-                    assert.is_truthy(option.confirm(nil, key):find("track a quest", 1, true))
+                    local warning = option.confirm(nil, key)
+                    assert.is_truthy(warning:find("Are you sure you want to bind " .. key, 1, true))
+                    assert.is_truthy(warning:find("track a quest", 1, true))
                 end
             end
-        end)
-
-        it("warns before binding a plain click on a zone header, which expands it", function()
-            assert.is_truthy(zone.abandonBinding.confirm(nil, "BUTTON2"):find("expand a zone header", 1, true))
         end)
 
         it("binds other keys without asking", function()
             assert.is_false(individual.abandonBinding.confirm(nil, "ALT-BUTTON1"))
             assert.is_false(individual.excludeBinding.confirm(nil, "CTRL-BUTTON2"))
-            assert.is_false(zone.abandonBinding.confirm(nil, "SHIFT-BUTTON1"))
+            assert.is_nil(zone.abandonBinding.confirm)
         end)
     end)
 

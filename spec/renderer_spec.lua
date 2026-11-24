@@ -174,8 +174,8 @@ for _, flavor in ipairs(Loader.FLAVORS) do
             it("binds the middle and side mouse buttons", function()
                 local names = { MiddleButton = "BUTTON3", Button4 = "BUTTON4", Button5 = "BUTTON5" }
                 for mouseButton, key in pairs(names) do
-                    E.db.general.individualQuests.excludeBinding = key
-                    Stub.Click(Stub.QuestLogRow(101), mouseButton)
+                    E.db.general.individualQuests.excludeBinding = "CTRL-" .. key
+                    Stub.Click(Stub.QuestLogRow(101), mouseButton, { ctrl = true })
                     assert.is_true(E:IsExcluded(101), key)
                     E:IncludeQuest(101)
                 end
